@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1f1717">
+<meta name="color-scheme" content="light dark">
+<title>Publik</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23e30e0e' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 40 36 16l24 24'/%3E%3Cpath d='M36 16v42'/%3E%3Cpath d='M18 46v14h36V46'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700&display=swap">
+<style>
+/* Publik · portal de publicación para agentes inmobiliarios. Rojo de marca (#e30e0e) como banda y acento, neutros cálidos, blanco y negro.
+   Layout: barra blanca con la marca → banda roja con titular y 3 pasos → cifras montadas sobre la banda → formulario → lotes. Una columna, máx. 920px. */
+:root{
+  --bg:#faf5f5; --panel:#ffffff; --panel-2:#fbecec; --line:#efd6d6; --line-2:#e3bcbc;
+  --fg:#1b1414; --fg-2:#5c4f4f; --fg-3:#937f7f;
+  --red:#e30e0e; --red-deep:#b80b0b; --red-ink:#ffffff; --red-soft:#fde3e3; --red-tint:#fff3f3;
+  --band:#e30e0e; --band-2:#c20c0c; --band-fg:#ffffff; --band-fg-2:rgba(255,255,255,.82);
+  --ok:#1f8a4c; --ok-soft:#dff3e7; --warn:#9a6200; --warn-soft:#fff0cc; --bad:#c21f1f; --bad-soft:#fde3e3; --info:#2d5fa8; --info-soft:#e3ecfa;
+  --display:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --r:22px; --r-s:14px; --r-xs:10px;
+  --shadow:0 18px 40px -22px rgba(120,20,20,.28), 0 2px 6px -2px rgba(120,20,20,.08);
+  --shadow-s:0 8px 20px -14px rgba(120,20,20,.25);
+  --ease-out:cubic-bezier(.23,1,.32,1);
+}
+@media (prefers-color-scheme: dark){ :root{
+  --bg:#161010; --panel:#1f1717; --panel-2:#2a1c1c; --line:#3a2828; --line-2:#4f3535;
+  --fg:#f4eeee; --fg-2:#c7b8b8; --fg-3:#8f7f7f;
+  --red:#ff4b4b; --red-deep:#ff7272; --red-ink:#1a0d0d; --red-soft:#3c1b1b; --red-tint:#2a1616;
+  --band:#c90e0e; --band-2:#a50b0b;
+  --ok:#5fd38f; --ok-soft:#1c3a28; --warn:#f0c15a; --warn-soft:#3e3010; --bad:#ff8a80; --bad-soft:#48221e; --info:#8fbcf5; --info-soft:#1a2d4c;
+  --shadow:0 18px 40px -22px rgba(0,0,0,.85), 0 2px 6px -2px rgba(0,0,0,.5); --shadow-s:0 8px 20px -14px rgba(0,0,0,.8);
+  color-scheme:dark } }
+
+*{box-sizing:border-box}
+html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.55;margin:0;min-height:100dvh}
+button,summary,.portal,.seg label{touch-action:manipulation;user-select:none;-webkit-user-select:none}
+button{font:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--red-soft);outline-offset:2px}
+p{margin:0}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;line-height:1.08}
+h1{font-size:clamp(32px,5.2vw,52px);font-weight:800;letter-spacing:-.03em}
+h2{font-size:24px;font-weight:800;letter-spacing:-.02em}
+h3{font-size:17px;font-weight:700}
+.eyebrow{font-family:var(--display);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-3)}
+.muted{color:var(--fg-2)} .small{font-size:14px} .mono{font-family:var(--mono);font-variant-numeric:tabular-nums} .num{font-variant-numeric:tabular-nums}
+.gutter{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.inner{max-width:920px;margin:0 auto}
+a{color:var(--red)}
+
+.top{background:var(--panel);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+.top .inner{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;padding-block:10px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--red)}
+.brand svg{width:34px;height:34px;flex:none}
+.brand .name{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-.04em;line-height:1;color:var(--fg)}
+.brand .name b{color:var(--red);font-weight:800}
+.who{display:flex;align-items:center;gap:10px;min-width:0}
+.who .avatar{width:34px;height:34px;border-radius:50%;background:var(--red);color:var(--red-ink);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:13px;flex:none}
+.who .txt{display:grid;line-height:1.2;min-width:0}
+.who .n{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who .p{font-size:12.5px;color:var(--fg-3)}
+.who .btn{padding:8px 14px;font-size:14px}
+@media (max-width:480px){ .who .txt{display:none} }
+
+.band{background:var(--band);color:var(--band-fg);position:relative;overflow:hidden}
+.band::before{content:"";position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='104' height='104' viewBox='0 0 104 104'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.11' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M26 56 52 30l26 26'/%3E%3Cpath d='M52 30v48'/%3E%3Cpath d='M32 62v16h40V62'/%3E%3C/g%3E%3C/svg%3E") 0 0/104px 104px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),rgba(0,0,0,.25));-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),rgba(0,0,0,.25))}
+.band::after{content:"";position:absolute;inset:auto -10% -40% -10%;height:60%;background:radial-gradient(60% 100% at 50% 100%,var(--band-2),transparent 70%);opacity:.9}
+.band .inner{position:relative;padding-block:40px 76px;display:grid;gap:26px}
+.band .eyebrow{color:var(--band-fg-2)}
+.band h1{max-width:18ch}
+.band .lead{font-size:clamp(16px,2vw,19px);color:var(--band-fg-2);max-width:52ch}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;counter-reset:paso;list-style:none;margin:0;padding:0}
+.step{position:relative;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:var(--r-s);padding:14px 16px 14px 54px;min-height:72px;display:grid;align-content:center;gap:2px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.step::before{counter-increment:paso;content:counter(paso);position:absolute;left:14px;top:50%;translate:0 -50%;width:28px;height:28px;border-radius:50%;background:#fff;color:var(--band);font-family:var(--display);font-weight:800;font-size:14px;display:grid;place-items:center}
+.step b{font-family:var(--display);font-weight:700;font-size:15px}
+.step span{font-size:13.5px;color:var(--band-fg-2)}
+@media (max-width:640px){ .steps{grid-template-columns:1fr} .band .inner{padding-block:30px 70px;gap:20px} }
+
+main.inner{display:grid;gap:28px;padding-block:0 64px}
+.lift{margin-top:-44px;position:relative}
+
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:-44px;position:relative}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-s);padding:16px 18px;box-shadow:var(--shadow);display:grid;gap:4px;min-width:0}
+.stat .lbl{font-size:12.5px;font-weight:700;color:var(--fg-3);letter-spacing:.04em;text-transform:uppercase;font-family:var(--display)}
+.stat .val{font-family:var(--display);font-weight:800;font-size:30px;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.stat .val small{font-size:15px;font-weight:700;color:var(--fg-3);letter-spacing:0}
+.stat .sub{font-size:13px;color:var(--fg-2)}
+.meter{height:6px;border-radius:999px;background:var(--panel-2);overflow:hidden;margin-top:6px}
+.meter i{display:block;height:100%;width:0;background:var(--ok);border-radius:999px;transition:width 400ms var(--ease-out),background-color 200ms ease}
+.meter.warn i{background:var(--warn)} .meter.bad i{background:var(--bad)}
+@media (max-width:720px){ .stats{grid-template-columns:repeat(2,minmax(0,1fr))} .stat .val{font-size:26px} }
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:26px;box-shadow:var(--shadow)}
+.card-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+.card-head p{max-width:56ch}
+.card.narrow{max-width:460px;margin:0 auto;width:100%}
+@media (max-width:480px){ .card{padding:20px 18px} }
+
+.notice{padding:12px 16px;border-radius:var(--r-s);font-size:15px;font-weight:600;transition:opacity 200ms var(--ease-out),transform 200ms var(--ease-out)}
+@starting-style{ .notice{opacity:0;transform:translateY(6px)} }
+.notice.warn{background:var(--warn-soft);color:var(--warn)} .notice.bad{background:var(--bad-soft);color:var(--bad)} .notice.ok{background:var(--ok-soft);color:var(--ok)} .notice.info{background:var(--info-soft);color:var(--info)}
+section[id^=view]{transition:opacity 220ms var(--ease-out)}
+@starting-style{ section[id^=view]{opacity:0} }
+
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:999px;font-size:13px;font-weight:700;white-space:nowrap;line-height:1.3;flex:none}
+.chip.ok{background:var(--ok-soft);color:var(--ok)} .chip.warn{background:var(--warn-soft);color:var(--warn)} .chip.bad{background:var(--bad-soft);color:var(--bad)} .chip.info{background:var(--info-soft);color:var(--info)} .chip.neutral{background:var(--panel-2);color:var(--fg-2)}
+.chip .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+
+.btn{border:2px solid var(--line-2);background:var(--panel);color:var(--fg);padding:11px 20px;border-radius:999px;font-weight:800;font-size:15px;font-family:var(--display);transition:transform 160ms var(--ease-out),background-color 150ms ease,border-color 150ms ease}
+@media (hover:hover) and (pointer:fine){ .btn:hover{background:var(--panel-2)} .btn.primary:hover{background:var(--red-deep);border-color:var(--red-deep)} }
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--red);color:var(--red-ink);border-color:var(--red);padding:15px 28px;font-size:17px;box-shadow:0 12px 24px -12px rgba(227,14,14,.55)}
+.btn.sm{padding:7px 13px;font-size:13.5px}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+.btn.block{width:100%}
+
+form{display:grid;gap:20px}
+.field{display:grid;gap:7px;min-width:0}
+.field label,.field .lbl{font-weight:700;color:var(--fg);font-size:15px;font-family:var(--display)}
+.inputwrap{position:relative}
+.inputwrap svg{position:absolute;left:16px;top:50%;translate:0 -50%;width:20px;height:20px;color:var(--fg-3);pointer-events:none}
+.field input:not([type=checkbox]):not([type=radio]),.field textarea,.field select{width:100%;font:inherit;font-size:16px;padding:14px 16px;border-radius:var(--r-s);border:2px solid var(--line-2);background:var(--bg);color:var(--fg);transition:border-color 150ms ease,box-shadow 150ms ease}
+.field input.big{font-size:17px;padding-left:46px}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--red);box-shadow:0 0 0 4px var(--red-soft);outline:none}
+.field textarea{min-height:70px;resize:vertical}
+.hint{font-size:13.5px;color:var(--fg-3)}
+.err{font-size:14px;color:var(--bad);font-weight:700}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.portals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.portal{position:relative;display:grid;gap:3px;padding:14px 44px 14px 16px;border:2px solid var(--line-2);border-radius:var(--r-s);background:var(--bg);cursor:pointer;transition:border-color 150ms ease,background-color 150ms ease}
+.portal input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.portal b{font-family:var(--display);font-weight:700;font-size:15px}
+.portal span{font-size:13px;color:var(--fg-2)}
+.portal .tick{position:absolute;right:14px;top:14px;width:22px;height:22px;border-radius:50%;border:2px solid var(--line-2);display:grid;place-items:center;color:transparent;transition:background-color 150ms ease,border-color 150ms ease,color 150ms ease}
+.portal .tick svg{width:12px;height:12px}
+.portal:has(input:checked){border-color:var(--red);background:var(--red-tint)}
+.portal:has(input:checked) .tick{background:var(--red);border-color:var(--red);color:var(--red-ink)}
+.portal:has(input:focus-visible){outline:3px solid var(--red-soft);outline-offset:2px}
+@media (max-width:480px){ .portals{grid-template-columns:1fr} }
+.seg{position:relative;display:grid;grid-template-columns:1fr 1fr;background:var(--panel-2);border-radius:999px;padding:4px}
+.seg .thumb{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:999px;background:var(--panel);box-shadow:var(--shadow-s);transition:transform 220ms var(--ease-out)}
+.seg[data-i="1"] .thumb{transform:translateX(100%)}
+.seg label{position:relative;z-index:1;text-align:center;padding:10px 12px;border-radius:999px;font-weight:700;font-size:15px;color:var(--fg-2);cursor:pointer;transition:color 150ms ease}
+.seg label:has(input:checked){color:var(--fg)}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.actions{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:4px;padding-top:18px}
+.rules{font-size:14px;color:var(--fg-2);max-width:44ch}
+
+.jobs{display:grid;gap:12px}
+.job{border:1px solid var(--line);border-left-width:5px;border-left-color:var(--fg-3);border-radius:var(--r-s);background:var(--panel);overflow:hidden;box-shadow:var(--shadow-s)}
+.job[data-k="ok"]{border-left-color:var(--ok)} .job[data-k="warn"]{border-left-color:var(--warn)} .job[data-k="info"]{border-left-color:var(--info)} .job[data-k="bad"]{border-left-color:var(--bad)}
+.job>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:8px 14px;padding:16px 18px;align-items:center}
+.job>summary::-webkit-details-marker{display:none}
+.job .title{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.job .title .code{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:-.01em}
+.job .pos{text-align:right;font-size:14px;color:var(--fg-2)}
+.job .meta{font-size:13.5px;color:var(--fg-3);display:flex;gap:4px 16px;flex-wrap:wrap;grid-column:1/-1}
+.job .meta span{overflow-wrap:anywhere;min-width:0}
+.job .caret{display:inline-block;transition:transform 200ms var(--ease-out);color:var(--fg-3)}
+.job[open] .caret{transform:rotate(180deg)}
+.job .body{border-top:1px solid var(--line);padding:16px 18px;display:grid;gap:12px}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:top}
+td.wrap{white-space:normal;min-width:160px;max-width:320px}
+td .small{display:block;white-space:normal;max-width:260px}
+th{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3);font-weight:700;font-family:var(--display)}
+td.num,th.num{text-align:right}
+tr:last-child td{border-bottom:0}
+.empty{padding:36px 20px;text-align:center;color:var(--fg-2);border:2px dashed var(--line-2);border-radius:var(--r);font-size:15px;display:grid;gap:8px;justify-items:center}
+.empty svg{width:44px;height:44px;color:var(--line-2)}
+footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--line)}
+.linkbox{display:grid;gap:10px;padding:14px;border-radius:var(--r-s);background:var(--panel-2);border:1px solid var(--line)}
+.linkbox code{font-family:var(--mono);font-size:12.5px;overflow-wrap:anywhere;color:var(--fg-2)}
+.inlineacts{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:480px){ .job>summary{grid-template-columns:1fr} .job .pos{text-align:left} }
+@media (prefers-reduced-motion:reduce){ .btn:active{transform:none} .notice,section[id^=view]{transition:opacity 150ms ease;transform:none} .seg .thumb,.job .caret,.meter i{transition:none} }
+</style>
+</head>
+<body>
+
+<header class="top gutter">
+  <div class="inner">
+    <div class="brand">
+      <svg viewBox="0 0 72 72" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 40 36 16l24 24"/><path d="M36 16v42"/><path d="M18 46v14h36V46"/></g></svg>
+      <span class="name">publi<b>k</b></span>
+    </div>
+    <div class="who" id="who" hidden>
+      <span class="avatar" id="whoAvatar"></span>
+      <span class="txt"><span class="n" id="whoName"></span><span class="p" id="whoPlan"></span></span>
+      <button class="btn" id="btnAdmin" type="button" hidden>Clientes</button>
+      <button class="btn" id="logout" type="button">Salir</button>
+    </div>
+  </div>
+</header>
+
+<section class="band gutter">
+  <div class="inner">
+    <div style="display:grid;gap:10px">
+      <span class="eyebrow">Publicación de propiedades</span>
+      <h1 id="bandTitle">Pega tu link. Nosotros publicamos.</h1>
+      <p class="lead" id="bandLead">Tus propiedades salen en Encuentra24 y Compre o Alquile tal como están en Flex, verificadas una por una, y te avisamos con los IDs.</p>
+    </div>
+    <ol class="steps" id="steps">
+      <li class="step"><b>Pega el link</b><span>El botón "Share" de tu selección en Flex.</span></li>
+      <li class="step"><b>Publicamos</b><span>En orden de llegada, dentro de tu plan.</span></li>
+      <li class="step"><b>Te avisamos</b><span>IDs, estado y calidad de cada aviso, aquí y por WhatsApp.</span></li>
+    </ol>
+  </div>
+</section>
+
+<main class="inner gutter">
+  <div id="banner" class="notice warn" hidden style="margin-top:20px"></div>
+
+  <!-- CARGANDO -->
+  <section id="viewLoading" class="lift"><div class="card narrow" style="text-align:center"><p class="muted">Cargando…</p></div></section>
+
+  <!-- ENTRAR -->
+  <section id="viewLogin" class="lift" hidden>
+    <div class="card narrow">
+      <div class="card-head"><div style="display:grid;gap:6px"><span class="eyebrow">Entrar</span><h2>Tu cuenta</h2><p class="muted">Solo para agentes con cuenta activa.</p></div></div>
+      <form id="formLogin" novalidate>
+        <div class="field"><label for="lEmail">Correo</label><input type="email" id="lEmail" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false"></div>
+        <div class="field"><label for="lPass">Contraseña</label><input type="password" id="lPass" autocomplete="current-password"><span class="err" id="lErr" hidden></span></div>
+        <button class="btn primary block" id="lBtn" type="submit">Entrar</button>
+        <p class="hint">¿Olvidaste tu contraseña o no tienes cuenta? Escríbele a Ramsés por WhatsApp y te mandamos un enlace nuevo.</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ACTIVAR / NUEVA CONTRASEÑA -->
+  <section id="viewActivar" class="lift" hidden>
+    <div class="card narrow">
+      <div class="card-head"><div style="display:grid;gap:6px"><span class="eyebrow">Activar cuenta</span><h2 id="actTitle">Elige tu contraseña</h2><p class="muted" id="actText">Con ella entras a Publik desde cualquier dispositivo.</p></div></div>
+      <form id="formActivar" novalidate>
+        <div class="field"><label for="aPass">Contraseña nueva</label><input type="password" id="aPass" autocomplete="new-password"><span class="hint">Mínimo 8 caracteres.</span></div>
+        <div class="field"><label for="aPass2">Repítela</label><input type="password" id="aPass2" autocomplete="new-password"><span class="err" id="aErr" hidden></span></div>
+        <button class="btn primary block" id="aBtn" type="submit">Guardar y entrar</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- PLAN VENCIDO -->
+  <section id="viewBlocked" class="lift" hidden>
+    <div class="card narrow" style="display:grid;gap:12px">
+      <span class="eyebrow">Acceso</span>
+      <h2 id="blockedTitle">Tu plan no está activo</h2>
+      <p class="muted" id="blockedText">No puedes mandar links a publicar. Cuando renueves el plan, el acceso vuelve solo y tus lotes anteriores siguen guardados.</p>
+      <div><button class="btn" id="blockedOut" type="button">Salir</button></div>
+    </div>
+  </section>
+
+  <!-- APP -->
+  <section id="viewApp" hidden style="display:grid;gap:28px">
+    <div class="stats">
+      <div class="stat"><span class="lbl">Lotes este mes</span><span class="val num" id="stLotes">0</span><span class="sub" id="stLotesSub">&nbsp;</span></div>
+      <div class="stat"><span class="lbl">Avisos publicados</span><span class="val num" id="stAvisos">0</span><span class="sub">este mes, en los dos portales</span></div>
+      <div class="stat"><span class="lbl">En cola ahora</span><span class="val num" id="stCola">0</span><span class="sub" id="stColaSub">la cola está vacía</span></div>
+      <div class="stat"><span class="lbl">Hoy</span><span class="val num" id="stHoy">0</span><div class="meter" id="stMeter"><i></i></div><span class="sub" id="stHoySub">publicaciones de tu plan</span></div>
+    </div>
+
+    <section class="card">
+      <div class="card-head"><div style="display:grid;gap:6px"><span class="eyebrow">Nuevo lote</span><h2 id="greetTitle">Hola.</h2><p class="muted" id="greetText"></p></div></div>
+      <form id="form" novalidate>
+        <div class="field">
+          <label for="share">Link de Flex</label>
+          <div class="inputwrap">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>
+            <input class="big" type="url" id="share" placeholder="https://www.flexmls.com/share/XXXXX/Selected" autocomplete="off" inputmode="url" spellcheck="false">
+          </div>
+          <span class="hint">Se publica todo lo que traiga el share, con los datos exactos de Flex, en plan gratis y sin resaltar.</span>
+          <span class="err" id="errShare" hidden></span>
+        </div>
+        <div class="row">
+          <div class="field">
+            <span class="lbl">¿Dónde?</span>
+            <div class="portals">
+              <label class="portal"><input type="checkbox" id="pE24" checked><b>Encuentra24</b><span>Cuenta de la oficina, con tu contacto</span><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.5 4.8 9 10 3.5"/></svg></span></label>
+              <label class="portal"><input type="checkbox" id="pCoA" checked><b>Compre o Alquile</b><span id="coaSub">Plan Simple</span><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.5 4.8 9 10 3.5"/></svg></span></label>
+            </div>
+            <span class="err" id="errPortal" hidden></span>
+          </div>
+          <div class="field">
+            <span class="lbl">¿Cuándo?</span>
+            <div class="seg" id="seg" data-i="0">
+              <span class="thumb" aria-hidden="true"></span>
+              <label><input type="radio" name="cuando" id="cAhora" value="ahora" checked>Lo antes posible</label>
+              <label><input type="radio" name="cuando" id="cHora" value="hora">A una hora</label>
+            </div>
+            <div class="field" id="fHora" hidden style="margin-top:4px">
+              <input type="datetime-local" id="hora" aria-label="Día y hora">
+              <span class="hint">Puede salir unos minutos después de la hora.</span>
+              <span class="err" id="errHora" hidden></span>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="notas">Nota para Bob <span class="muted" style="font-weight:400;font-family:var(--body)">(si hace falta)</span></label>
+          <textarea id="notas" placeholder="Por ejemplo: 4 propiedades cada hora empezando a las 4:30"></textarea>
+        </div>
+        <div class="actions">
+          <div class="rules" id="rules">Los lotes salen en orden de llegada y dentro del tope diario de tu plan. Si tu cuenta de Compre o Alquile no tiene cupo, te lo decimos aquí.</div>
+          <button class="btn primary" id="send" type="submit">Publicar</button>
+        </div>
+        <div class="notice ok" id="sent" hidden></div>
+      </form>
+    </section>
+
+    <section style="display:grid;gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">
+        <div style="display:grid;gap:4px"><span class="eyebrow">Historial</span><h2>Tus lotes</h2></div>
+        <span class="small muted" id="jobsCount"></span>
+      </div>
+      <div class="jobs" id="jobs"></div>
+      <div class="empty" id="jobsEmpty" hidden>
+        <svg viewBox="0 0 72 72" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 40 36 16l24 24"/><path d="M36 16v42"/><path d="M18 46v14h36V46"/></g></svg>
+        <span>Todavía no has mandado ningún lote.<br>El primero aparece aquí con su lugar en la cola.</span>
+      </div>
+    </section>
+  </section>
+
+  <!-- ADMIN -->
+  <section id="viewAdmin" hidden style="display:grid;gap:24px" class="lift">
+    <section class="card">
+      <div class="card-head"><div style="display:grid;gap:6px"><span class="eyebrow">Administración</span><h2>Clientes</h2><p class="muted">Crea cuentas, cambia planes y apaga el acceso de quien no pague. Cada cambio aplica la próxima vez que el agente abra la página.</p></div><button class="btn" id="adminBack" type="button">Volver a mis lotes</button></div>
+      <div class="tablewrap"><table id="tblClientes"><thead><tr><th>Agente</th><th>Código</th><th>Plan</th><th class="num">Tope/día</th><th class="num">Mes</th><th>CoA</th><th>Estado</th><th></th></tr></thead><tbody></tbody></table></div>
+      <div id="adminMsg" class="notice info" hidden style="margin-top:14px"></div>
+    </section>
+    <section class="card">
+      <div class="card-head"><div style="display:grid;gap:6px"><span class="eyebrow">Alta</span><h2>Nuevo cliente</h2><p class="muted">Al guardar sale un enlace de activación: mándaselo por WhatsApp. Con él elige su contraseña y entra.</p></div></div>
+      <form id="formNuevo" novalidate>
+        <div class="row">
+          <div class="field"><label for="nNombre">Nombre completo</label><input id="nNombre" autocomplete="off"></div>
+          <div class="field"><label for="nCorreo">Correo</label><input id="nCorreo" type="email" inputmode="email" autocapitalize="none" autocomplete="off"></div>
+          <div class="field"><label for="nCel">Celular (WhatsApp)</label><input id="nCel" type="tel" inputmode="tel" placeholder="+507 6xxx xxxx"></div>
+          <div class="field"><label for="nCodigo">Código de agente</label><input id="nCodigo" autocapitalize="characters" placeholder="AECC" style="text-transform:uppercase"><span class="hint">Las letras que van en los títulos de los avisos.</span></div>
+          <div class="field"><label for="nOficina">Oficina</label><input id="nOficina" value="Rent-A-House Panamá VIP"></div>
+          <div class="field"><label for="nCoa">Cuenta de Compre o Alquile</label><select id="nCoa"><option value="oficina">La de la oficina</option><option value="propia">La suya (clave al llavero de Bob)</option></select></div>
+          <div class="field"><label for="nPlan">Plan</label><select id="nPlan"><option value="Piloto">Piloto (gratis)</option><option value="Básico">Básico</option><option value="Pro">Pro</option><option value="Oficina">Oficina</option></select></div>
+          <div class="field"><label for="nLim">Tope de publicaciones por día</label><input id="nLim" type="number" inputmode="numeric" min="0" value="15"></div>
+          <div class="field"><label for="nPrecio">Precio mensual (USD)</label><input id="nPrecio" type="number" inputmode="decimal" min="0" step="0.01" value="0"></div>
+        </div>
+        <div class="field"><label for="nNotas">Notas internas</label><textarea id="nNotas" placeholder="Solo las ven los administradores."></textarea></div>
+        <div class="actions"><span class="rules" id="nErr"></span><button class="btn primary" id="nBtn" type="submit">Crear cuenta</button></div>
+        <div class="linkbox" id="nLink" hidden></div>
+      </form>
+    </section>
+  </section>
+
+  <footer>
+    <span>Publik · Operado por Bob.</span>
+    <span id="connState" class="mono">conectando…</span>
+  </footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+(() => {
+  const SB_URL = 'https://vjivvprjtydmkxsrwygf.supabase.co';
+  const SB_KEY = 'sb_publishable_iPGhThzxWVApDJomhbcL8w_PFMrvwqx';
+  const sb = window.supabase.createClient(SB_URL, SB_KEY);
+  const SHARE_RE = /^https?:\/\/(?:www\.)?flexmls\.com\/share\/([A-Za-z0-9]+)(?:\/[A-Za-z0-9\-]+)?\/?$/i;
+  const $ = (id) => document.getElementById(id);
+  const S = { user: null, cliente: null, trabajos: [], colaTotal: 0, posiciones: {}, pubsHoy: 0, canal: null, sentTimer: 0, clientes: [] };
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const iniciales = (n) => (n || '?').trim().split(/\s+/).filter(Boolean).slice(0, 2).map((w) => Array.from(w)[0].toUpperCase()).join('') || '?';
+  const fmtDT = (iso) => { if (!iso) return '—'; const d = new Date(iso); if (isNaN(d)) return iso; return d.toLocaleString('es-PA', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); };
+  const mesActual = (iso) => { const d = new Date(iso); const n = new Date(); return d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear(); };
+  const plural = (n, s, p) => `${n} ${n === 1 ? s : p}`;
+  const ESTADOS = { 'En cola': ['info', 'En cola'], 'Programado': ['info', 'Programado'], 'En proceso': ['warn', 'Publicando'], 'Publicado': ['ok', 'Publicado'], 'Con observaciones': ['warn', 'Publicado con avisos'], 'Cancelado': ['neutral', 'Cancelado'] };
+  const estadoChip = (e) => { const [k, l] = ESTADOS[e] || ['neutral', e || '—']; return `<span class="chip ${k}"><span class="dot"></span>${esc(l)}</span>`; };
+  const estadoKind = (e) => (ESTADOS[e] || ['neutral'])[0];
+  const portalNombre = (p) => p === 'coa' ? 'Compre o Alquile' : 'Encuentra24';
+  const activo = (t) => ['En cola', 'En proceso', 'Programado'].includes(t.estado);
+  const sitio = () => location.origin + location.pathname;
+  const VIEWS = ['viewLoading', 'viewLogin', 'viewActivar', 'viewBlocked', 'viewApp', 'viewAdmin'];
+  function show(v) { VIEWS.forEach((id) => { $(id).hidden = id !== v; }); $('who').hidden = !S.user || v === 'viewActivar'; $('steps').hidden = v === 'viewAdmin'; }
+  function banner(text, kind) { const b = $('banner'); if (!text) { b.hidden = true; return; } b.textContent = text; b.className = 'notice ' + (kind || 'warn'); b.hidden = false; }
+  const errMsg = (e) => { const m = (e && (e.message || e.error_description || e.error)) || ''; if (/invalid login|invalid credentials/i.test(m)) return 'Correo o contraseña incorrectos.'; if (/rate limit/i.test(m)) return 'Demasiados intentos. Espera un minuto.'; if (/network|fetch/i.test(m)) return 'Sin conexión. Intenta otra vez.'; return m || 'Algo salió mal. Intenta otra vez.'; };
+
+  // ---------- sesión ----------
+  async function arrancar() {
+    const h = location.hash || '';
+    const mAct = h.match(/^#activar=([A-Za-z0-9_\-]+)/);
+    if (mAct) {
+      history.replaceState(null, '', location.pathname + location.search);
+      show('viewLoading');
+      const { data, error } = await sb.auth.verifyOtp({ token_hash: mAct[1], type: 'recovery' });
+      if (error || !data.session) { show('viewLogin'); banner('El enlace ya no sirve (vence a la hora o ya fue usado). Pide uno nuevo.', 'bad'); return; }
+      S.user = data.session.user; show('viewActivar'); return;
+    }
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { show('viewLogin'); $('connState').textContent = 'listo'; return; }
+    S.user = session.user; await entrar();
+  }
+  sb.auth.onAuthStateChange((ev, session) => { if (ev === 'SIGNED_OUT') { S.user = null; S.cliente = null; if (S.canal) { sb.removeChannel(S.canal); S.canal = null; } show('viewLogin'); } });
+
+  async function entrar() {
+    show('viewLoading');
+    const { data: c, error } = await sb.from('clientes').select('*').eq('id', S.user.id).single();
+    if (error || !c) { show('viewLogin'); banner('Tu usuario existe pero no tiene ficha de cliente. Escríbele a Ramsés.', 'bad'); await sb.auth.signOut(); return; }
+    S.cliente = c;
+    const nombre = c.nombre.split(' ')[0];
+    $('whoAvatar').textContent = iniciales(c.nombre); $('whoName').textContent = c.nombre; $('whoPlan').textContent = `Plan ${c.plan}${c.limite_dia ? ' · ' + c.limite_dia + ' por día' : ''}`;
+    $('btnAdmin').hidden = !c.es_admin;
+    if (!c.activo) { $('blockedTitle').textContent = `${nombre}, tu plan no está activo`; show('viewBlocked'); $('who').hidden = false; return; }
+    $('greetTitle').textContent = `Hola, ${nombre}.`;
+    $('bandTitle').textContent = `Hola, ${nombre}. ¿Qué publicamos hoy?`;
+    $('coaSub').textContent = c.cuenta_coa === 'propia' ? 'Tu cuenta, plan Simple' : 'Cuenta de la oficina, plan Simple';
+    $('connState').textContent = 'conectado';
+    await cargar();
+    show(location.hash === '#admin' && c.es_admin ? 'viewAdmin' : 'viewApp');
+    if (location.hash === '#admin' && c.es_admin) cargarAdmin();
+    if (!S.canal) {
+      S.canal = sb.channel('publik-live')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'trabajos' }, () => { cargar(); if (!$('viewAdmin').hidden) cargarAdmin(); })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'clientes', filter: `id=eq.${S.user.id}` }, () => entrar())
+        .subscribe((st) => { $('connState').textContent = st === 'SUBSCRIBED' ? 'en vivo' : 'conectado'; });
+    }
+  }
+  async function cargar() {
+    const [{ data: ts }, { data: total }, { data: hoy }] = await Promise.all([
+      sb.from('trabajos').select('*').eq('cliente_id', S.user.id).order('creado', { ascending: false }).limit(300),
+      sb.rpc('cola_total'), sb.rpc('publicaciones_hoy', { c: S.user.id }),
+    ]);
+    S.trabajos = ts || []; S.colaTotal = total || 0; S.pubsHoy = hoy || 0;
+    const act = S.trabajos.filter(activo);
+    S.posiciones = {};
+    await Promise.all(act.map(async (t) => { const { data } = await sb.rpc('posicion_en_cola', { t: t.id }); S.posiciones[t.id] = data || 0; }));
+    renderAll();
+  }
+
+  // ---------- login / activar ----------
+  $('formLogin').addEventListener('submit', async (ev) => {
+    ev.preventDefault(); const b = $('lBtn'); b.disabled = true; b.textContent = 'Entrando…'; $('lErr').hidden = true; banner('');
+    const { data, error } = await sb.auth.signInWithPassword({ email: $('lEmail').value.trim(), password: $('lPass').value });
+    b.disabled = false; b.textContent = 'Entrar';
+    if (error) { $('lErr').textContent = errMsg(error); $('lErr').hidden = false; return; }
+    S.user = data.user; $('lPass').value = ''; await entrar();
+  });
+  $('formActivar').addEventListener('submit', async (ev) => {
+    ev.preventDefault(); const p = $('aPass').value, p2 = $('aPass2').value; const e = $('aErr');
+    if (p.length < 8) { e.textContent = 'La contraseña necesita al menos 8 caracteres.'; e.hidden = false; return; }
+    if (p !== p2) { e.textContent = 'Las dos contraseñas no coinciden.'; e.hidden = false; return; }
+    e.hidden = true; const b = $('aBtn'); b.disabled = true; b.textContent = 'Guardando…';
+    const { error } = await sb.auth.updateUser({ password: p });
+    b.disabled = false; b.textContent = 'Guardar y entrar';
+    if (error) { e.textContent = errMsg(error); e.hidden = false; return; }
+    $('aPass').value = ''; $('aPass2').value = ''; await entrar();
+  });
+  const salir = async () => { await sb.auth.signOut(); location.hash = ''; };
+  $('logout').addEventListener('click', salir); $('blockedOut').addEventListener('click', salir);
+  $('btnAdmin').addEventListener('click', () => { location.hash = '#admin'; show('viewAdmin'); cargarAdmin(); });
+  $('adminBack').addEventListener('click', () => { location.hash = ''; show('viewApp'); });
+
+  // ---------- formulario de lote ----------
+  const toggleHora = () => { const h = $('cHora').checked; $('fHora').hidden = !h; $('seg').dataset.i = h ? '1' : '0'; };
+  $('cAhora').addEventListener('change', toggleHora); $('cHora').addEventListener('change', toggleHora);
+  function setErr(id, msg) { const el = $(id); el.textContent = msg || ''; el.hidden = !msg; }
+  function validar() {
+    let ok = true;
+    const share = $('share').value.trim(); const m = share.match(SHARE_RE);
+    if (!m) { setErr('errShare', 'Pega el link completo de Flex, con la forma flexmls.com/share/CÓDIGO.'); ok = false; } else setErr('errShare', '');
+    const e24 = $('pE24').checked, coa = $('pCoA').checked;
+    if (!e24 && !coa) { setErr('errPortal', 'Marca al menos un portal.'); ok = false; } else setErr('errPortal', '');
+    let hora = null;
+    if ($('cHora').checked) { const v = $('hora').value; if (!v) { setErr('errHora', 'Dinos el día y la hora.'); ok = false; } else { const d = new Date(v); if (isNaN(d)) { setErr('errHora', 'Esa fecha no se entiende.'); ok = false; } else if (d.getTime() < Date.now() - 60000) { setErr('errHora', 'Esa hora ya pasó.'); ok = false; } else { setErr('errHora', ''); hora = d.toISOString(); } } }
+    return ok ? { share: m[1], url: share, portales: [e24 && 'e24', coa && 'coa'].filter(Boolean), hora } : null;
+  }
+  $('form').addEventListener('submit', async (ev) => {
+    ev.preventDefault(); if (!S.cliente) return;
+    const v = validar(); if (!v) return;
+    const btn = $('send'); btn.disabled = true; btn.textContent = 'Enviando…';
+    const doc = { cliente_id: S.user.id, share: v.share, url: v.url, portales: v.portales, cuando: v.hora ? 'hora' : 'ahora', hora_pedida: v.hora, notas: $('notas').value.trim() || null, estado: v.hora ? 'Programado' : 'En cola', origen: 'web' };
+    const { data, error } = await sb.from('trabajos').insert(doc).select().single();
+    if (error) {
+      banner(/row-level security|42501/i.test(error.message + error.code) ? 'No se pudo guardar: llegaste al tope de hoy o tu plan no está activo.' : 'No pudimos guardar el lote. Intenta otra vez en un momento.', 'bad');
+    } else {
+      banner('');
+      $('form').reset(); toggleHora();
+      await cargar();
+      const pos = S.posiciones[data.id] || 1;
+      const s = $('sent'); s.textContent = v.hora ? `Listo. El lote ${v.share} queda para el ${fmtDT(v.hora)}. Bob prepara las fichas antes y publica a esa hora.` : `Listo. El lote ${v.share} entró en la cola en el lugar ${pos}. Bob lo toma en los próximos minutos.`; s.hidden = false; clearTimeout(S.sentTimer); S.sentTimer = setTimeout(() => { s.hidden = true; }, 12000);
+    }
+    btn.disabled = false; btn.textContent = 'Publicar'; renderAll();
+  });
+
+  function renderAll() {
+    const c = S.cliente; if (!c) return;
+    const mios = S.trabajos;
+    const mes = mios.filter((t) => mesActual(t.creado));
+    const pubs = mes.reduce((n, t) => n + (t.resultados || []).filter((r) => r.estado === 'Activo').length, 0);
+    const miosEnCola = mios.filter(activo).length;
+    const ultimoCupo = mios.filter((t) => t.resumen && t.resumen.cupoCoa != null).sort((a, b) => (b.fin || b.creado || '').localeCompare(a.fin || a.creado || ''))[0];
+    const lim = c.limite_dia || 0, pubsHoy = S.pubsHoy;
+    const topeLleno = lim > 0 && pubsHoy >= lim;
+    const ratio = lim ? Math.min(1, pubsHoy / lim) : 0;
+    $('stLotes').textContent = mes.length;
+    $('stLotesSub').textContent = mes.length ? `${plural(mios.length, 'lote', 'lotes')} en total` : 'todavía ninguno este mes';
+    $('stAvisos').textContent = pubs;
+    $('stCola').textContent = S.colaTotal;
+    $('stColaSub').textContent = S.colaTotal ? (miosEnCola ? `${plural(miosEnCola, 'lote tuyo', 'lotes tuyos')} esperando` : 'de otros agentes, antes que el tuyo') : 'la cola está vacía';
+    $('stHoy').innerHTML = lim ? `${pubsHoy}<small> / ${lim}</small>` : `${pubsHoy}`;
+    const meter = $('stMeter'); meter.className = 'meter' + (topeLleno ? ' bad' : ratio >= .8 ? ' warn' : ''); meter.firstElementChild.style.width = (ratio * 100) + '%';
+    $('stHoySub').textContent = topeLleno ? 'tope de hoy alcanzado' : lim ? `publicaciones de tu plan ${c.plan}` : 'sin tope diario';
+    $('send').disabled = topeLleno; $('send').textContent = topeLleno ? 'Tope de hoy alcanzado' : 'Publicar';
+    $('rules').textContent = topeLleno ? `Llegaste a las ${lim} publicaciones de hoy. El siguiente lote sale mañana; puedes dejarlo programado.` : 'Los lotes salen en orden de llegada y dentro del tope diario de tu plan. Si tu cuenta de Compre o Alquile no tiene cupo, te lo decimos aquí.';
+    $('greetText').textContent = (ultimoCupo ? `Tu cupo en Compre o Alquile tras el último lote: ${ultimoCupo.resumen.cupoCoa}. ` : '') + 'Una publicación es una propiedad en un portal; una propiedad en los dos portales cuenta dos.';
+    const box = $('jobs'); box.innerHTML = '';
+    $('jobsEmpty').hidden = mios.length > 0;
+    $('jobsCount').textContent = mios.length ? plural(mios.length, 'lote', 'lotes') : '';
+    mios.forEach((t, i) => {
+      const d = document.createElement('details'); d.className = 'job'; d.dataset.k = estadoKind(t.estado); if (i === 0) d.open = true;
+      const res = t.resultados || [];
+      const act = res.filter((r) => r.estado === 'Activo').length, falt = res.filter((r) => r.estado !== 'Activo').length;
+      const pos = S.posiciones[t.id] || 0;
+      const resumenTxt = ['Publicado', 'Con observaciones'].includes(t.estado) ? `${plural(act, 'activa', 'activas')}${falt ? ` · ${falt} sin publicar` : ''}` : (pos ? `lugar ${pos} en la cola` : '');
+      const vacio = t.estado === 'Programado' ? 'Bob prepara las fichas antes de la hora pedida y publica a esa hora.' : t.estado === 'En proceso' ? 'Publicando ahora. Los IDs aparecen aquí al verificar cada portal.' : t.estado === 'En cola' ? 'En espera de que Bob lo tome. Se procesa en orden de llegada.' : 'Sin resultados registrados.';
+      d.innerHTML = `
+        <summary>
+          <div class="title"><span class="code">${esc(t.share)}</span>${estadoChip(t.estado)}<span class="small muted">${esc((t.portales || []).map(portalNombre).join(' + '))}</span></div>
+          <div class="pos num">${esc(resumenTxt)} <span class="caret">▾</span></div>
+          <div class="meta"><span>Enviado ${fmtDT(t.creado)}</span>${t.hora_pedida ? `<span>Pedido para ${fmtDT(t.hora_pedida)}</span>` : ''}${t.inicio ? `<span>Publicado ${fmtDT(t.inicio)}${t.fin ? ' → ' + fmtDT(t.fin) : ''}</span>` : ''}${t.notas ? `<span>Nota: ${esc(t.notas)}</span>` : ''}</div>
+        </summary>
+        <div class="body">
+          ${t.resumen && t.resumen.texto ? `<p class="small">${esc(t.resumen.texto)}</p>` : ''}
+          ${res.length ? `<div class="tablewrap"><table><thead><tr><th>MLS</th><th>Propiedad</th><th>Portal</th><th>ID</th><th>Estado</th><th class="num">Calidad</th></tr></thead><tbody>` +
+            res.map((r) => `<tr><td class="mono">${esc(r.mls)}</td><td class="wrap">${esc(r.titulo || '')}</td><td>${portalNombre(r.portal)}</td><td class="mono">${esc(r.id || '—')}</td><td>${r.estado === 'Activo' ? '<span class="chip ok"><span class="dot"></span>Activo</span>' : `<span class="chip warn"><span class="dot"></span>${esc(r.estado)}</span>`}${r.nota ? ` <span class="small muted">${esc(r.nota)}</span>` : ''}</td><td class="num">${r.calidad != null ? (r.calidad < 90 ? `<span class="chip warn">${r.calidad}</span>` : r.calidad) : '—'}</td></tr>`).join('') +
+            `</tbody></table></div>` : `<p class="small muted">${vacio}</p>`}
+        </div>`;
+      box.appendChild(d);
+    });
+  }
+
+  // ---------- administración ----------
+  async function llamarAdmin(body) {
+    const { data, error } = await sb.functions.invoke('admin', { body: { ...body, sitio: sitio() } });
+    if (error) { let m = error.message; try { const j = await error.context.json(); m = j.error || m; } catch (e) {} throw new Error(m); }
+    if (data && data.error) throw new Error(data.error);
+    return data;
+  }
+  function adminMsg(t, k) { const m = $('adminMsg'); if (!t) { m.hidden = true; return; } m.textContent = t; m.className = 'notice ' + (k || 'info'); m.hidden = false; }
+  async function cargarAdmin() {
+    const [{ data: cs }, { data: ts }] = await Promise.all([sb.from('clientes').select('*').order('nombre'), sb.from('trabajos').select('cliente_id, creado, resultados')]);
+    S.clientes = cs || [];
+    const porCliente = {}; (ts || []).forEach((t) => { if (!mesActual(t.creado)) return; porCliente[t.cliente_id] = (porCliente[t.cliente_id] || 0) + (t.resultados || []).filter((r) => r.estado === 'Activo').length; });
+    const tb = $('tblClientes').querySelector('tbody'); tb.innerHTML = '';
+    S.clientes.forEach((c) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td class="wrap"><b>${esc(c.nombre)}</b>${c.es_admin ? ' <span class="chip neutral">admin</span>' : ''}<span class="small muted">${esc(c.correo)}${c.celular ? ' · ' + esc(c.celular) : ''}</span></td><td class="mono">${esc(c.codigo)}</td><td>${esc(c.plan)}${c.precio_mes ? ` <span class="small muted">$${c.precio_mes}</span>` : ''}</td><td class="num">${c.limite_dia}</td><td class="num">${porCliente[c.id] || 0}</td><td>${c.cuenta_coa === 'propia' ? 'propia' : 'oficina'}</td><td>${c.activo ? '<span class="chip ok"><span class="dot"></span>Activo</span>' : '<span class="chip bad"><span class="dot"></span>Apagado</span>'}</td><td><div class="inlineacts"><button class="btn sm" data-a="toggle" data-id="${c.id}" type="button">${c.activo ? 'Apagar' : 'Activar'}</button><button class="btn sm" data-a="plan" data-id="${c.id}" type="button">Plan</button><button class="btn sm" data-a="enlace" data-id="${c.id}" type="button">Enlace</button></div></td>`;
+      tb.appendChild(tr);
+    });
+  }
+  $('tblClientes').addEventListener('click', async (ev) => {
+    const b = ev.target.closest('button[data-a]'); if (!b) return;
+    const c = S.clientes.find((x) => x.id === b.dataset.id); if (!c) return;
+    b.disabled = true;
+    try {
+      if (b.dataset.a === 'toggle') { await llamarAdmin({ accion: 'actualizar', id: c.id, cambios: { activo: !c.activo } }); adminMsg(`${c.nombre}: ${c.activo ? 'acceso apagado' : 'acceso activado'}.`, 'ok'); }
+      else if (b.dataset.a === 'plan') {
+        const tr = b.closest('tr'); const celda = tr.children[2];
+        celda.innerHTML = `<div class="inlineacts"><select class="btn sm" data-f="plan">${['Piloto', 'Básico', 'Pro', 'Oficina'].map((p) => `<option ${p === c.plan ? 'selected' : ''}>${p}</option>`).join('')}</select><input class="btn sm" data-f="lim" type="number" min="0" value="${c.limite_dia}" style="width:72px" aria-label="Tope por día"><input class="btn sm" data-f="precio" type="number" min="0" step="0.01" value="${c.precio_mes}" style="width:88px" aria-label="Precio mensual"><button class="btn sm primary" data-a="guardarPlan" data-id="${c.id}" type="button">Guardar</button></div>`;
+        b.disabled = false; return;
+      }
+      else if (b.dataset.a === 'guardarPlan') {
+        const tr = b.closest('tr'); const plan = tr.querySelector('[data-f=plan]').value, lim = Number(tr.querySelector('[data-f=lim]').value), precio = Number(tr.querySelector('[data-f=precio]').value);
+        await llamarAdmin({ accion: 'actualizar', id: c.id, cambios: { plan, limite_dia: lim, precio_mes: precio } }); adminMsg(`${c.nombre}: plan ${plan}, ${lim} por día, $${precio}/mes.`, 'ok');
+      }
+      else if (b.dataset.a === 'enlace') { const r = await llamarAdmin({ accion: 'enlace', id: c.id }); mostrarEnlace(c, r.enlace, $('adminMsg')); b.disabled = false; return; }
+      await cargarAdmin();
+    } catch (e) { adminMsg(errMsg(e), 'bad'); b.disabled = false; }
+  });
+  function mostrarEnlace(c, enlace, donde) {
+    const tel = String(c.celular || '').replace(/\D/g, '');
+    const texto = `Hola ${c.nombre.split(' ')[0]}, tu acceso a Publik está listo. Entra aquí y elige tu contraseña (el enlace vence en una hora): ${enlace}`;
+    donde.className = 'linkbox'; donde.hidden = false;
+    donde.innerHTML = `<b>Enlace de activación para ${esc(c.nombre)}</b><code>${esc(enlace)}</code><div class="inlineacts"><button class="btn sm" type="button" data-copy>Copiar enlace</button>${tel ? `<a class="btn sm" href="https://wa.me/${tel}?text=${encodeURIComponent(texto)}" target="_blank" rel="noopener">Mandar por WhatsApp</a>` : ''}</div><span class="hint">Vence en una hora. Si vence, pulsa "Enlace" en su fila y sale uno nuevo.</span>`;
+    donde.querySelector('[data-copy]').addEventListener('click', async (ev) => { try { await navigator.clipboard.writeText(enlace); ev.target.textContent = 'Copiado'; } catch (e) { const r = document.createRange(); r.selectNodeContents(donde.querySelector('code')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } });
+  }
+  $('formNuevo').addEventListener('submit', async (ev) => {
+    ev.preventDefault(); const e = $('nErr'); e.textContent = ''; const b = $('nBtn');
+    const cliente = { nombre: $('nNombre').value.trim(), correo: $('nCorreo').value.trim().toLowerCase(), celular: $('nCel').value.trim(), codigo: $('nCodigo').value.trim().toUpperCase(), oficina: $('nOficina').value.trim(), cuenta_coa: $('nCoa').value, plan: $('nPlan').value, limite_dia: Number($('nLim').value), precio_mes: Number($('nPrecio').value), notas: $('nNotas').value.trim() };
+    if (!cliente.nombre || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(cliente.correo) || !cliente.codigo) { e.textContent = 'Faltan nombre, correo válido o código.'; return; }
+    b.disabled = true; b.textContent = 'Creando…';
+    try {
+      const r = await llamarAdmin({ accion: 'crear', cliente });
+      mostrarEnlace({ ...cliente }, r.enlace, $('nLink'));
+      $('formNuevo').reset(); $('nOficina').value = 'Rent-A-House Panamá VIP'; $('nLim').value = 15; $('nPrecio').value = 0;
+      await cargarAdmin();
+    } catch (err) { e.textContent = errMsg(err); }
+    b.disabled = false; b.textContent = 'Crear cuenta';
+  });
+
+  arrancar();
+})();
+</script>
+</body>
+</html>
