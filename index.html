@@ -40,7 +40,7 @@
 html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
 [hidden]{display:none!important}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.55;margin:0;min-height:100dvh}
-button,summary,.portal,.seg label{touch-action:manipulation;user-select:none;-webkit-user-select:none}
+button,summary,.pill,.seg label{touch-action:manipulation;user-select:none;-webkit-user-select:none}
 button{font:inherit;cursor:pointer}
 button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--red-soft);outline-offset:2px}
 p{margin:0}
@@ -133,19 +133,24 @@ form{display:grid;gap:20px}
 .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--red);box-shadow:0 0 0 4px var(--red-soft);outline:none}
 .field textarea{min-height:70px;resize:vertical}
 .hint{font-size:13.5px;color:var(--fg-3)}
+.links{display:grid;gap:14px}
+.linkrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:start}
+.linkmain{display:grid;gap:10px;min-width:0}
+.linkrow .x{margin-top:7px}
+.linkrow .x{width:40px;height:40px;border-radius:50%;border:0;background:transparent;color:var(--fg-3);font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center;transition:background-color 150ms ease,color 150ms ease}
+.linkrow .x:hover{background:var(--panel-2);color:var(--fg)}
+.field input.bad{border-color:var(--bad)}
+.addlink{justify-self:start;border:0;background:transparent;padding:0;font:inherit;font-size:13.5px;font-weight:700;color:var(--fg-2);cursor:pointer}
+.addlink:hover{color:var(--red)}
 .err{font-size:14px;color:var(--bad);font-weight:700}
 .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
-.portals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.portal{position:relative;display:grid;gap:3px;padding:16px 44px 16px 16px;border:2px solid var(--line-2);border-radius:var(--r-s);background:var(--bg);cursor:pointer;transition:border-color 150ms ease,background-color 150ms ease}
-.portal input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
-.portal b{font-family:var(--display);font-weight:700;font-size:15px}
-.portal span{font-size:13px;color:var(--fg-2)}
-.portal .tick{position:absolute;right:14px;top:14px;width:22px;height:22px;border-radius:50%;border:2px solid var(--line-2);display:grid;place-items:center;color:transparent;transition:background-color 150ms ease,border-color 150ms ease,color 150ms ease}
-.portal .tick svg{width:12px;height:12px}
-.portal:has(input:checked){border-color:var(--red);background:var(--red-tint)}
-.portal:has(input:checked) .tick{background:var(--red);border-color:var(--red);color:var(--red-ink)}
-.portal:has(input:focus-visible){outline:3px solid var(--red-soft);outline-offset:2px}
-@media (max-width:480px){ .portals{grid-template-columns:1fr} }
+.pills{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.pill{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 10px;white-space:nowrap;min-width:0;border-radius:999px;border:2px solid var(--line-2);background:var(--bg);font-size:13.5px;font-weight:700;color:var(--fg-2);cursor:pointer;transition:border-color 150ms ease,background-color 150ms ease,color 150ms ease}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--line-2);transition:background-color 150ms ease}
+.pill input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.pill:has(input:checked){border-color:var(--red);background:var(--red-tint);color:var(--fg)}
+.pill:has(input:checked)::before{background:var(--red)}
+.pill:has(input:focus-visible){outline:3px solid var(--red-soft);outline-offset:2px}
 .seg{position:relative;display:grid;grid-template-columns:1fr 1fr;background:var(--panel-2);border-radius:999px;padding:4px}
 .seg .thumb{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:999px;background:var(--panel);box-shadow:var(--shadow-s);transition:transform 220ms var(--ease-out)}
 .seg[data-i="1"] .thumb{transform:translateX(100%)}
@@ -292,19 +297,14 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
       <form id="form" novalidate>
         <div class="field">
           <label for="share">Link de Flex</label>
-          <input class="big" type="url" id="share" placeholder="https://www.flexmls.com/share/XXXXX/Selected" autocomplete="off" inputmode="url" spellcheck="false">
-          <span class="hint">Se publica todo lo que traiga el share, tal como está en Flex.</span>
+          <div class="links" id="links">
+            <div class="linkrow"><div class="linkmain"><input class="big" type="url" id="share" placeholder="https://www.flexmls.com/share/XXXXX/Selected" autocomplete="off" inputmode="url" spellcheck="false"><div class="pills"><label class="pill"><input type="checkbox" data-p="e24" checked>Encuentra24</label><label class="pill"><input type="checkbox" data-p="coa" checked>Compre o Alquile</label></div></div></div>
+          </div>
+          <span class="hint">Se publica todo lo que traiga cada share, tal como está en Flex.</span>
+          <button class="addlink" id="addLink" type="button">+ Otro link</button>
           <span class="err" id="errShare" hidden></span>
         </div>
         <div class="row">
-          <div class="field">
-            <span class="lbl">¿Dónde?</span>
-            <div class="portals">
-              <label class="portal"><input type="checkbox" id="pE24" checked><b>Encuentra24</b><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.5 4.8 9 10 3.5"/></svg></span></label>
-              <label class="portal"><input type="checkbox" id="pCoA" checked><b>Compre o Alquile</b><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.5 4.8 9 10 3.5"/></svg></span></label>
-            </div>
-            <span class="err" id="errPortal" hidden></span>
-          </div>
           <div class="field">
             <span class="lbl">¿Cuándo?</span>
             <div class="seg" id="seg" data-i="0">
@@ -401,7 +401,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 01:01</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 07:33</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -527,36 +527,76 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   const toggleHora = () => { const h = $('cHora').checked; $('fHora').hidden = !h; $('seg').dataset.i = h ? '1' : '0'; };
   $('cAhora').addEventListener('change', toggleHora); $('cHora').addEventListener('change', toggleHora);
   function setErr(id, msg) { const el = $(id); el.textContent = msg || ''; el.hidden = !msg; }
+  // Varios links por envío (pedido de Andrés, 22/oct): cada link es su propio lote; portales, hora y nota se comparten.
+  const MAX_LINKS = 10;
+  const linkRows = () => [...$('links').querySelectorAll('.linkrow')];
+  const linkInputs = () => linkRows().map((r) => r.querySelector('input[type=url]'));
+  const portalesDe = (row) => [...row.querySelectorAll('input[data-p]')].filter((c) => c.checked).map((c) => c.dataset.p);
+  const PILLS = '<div class="pills"><label class="pill"><input type="checkbox" data-p="e24" checked>Encuentra24</label><label class="pill"><input type="checkbox" data-p="coa" checked>Compre o Alquile</label></div>';
+  function agregarLink(focus = true) {
+    const rows = linkRows(); if (rows.length >= MAX_LINKS) return;
+    // Si el link anterior va a un solo portal, el nuevo arranca con el otro (Ramsés, 22/oct); si va a los dos, con los dos.
+    const prev = portalesDe(rows[rows.length - 1]);
+    const defecto = prev.length === 1 ? ['e24', 'coa'].filter((p) => p !== prev[0]) : ['e24', 'coa'];
+    const row = document.createElement('div'); row.className = 'linkrow';
+    row.innerHTML = '<div class="linkmain"><input class="big" type="url" placeholder="https://www.flexmls.com/share/XXXXX/Selected" autocomplete="off" inputmode="url" spellcheck="false" aria-label="Otro link de Flex">' + PILLS + '</div><button class="x" type="button" aria-label="Quitar este link">×</button>';
+    row.querySelectorAll('input[data-p]').forEach((c) => { c.checked = defecto.includes(c.dataset.p); });
+    row.querySelector('.x').addEventListener('click', () => { row.remove(); $('addLink').hidden = false; });
+    $('links').appendChild(row);
+    $('addLink').hidden = linkRows().length >= MAX_LINKS;
+    if (focus) row.querySelector('input[type=url]').focus();
+  }
+  function resetLinks() { linkRows().slice(1).forEach((r) => r.remove()); linkInputs().forEach((i) => i.classList.remove('bad')); $('links').querySelectorAll('input[data-p]').forEach((c) => { c.checked = true; }); $('addLink').hidden = false; }
+  $('addLink').addEventListener('click', () => agregarLink());
+  $('links').addEventListener('input', (ev) => { if (ev.target.type === 'url') ev.target.classList.remove('bad'); });
   function validar() {
     let ok = true;
-    const share = $('share').value.trim(); const m = share.match(SHARE_RE);
-    if (!m) { setErr('errShare', 'Pega el link completo de Flex, con la forma flexmls.com/share/CÓDIGO.'); ok = false; } else setErr('errShare', '');
-    const e24 = $('pE24').checked, coa = $('pCoA').checked;
-    if (!e24 && !coa) { setErr('errPortal', 'Marca al menos un portal.'); ok = false; } else setErr('errPortal', '');
+    const rows = linkRows(); const lotes = []; const vistos = new Set();
+    rows.forEach((row, i) => {
+      const inp = row.querySelector('input[type=url]'); const url = inp.value.trim(); inp.classList.remove('bad');
+      const n = rows.length > 1 ? `El link ${i + 1}` : 'El link';
+      if (!url) { if (i === 0) { inp.classList.add('bad'); setErr('errShare', 'Pega el link completo de Flex, con la forma flexmls.com/share/CÓDIGO.'); ok = false; } return; }
+      const m = url.match(SHARE_RE);
+      if (!m) { inp.classList.add('bad'); if (ok) setErr('errShare', rows.length > 1 ? `${n} no tiene la forma flexmls.com/share/CÓDIGO.` : 'Pega el link completo de Flex, con la forma flexmls.com/share/CÓDIGO.'); ok = false; return; }
+      const k = m[1].toLowerCase();
+      if (vistos.has(k)) { inp.classList.add('bad'); if (ok) setErr('errShare', `${n} está repetido (${m[1]}).`); ok = false; return; }
+      const portales = portalesDe(row);
+      if (!portales.length) { inp.classList.add('bad'); if (ok) setErr('errShare', `${n} necesita al menos un portal.`); ok = false; return; }
+      vistos.add(k); lotes.push({ share: m[1], url, portales });
+    });
+    if (ok) setErr('errShare', '');
     let hora = null;
     if ($('cHora').checked) { const v = $('hora').value; if (!v) { setErr('errHora', 'Dinos el día y la hora.'); ok = false; } else { const d = new Date(v); if (isNaN(d)) { setErr('errHora', 'Esa fecha no se entiende.'); ok = false; } else if (d.getTime() < Date.now() - 60000) { setErr('errHora', 'Esa hora ya pasó.'); ok = false; } else { setErr('errHora', ''); hora = d.toISOString(); } } }
-    return ok ? { share: m[1], url: share, portales: [e24 && 'e24', coa && 'coa'].filter(Boolean), hora } : null;
+    return ok ? { lotes, hora } : null;
   }
   $('form').addEventListener('submit', async (ev) => {
     ev.preventDefault(); if (!S.cliente) return;
     const v = validar(); if (!v) return;
-    const activoIgual = S.trabajos.find((t) => t.share.toLowerCase() === v.share.toLowerCase() && activo(t));
-    if (activoIgual) { setErr('errShare', `Ese lote ya está ${activoIgual.estado === 'Programado' ? 'programado' : 'en la cola'}; no hace falta mandarlo otra vez.`); return; }
-    const reciente = S.trabajos.find((t) => t.share.toLowerCase() === v.share.toLowerCase() && !activo(t) && (Date.now() - new Date(t.creado).getTime()) < 7 * 86400000);
-    if (reciente && S.confirmarRepetido !== v.share) { S.confirmarRepetido = v.share; setErr('errShare', `Este lote ya lo publicamos el ${fmtDT(reciente.fin || reciente.creado)}. Si quieres repetirlo, pulsa Publicar otra vez.`); return; }
+    const mismo = (t, l) => t.share.toLowerCase() === l.share.toLowerCase();
+    const yaActivo = v.lotes.find((l) => S.trabajos.some((t) => mismo(t, l) && activo(t)));
+    if (yaActivo) { const t = S.trabajos.find((t) => mismo(t, yaActivo) && activo(t)); setErr('errShare', `El lote ${yaActivo.share} ya está ${t.estado === 'Programado' ? 'programado' : 'en la cola'}; no hace falta mandarlo otra vez.`); return; }
+    const repetidos = v.lotes.map((l) => ({ l, t: S.trabajos.find((t) => mismo(t, l) && !activo(t) && (Date.now() - new Date(t.creado).getTime()) < 7 * 86400000) })).filter((x) => x.t);
+    const claveRep = repetidos.map((x) => x.l.share.toLowerCase()).sort().join(',');
+    if (repetidos.length && S.confirmarRepetido !== claveRep) { S.confirmarRepetido = claveRep; const x = repetidos[0]; setErr('errShare', repetidos.length === 1 ? `El lote ${x.l.share} ya lo publicamos el ${fmtDT(x.t.fin || x.t.creado)}. Si quieres repetirlo, pulsa Publicar otra vez.` : `Los lotes ${repetidos.map((r) => r.l.share).join(', ')} ya los publicamos antes. Si quieres repetirlos, pulsa Publicar otra vez.`); return; }
     S.confirmarRepetido = null;
     const btn = $('send'); btn.disabled = true; btn.textContent = 'Enviando…';
-    const doc = { cliente_id: S.user.id, share: v.share, url: v.url, portales: v.portales, cuando: v.hora ? 'hora' : 'ahora', hora_pedida: v.hora, notas: $('notas').value.trim() || null, estado: v.hora ? 'Programado' : 'En cola', origen: 'web' };
-    const { data, error } = await sb.from('trabajos').insert(doc).select().single();
+    const notas = $('notas').value.trim() || null;
+    const docs = v.lotes.map((l) => ({ cliente_id: S.user.id, share: l.share, url: l.url, portales: l.portales, cuando: v.hora ? 'hora' : 'ahora', hora_pedida: v.hora, notas, estado: v.hora ? 'Programado' : 'En cola', origen: 'web' }));
+    const { data, error } = await sb.from('trabajos').insert(docs).select();
     if (error) {
       const txt = error.message + ' ' + error.code;
-      banner(/23505|trabajos_share_activo_unico/i.test(txt) ? 'Ese lote ya está en la cola.' : /row-level security|42501/i.test(txt) ? 'No se pudo guardar: llegaste al tope de hoy o tu plan no está activo.' : 'No pudimos guardar el lote. Intenta otra vez en un momento.', 'bad');
+      banner(/23505|trabajos_share_activo_unico/i.test(txt) ? 'Uno de esos lotes ya está en la cola.' : /row-level security|42501/i.test(txt) ? 'No se pudo guardar: llegaste al tope de hoy o tu plan no está activo.' : 'No pudimos guardar el lote. Intenta otra vez en un momento.', 'bad');
     } else {
       banner('');
-      $('form').reset(); toggleHora();
+      $('form').reset(); resetLinks(); toggleHora();
       await cargar();
-      const pos = S.posiciones[data.id] || 1;
-      confirmarRecibido(v.hora ? `Tu lote ${v.share} queda programado para el ${fmtDT(v.hora)}. Te avisamos cuando esté publicado.` : `Tu lote ${v.share} entró en la cola${pos > 1 ? `, lugar ${pos}` : ''}. Lo publicamos en los próximos minutos y te avisamos.`);
+      const n = docs.length, codigos = docs.map((d) => d.share).join(', ');
+      if (n === 1) {
+        const pos = S.posiciones[data[0].id] || 1;
+        confirmarRecibido(v.hora ? `Tu lote ${codigos} queda programado para el ${fmtDT(v.hora)}. Te avisamos cuando esté publicado.` : `Tu lote ${codigos} entró en la cola${pos > 1 ? `, lugar ${pos}` : ''}. Lo publicamos en los próximos minutos y te avisamos.`);
+      } else {
+        confirmarRecibido(v.hora ? `Tus ${n} lotes (${codigos}) quedan programados para el ${fmtDT(v.hora)}. Te avisamos cuando estén publicados.` : `Tus ${n} lotes (${codigos}) entraron en la cola. Los publicamos en los próximos minutos y te avisamos.`);
+      }
     }
     btn.disabled = false; btn.textContent = 'Publicar'; renderAll();
   });
