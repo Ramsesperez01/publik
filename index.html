@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700&display=swap">
 <style>
 /* Publik · portal de publicación para agentes inmobiliarios. Rojo de marca (#e30e0e) como banda y acento, neutros cálidos, blanco y negro.
-   Layout: barra blanca con la marca → banda roja con titular y 3 pasos → cifras montadas sobre la banda → formulario → lotes. Una columna, máx. 920px. */
+   Layout: barra blanca con la marca → banda roja con titular (y 3 pasos solo en el login) → formulario → lotes. Una columna, máx. 920px. */
 :root{
   --bg:#faf5f5; --panel:#ffffff; --panel-2:#fbecec; --line:#efd6d6; --line-2:#e3bcbc;
   --fg:#1b1414; --fg-2:#5c4f4f; --fg-3:#937f7f;
@@ -85,16 +85,6 @@ a{color:var(--red)}
 main.inner{display:grid;gap:28px;padding-block:0 64px}
 .lift{margin-top:-44px;position:relative}
 
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:-44px;position:relative}
-.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-s);padding:16px 18px;box-shadow:var(--shadow);display:grid;gap:4px;min-width:0}
-.stat .lbl{font-size:12.5px;font-weight:700;color:var(--fg-3);letter-spacing:.04em;text-transform:uppercase;font-family:var(--display)}
-.stat .val{font-family:var(--display);font-weight:800;font-size:30px;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
-.stat .val small{font-size:15px;font-weight:700;color:var(--fg-3);letter-spacing:0}
-.stat .sub{font-size:13px;color:var(--fg-2)}
-.meter{height:6px;border-radius:999px;background:var(--panel-2);overflow:hidden;margin-top:6px}
-.meter i{display:block;height:100%;width:0;background:var(--ok);border-radius:999px;transition:width 400ms var(--ease-out),background-color 200ms ease}
-.meter.warn i{background:var(--warn)} .meter.bad i{background:var(--bad)}
-@media (max-width:720px){ .stats{grid-template-columns:repeat(2,minmax(0,1fr))} .stat .val{font-size:26px} }
 
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:26px;box-shadow:var(--shadow)}
 .card-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:20px}
@@ -123,8 +113,6 @@ section[id^=view]{transition:opacity 220ms var(--ease-out)}
 form{display:grid;gap:20px}
 .field{display:grid;gap:7px;min-width:0}
 .field label,.field .lbl{font-weight:700;color:var(--fg);font-size:15px;font-family:var(--display)}
-.inputwrap{position:relative}
-.inputwrap svg{position:absolute;left:16px;top:50%;translate:0 -50%;width:20px;height:20px;color:var(--fg-3);pointer-events:none}
 .field input:not([type=checkbox]):not([type=radio]),.field textarea,.field select{width:100%;font:inherit;font-size:16px;padding:14px 16px;border-radius:var(--r-s);border:2px solid var(--line-2);background:var(--bg);color:var(--fg);transition:border-color 150ms ease,box-shadow 150ms ease}
 .field input.big{font-size:17px}
 .field>*{min-width:0;max-width:100%}
@@ -214,7 +202,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
 @keyframes okdraw{to{stroke-dashoffset:0}}
 @media (prefers-reduced-motion:reduce){ .okcheck path{animation:none;stroke-dashoffset:0} .okbox{transition:opacity 150ms ease;transform:none} }
 @media (max-width:480px){ .job>summary{grid-template-columns:1fr} .job .pos{text-align:left} .actions{flex-direction:column;align-items:stretch} .actions .btn.primary{width:100%} }
-@media (prefers-reduced-motion:reduce){ .btn:active{transform:none} .notice,section[id^=view]{transition:opacity 150ms ease;transform:none} .seg .thumb,.job .caret,.meter i{transition:none} }
+@media (prefers-reduced-motion:reduce){ .btn:active{transform:none} .notice,section[id^=view]{transition:opacity 150ms ease;transform:none} .seg .thumb,.job .caret{transition:none} }
 </style>
 </head>
 <body>
@@ -327,7 +315,6 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
           <div class="rules" id="rules">Sale en orden de llegada, dentro de tu tope diario.</div>
           <button class="btn primary" id="send" type="submit">Publicar</button>
         </div>
-        <div class="notice ok" id="sent" hidden></div>
       </form>
     </section>
 
@@ -401,7 +388,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 07:48</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 08:24</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -414,7 +401,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   const sb = window.supabase.createClient(SB_URL, SB_KEY);
   const SHARE_RE = /^https?:\/\/(?:www\.)?flexmls\.com\/share\/([A-Za-z0-9]+)(?:\/[A-Za-z0-9\-]+)*\/?(?:[?#].*)?$/i;
   const $ = (id) => document.getElementById(id);
-  const S = { user: null, cliente: null, trabajos: [], colaTotal: 0, posiciones: {}, pubsHoy: 0, canal: null, sentTimer: 0, clientes: [], cuentasDe: null, panelDe: null, confirmarRepetido: null };
+  const S = { user: null, cliente: null, trabajos: [], colaTotal: 0, posiciones: {}, pubsHoy: 0, canal: null, enviando: false, clientes: [], cuentasDe: null, panelDe: null, confirmarRepetido: null };
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const iniciales = (n) => (n || '?').trim().split(/\s+/).filter(Boolean).slice(0, 2).map((w) => Array.from(w)[0].toUpperCase()).join('') || '?';
   const fmtDT = (iso) => { if (!iso) return '—'; const d = new Date(iso); if (isNaN(d)) return iso; return d.toLocaleString('es-PA', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); };
@@ -439,7 +426,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
       history.replaceState(null, '', location.pathname + location.search);
       show('viewLoading');
       const { data, error } = await sb.auth.verifyOtp({ token_hash: mAct[1], type: 'recovery' });
-      if (error || !data.session) { show('viewLogin'); banner('El enlace ya no sirve (vence a la hora o ya fue usado). Pide uno nuevo.', 'bad'); return; }
+      if (error || !data.session) { show('viewLogin'); banner('El enlace ya no sirve (vence a las 24 horas o ya fue usado). Pide uno nuevo.', 'bad'); return; }
       S.user = data.session.user; show('viewActivar'); return;
     }
     const { data: { session } } = await sb.auth.getSession();
@@ -471,14 +458,13 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     }
   }
   async function cargar() {
-    const [{ data: ts }, { data: total }, { data: hoy }] = await Promise.all([
+    if (!S.user) return;
+    const [{ data: ts }, { data: cola }] = await Promise.all([
       sb.from('trabajos').select('*').eq('cliente_id', S.user.id).order('creado', { ascending: false }).limit(300),
-      sb.rpc('cola_total'), sb.rpc('publicaciones_hoy', { c: S.user.id }),
+      sb.rpc('mi_cola'),
     ]);
-    S.trabajos = ts || []; S.colaTotal = total || 0; S.pubsHoy = hoy || 0;
-    const act = S.trabajos.filter(activo);
-    S.posiciones = {};
-    await Promise.all(act.map(async (t) => { const { data } = await sb.rpc('posicion_en_cola', { t: t.id }); S.posiciones[t.id] = data || 0; }));
+    if (!S.user) return;
+    S.trabajos = ts || []; S.colaTotal = (cola && cola.total) || 0; S.pubsHoy = (cola && cola.hoy) || 0; S.posiciones = (cola && cola.posiciones) || {};
     renderAll();
   }
 
@@ -555,7 +541,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     rows.forEach((row, i) => {
       const inp = row.querySelector('input[type=url]'); const url = inp.value.trim(); inp.classList.remove('bad');
       const n = rows.length > 1 ? `El link ${i + 1}` : 'El link';
-      if (!url) { if (i === 0) { inp.classList.add('bad'); setErr('errShare', 'Pega el link completo de Flex, con la forma flexmls.com/share/CÓDIGO.'); ok = false; } return; }
+      if (!url) return;
       const m = url.match(SHARE_RE);
       if (!m) { inp.classList.add('bad'); if (ok) setErr('errShare', rows.length > 1 ? `${n} no tiene la forma flexmls.com/share/CÓDIGO.` : 'Pega el link completo de Flex, con la forma flexmls.com/share/CÓDIGO.'); ok = false; return; }
       const k = m[1].toLowerCase();
@@ -564,6 +550,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
       if (!portales.length) { inp.classList.add('bad'); if (ok) setErr('errShare', `${n} necesita al menos un portal.`); ok = false; return; }
       vistos.add(k); lotes.push({ share: m[1], url, portales });
     });
+    if (ok && !lotes.length) { linkInputs()[0].classList.add('bad'); setErr('errShare', 'Pega el link completo de Flex, con la forma flexmls.com/share/CÓDIGO.'); ok = false; }
     if (ok) setErr('errShare', '');
     let hora = null;
     if ($('cHora').checked) { const v = $('hora').value; if (!v) { setErr('errHora', 'Dinos el día y la hora.'); ok = false; } else { const d = new Date(v); if (isNaN(d)) { setErr('errHora', 'Esa fecha no se entiende.'); ok = false; } else if (d.getTime() < Date.now() - 60000) { setErr('errHora', 'Esa hora ya pasó.'); ok = false; } else { setErr('errHora', ''); hora = d.toISOString(); } } }
@@ -579,7 +566,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const claveRep = repetidos.map((x) => x.l.share.toLowerCase()).sort().join(',');
     if (repetidos.length && S.confirmarRepetido !== claveRep) { S.confirmarRepetido = claveRep; const x = repetidos[0]; setErr('errShare', repetidos.length === 1 ? `El lote ${x.l.share} ya lo publicamos el ${fmtDT(x.t.fin || x.t.creado)}. Si quieres repetirlo, pulsa Publicar otra vez.` : `Los lotes ${repetidos.map((r) => r.l.share).join(', ')} ya los publicamos antes. Si quieres repetirlos, pulsa Publicar otra vez.`); return; }
     S.confirmarRepetido = null;
-    const btn = $('send'); btn.disabled = true; btn.textContent = 'Enviando…';
+    const btn = $('send'); S.enviando = true; btn.disabled = true; btn.textContent = 'Enviando…';
     const notas = $('notas').value.trim() || null;
     const docs = v.lotes.map((l) => ({ cliente_id: S.user.id, share: l.share, url: l.url, portales: l.portales, cuando: v.hora ? 'hora' : 'ahora', hora_pedida: v.hora, notas, estado: v.hora ? 'Programado' : 'En cola', origen: 'web' }));
     const { data, error } = await sb.from('trabajos').insert(docs).select();
@@ -598,7 +585,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
         confirmarRecibido(v.hora ? `Tus ${n} lotes (${codigos}) quedan programados para el ${fmtDT(v.hora)}. Te avisamos cuando estén publicados.` : `Tus ${n} lotes (${codigos}) entraron en la cola. Los publicamos en los próximos minutos y te avisamos.`);
       }
     }
-    btn.disabled = false; btn.textContent = 'Publicar'; renderAll();
+    S.enviando = false; btn.disabled = false; btn.textContent = 'Publicar'; renderAll();
   });
 
   function renderAll() {
@@ -612,7 +599,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const topeLleno = lim > 0 && pubsHoy >= lim;
     const ratio = lim ? Math.min(1, pubsHoy / lim) : 0;
     const chip = $('hoyChip'); chip.textContent = lim ? `Hoy ${pubsHoy} de ${lim}` : `Hoy ${pubsHoy}`; chip.className = 'chip ' + (topeLleno ? 'bad' : ratio >= .8 ? 'warn' : 'ok');
-    $('send').disabled = topeLleno; $('send').textContent = topeLleno ? 'Tope de hoy alcanzado' : 'Publicar';
+    if (!S.enviando) { $('send').disabled = topeLleno; $('send').textContent = topeLleno ? 'Tope de hoy alcanzado' : 'Publicar'; }
     $('rules').textContent = topeLleno ? `Llegaste a tus ${lim} publicaciones de hoy. Puedes dejar el siguiente programado para mañana.` : 'Sale en orden de llegada, dentro de tu tope diario.';
     $('greetText').textContent = (S.colaTotal ? (miosEnCola ? `${plural(miosEnCola, 'lote tuyo', 'lotes tuyos')} en cola.` : `${plural(S.colaTotal, 'lote', 'lotes')} en cola antes del tuyo.`) : 'La cola está vacía.') + (ultimoCupo ? ` Cupo en Compre o Alquile: ${ultimoCupo.resumen.cupoCoa}.` : '');
     const box = $('jobs'); box.innerHTML = '';
@@ -650,7 +637,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   }
   function adminMsg(t, k) { const m = $('adminMsg'); if (!t) { m.hidden = true; return; } m.textContent = t; m.className = 'notice ' + (k || 'info'); m.hidden = false; }
   async function cargarAdmin() {
-    const [{ data: cs }, { data: ts }] = await Promise.all([sb.from('clientes').select('*').order('nombre'), sb.from('trabajos').select('cliente_id, creado, resultados')]);
+    const [{ data: cs }, { data: ts }] = await Promise.all([sb.from('clientes').select('*').order('nombre'), sb.from('trabajos').select('cliente_id, creado, resultados').gte('creado', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString())]);
     S.clientes = cs || [];
     const porCliente = {}; (ts || []).forEach((t) => { if (!mesActual(t.creado)) return; porCliente[t.cliente_id] = (porCliente[t.cliente_id] || 0) + (t.resultados || []).filter((r) => r.estado === 'Activo').length; });
     const abierto = S.panelDe; const panelViejo = abierto ? document.querySelector(`.cli[data-id="${abierto}"] .panel`) : null; const formDentro = panelViejo && panelViejo.contains($('formCuentas')); if (formDentro) $('viewAdmin').querySelector('.card').appendChild($('formCuentas')); const contenidoViejo = panelViejo ? [...panelViejo.childNodes] : [];
@@ -698,9 +685,9 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   $('btnCerrarNuevo').addEventListener('click', () => { $('cardNuevo').hidden = true; });
   function mostrarEnlace(c, enlace, donde) {
     const tel = String(c.celular || '').replace(/\D/g, '');
-    const texto = `Hola ${c.nombre.split(' ')[0]}, tu acceso a Publik está listo. Entra aquí y elige tu contraseña (el enlace vence en una hora): ${enlace}`;
+    const texto = `Hola ${c.nombre.split(' ')[0]}, tu acceso a Publik está listo. Entra aquí y elige tu contraseña (el enlace vence en 24 horas): ${enlace}`;
     donde.className = 'linkbox'; donde.hidden = false;
-    donde.innerHTML = `<b>Enlace de activación para ${esc(c.nombre)}</b><code>${esc(enlace)}</code><div class="inlineacts"><button class="btn sm" type="button" data-copy>Copiar enlace</button>${tel ? `<a class="btn sm" href="https://wa.me/${tel}?text=${encodeURIComponent(texto)}" target="_blank" rel="noopener">Mandar por WhatsApp</a>` : ''}</div><span class="hint">Vence en una hora. Si vence, pulsa "Enlace" en su fila y sale uno nuevo.</span>`;
+    donde.innerHTML = `<b>Enlace de activación para ${esc(c.nombre)}</b><code>${esc(enlace)}</code><div class="inlineacts"><button class="btn sm" type="button" data-copy>Copiar enlace</button>${tel ? `<a class="btn sm" href="https://wa.me/${tel}?text=${encodeURIComponent(texto)}" target="_blank" rel="noopener">Mandar por WhatsApp</a>` : ''}</div><span class="hint">Vence en 24 horas y sirve una sola vez. Si vence, pulsa "Enlace" en su fila y sale uno nuevo.</span>`;
     donde.querySelector('[data-copy]').addEventListener('click', async (ev) => { try { await navigator.clipboard.writeText(enlace); ev.target.textContent = 'Copiado'; } catch (e) { const r = document.createRange(); r.selectNodeContents(donde.querySelector('code')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } });
   }
   $('cuCancelar').addEventListener('click', () => { rescatarFormCuentas(); S.cuentasDe = null; S.panelDe = null; });
