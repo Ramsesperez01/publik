@@ -330,6 +330,16 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
       <div class="card-head"><div style="display:grid;gap:6px"><span class="eyebrow">Administración</span><h2>Clientes</h2><p class="muted">Crea cuentas, cambia planes y apaga el acceso de quien no pague. Cada cambio aplica la próxima vez que el agente abra la página.</p></div><button class="btn" id="adminBack" type="button">Volver a mis lotes</button></div>
       <div class="tablewrap"><table id="tblClientes"><thead><tr><th>Agente</th><th>Código</th><th>Plan</th><th class="num">Tope/día</th><th class="num">Mes</th><th>Portales</th><th>Estado</th><th></th></tr></thead><tbody></tbody></table></div>
       <div id="adminMsg" class="notice info" hidden style="margin-top:14px"></div>
+      <form id="formCuentas" hidden style="margin-top:18px;padding:18px;border:1px solid var(--line);border-radius:var(--r-s);background:var(--bg)">
+        <div style="display:grid;gap:4px"><span class="eyebrow">Cuentas en los portales</span><h3 id="cuTitulo">Agente</h3><p class="hint">Escribe la contraseña solo si la vas a cambiar o si cambias el correo. Vacía = se conserva la guardada.</p></div>
+        <div class="row">
+          <div class="field"><label for="cuE24c">Encuentra24 · correo</label><input id="cuE24c" type="email" inputmode="email" autocapitalize="none" autocomplete="off"></div>
+          <div class="field"><label for="cuE24k">Encuentra24 · contraseña</label><input id="cuE24k" type="password" autocomplete="new-password" placeholder="(guardada)"></div>
+          <div class="field"><label for="cuCoac">Compre o Alquile · correo</label><input id="cuCoac" type="email" inputmode="email" autocapitalize="none" autocomplete="off"></div>
+          <div class="field"><label for="cuCoak">Compre o Alquile · contraseña</label><input id="cuCoak" type="password" autocomplete="new-password" placeholder="(guardada)"></div>
+        </div>
+        <div class="actions" style="border-top:0;padding-top:0;margin-top:0"><span class="rules err" id="cuErr"></span><div class="inlineacts"><button class="btn" id="cuCancelar" type="button">Cancelar</button><button class="btn primary" id="cuGuardar" type="submit">Guardar cuentas</button></div></div>
+      </form>
     </section>
     <section class="card">
       <div class="card-head"><div style="display:grid;gap:6px"><span class="eyebrow">Alta</span><h2>Nuevo cliente</h2><p class="muted">Al guardar sale un enlace de activación: mándaselo por WhatsApp. Con él elige su contraseña y entra.</p></div></div>
@@ -375,7 +385,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   const sb = window.supabase.createClient(SB_URL, SB_KEY);
   const SHARE_RE = /^https?:\/\/(?:www\.)?flexmls\.com\/share\/([A-Za-z0-9]+)(?:\/[A-Za-z0-9\-]+)?\/?$/i;
   const $ = (id) => document.getElementById(id);
-  const S = { user: null, cliente: null, trabajos: [], colaTotal: 0, posiciones: {}, pubsHoy: 0, canal: null, sentTimer: 0, clientes: [] };
+  const S = { user: null, cliente: null, trabajos: [], colaTotal: 0, posiciones: {}, pubsHoy: 0, canal: null, sentTimer: 0, clientes: [], cuentasDe: null };
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const iniciales = (n) => (n || '?').trim().split(/\s+/).filter(Boolean).slice(0, 2).map((w) => Array.from(w)[0].toUpperCase()).join('') || '?';
   const fmtDT = (iso) => { if (!iso) return '—'; const d = new Date(iso); if (isNaN(d)) return iso; return d.toLocaleString('es-PA', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); };
@@ -582,19 +592,10 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
         await llamarAdmin({ accion: 'actualizar', id: c.id, cambios: { plan, limite_dia: lim, precio_mes: precio } }); adminMsg(`${c.nombre}: plan ${plan}, ${lim} por día, $${precio}/mes.`, 'ok');
       }
       else if (b.dataset.a === 'cuentas') {
-        const tr = b.closest('tr'); const celda = tr.children[5];
-        celda.innerHTML = `<div style="display:grid;gap:6px;min-width:260px"><input class="btn sm" data-f="e24c" type="email" placeholder="Encuentra24 · correo" value="${esc(c.e24_correo || '')}"><input class="btn sm" data-f="e24k" type="password" placeholder="Encuentra24 · contraseña ${c.e24_correo ? '(guardada; escribe para cambiar)' : ''}" autocomplete="new-password"><input class="btn sm" data-f="coac" type="email" placeholder="Compre o Alquile · correo" value="${esc(c.coa_correo || '')}"><input class="btn sm" data-f="coak" type="password" placeholder="Compre o Alquile · contraseña ${c.coa_correo ? '(guardada; escribe para cambiar)' : ''}" autocomplete="new-password"><div class="inlineacts"><button class="btn sm primary" data-a="guardarCuentas" data-id="${c.id}" type="button">Guardar</button><span class="hint">Deja la contraseña vacía para conservar la guardada.</span></div></div>`;
+        S.cuentasDe = c.id; adminMsg('');
+        $('cuTitulo').textContent = c.nombre; $('cuE24c').value = c.e24_correo || ''; $('cuCoac').value = c.coa_correo || ''; $('cuE24k').value = ''; $('cuCoak').value = ''; $('cuErr').textContent = '';
+        const f = $('formCuentas'); f.hidden = false; f.scrollIntoView({ behavior: 'smooth', block: 'start' });
         b.disabled = false; return;
-      }
-      else if (b.dataset.a === 'guardarCuentas') {
-        const tr = b.closest('tr'); const g = (f) => tr.querySelector(`[data-f=${f}]`).value.trim();
-        const portales = {};
-        const e24c = g('e24c'), e24k = g('e24k'), coac = g('coac'), coak = g('coak');
-        if (!e24c || !coac) { adminMsg('Los correos de los dos portales son obligatorios.', 'bad'); b.disabled = false; return; }
-        if (e24k) portales.e24 = { correo: e24c, clave: e24k }; else if (e24c !== (c.e24_correo || '')) { adminMsg('Para cambiar el correo de Encuentra24 escribe también la contraseña.', 'bad'); b.disabled = false; return; }
-        if (coak) portales.coa = { correo: coac, clave: coak }; else if (coac !== (c.coa_correo || '')) { adminMsg('Para cambiar el correo de Compre o Alquile escribe también la contraseña.', 'bad'); b.disabled = false; return; }
-        if (!Object.keys(portales).length) { adminMsg('Sin cambios.', 'info'); b.disabled = false; return; }
-        await llamarAdmin({ accion: 'actualizar', id: c.id, cambios: {}, portales }); adminMsg(`${c.nombre}: cuentas de portales guardadas.`, 'ok');
       }
       else if (b.dataset.a === 'enlace') { const r = await llamarAdmin({ accion: 'enlace', id: c.id }); mostrarEnlace(c, r.enlace, $('adminMsg')); b.disabled = false; return; }
       await cargarAdmin();
@@ -607,6 +608,21 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     donde.innerHTML = `<b>Enlace de activación para ${esc(c.nombre)}</b><code>${esc(enlace)}</code><div class="inlineacts"><button class="btn sm" type="button" data-copy>Copiar enlace</button>${tel ? `<a class="btn sm" href="https://wa.me/${tel}?text=${encodeURIComponent(texto)}" target="_blank" rel="noopener">Mandar por WhatsApp</a>` : ''}</div><span class="hint">Vence en una hora. Si vence, pulsa "Enlace" en su fila y sale uno nuevo.</span>`;
     donde.querySelector('[data-copy]').addEventListener('click', async (ev) => { try { await navigator.clipboard.writeText(enlace); ev.target.textContent = 'Copiado'; } catch (e) { const r = document.createRange(); r.selectNodeContents(donde.querySelector('code')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } });
   }
+  $('cuCancelar').addEventListener('click', () => { $('formCuentas').hidden = true; S.cuentasDe = null; });
+  $('formCuentas').addEventListener('submit', async (ev) => {
+    ev.preventDefault(); const c = S.clientes.find((x) => x.id === S.cuentasDe); if (!c) return;
+    const e = $('cuErr'); e.textContent = ''; const b = $('cuGuardar');
+    const e24c = $('cuE24c').value.trim().toLowerCase(), e24k = $('cuE24k').value, coac = $('cuCoac').value.trim(), coak = $('cuCoak').value;
+    if (!e24c || !coac) { e.textContent = 'Los correos de los dos portales son obligatorios.'; return; }
+    const portales = {};
+    if (e24k) portales.e24 = { correo: e24c, clave: e24k }; else if (e24c !== (c.e24_correo || '').toLowerCase()) { e.textContent = 'Cambiaste el correo de Encuentra24: escribe también su contraseña.'; return; }
+    if (coak) portales.coa = { correo: coac, clave: coak }; else if (coac.toLowerCase() !== (c.coa_correo || '').toLowerCase()) { e.textContent = 'Cambiaste el correo de Compre o Alquile: escribe también su contraseña.'; return; }
+    if (!Object.keys(portales).length) { e.textContent = 'No cambiaste nada.'; return; }
+    b.disabled = true; b.textContent = 'Guardando…';
+    try { await llamarAdmin({ accion: 'actualizar', id: c.id, cambios: {}, portales }); $('formCuentas').hidden = true; S.cuentasDe = null; adminMsg(`${c.nombre}: cuentas de portales guardadas.`, 'ok'); await cargarAdmin(); }
+    catch (err) { e.textContent = errMsg(err); }
+    b.disabled = false; b.textContent = 'Guardar cuentas';
+  });
   $('formNuevo').addEventListener('submit', async (ev) => {
     ev.preventDefault(); const e = $('nErr'); e.textContent = ''; const b = $('nBtn');
     const cliente = { nombre: $('nNombre').value.trim(), correo: $('nCorreo').value.trim().toLowerCase(), celular: $('nCel').value.trim(), codigo: $('nCodigo').value.trim().toUpperCase(), oficina: $('nOficina').value.trim(), plan: $('nPlan').value, limite_dia: Number($('nLim').value), precio_mes: Number($('nPrecio').value), notas: $('nNotas').value.trim() };
