@@ -126,7 +126,7 @@ form{display:grid;gap:20px}
 .inputwrap{position:relative}
 .inputwrap svg{position:absolute;left:16px;top:50%;translate:0 -50%;width:20px;height:20px;color:var(--fg-3);pointer-events:none}
 .field input:not([type=checkbox]):not([type=radio]),.field textarea,.field select{width:100%;font:inherit;font-size:16px;padding:14px 16px;border-radius:var(--r-s);border:2px solid var(--line-2);background:var(--bg);color:var(--fg);transition:border-color 150ms ease,box-shadow 150ms ease}
-.field input.big{font-size:17px;padding-left:46px}
+.field input.big{font-size:17px}
 .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--red);box-shadow:0 0 0 4px var(--red-soft);outline:none}
 .field textarea{min-height:70px;resize:vertical}
 .hint{font-size:13.5px;color:var(--fg-3)}
@@ -278,10 +278,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
       <form id="form" novalidate>
         <div class="field">
           <label for="share">Link de Flex</label>
-          <div class="inputwrap">
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>
-            <input class="big" type="url" id="share" placeholder="https://www.flexmls.com/share/XXXXX/Selected" autocomplete="off" inputmode="url" spellcheck="false">
-          </div>
+          <input class="big" type="url" id="share" placeholder="https://www.flexmls.com/share/XXXXX/Selected" autocomplete="off" inputmode="url" spellcheck="false">
           <span class="hint">Se publica todo lo que traiga el share, tal como está en Flex.</span>
           <span class="err" id="errShare" hidden></span>
         </div>
@@ -381,7 +378,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </section>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 00:48</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 00:50</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
