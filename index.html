@@ -127,6 +127,9 @@ form{display:grid;gap:20px}
 .inputwrap svg{position:absolute;left:16px;top:50%;translate:0 -50%;width:20px;height:20px;color:var(--fg-3);pointer-events:none}
 .field input:not([type=checkbox]):not([type=radio]),.field textarea,.field select{width:100%;font:inherit;font-size:16px;padding:14px 16px;border-radius:var(--r-s);border:2px solid var(--line-2);background:var(--bg);color:var(--fg);transition:border-color 150ms ease,box-shadow 150ms ease}
 .field input.big{font-size:17px}
+.field>*{min-width:0;max-width:100%}
+.field input[type=datetime-local]{-webkit-appearance:none;appearance:none;display:block;width:100%;min-width:0;max-width:100%;box-sizing:border-box;text-align:left;min-height:52px;line-height:1.3}
+.field input[type=datetime-local]::-webkit-date-and-time-value{text-align:left}
 .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--red);box-shadow:0 0 0 4px var(--red-soft);outline:none}
 .field textarea{min-height:70px;resize:vertical}
 .hint{font-size:13.5px;color:var(--fg-3)}
@@ -205,7 +208,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
 .okcheck path{fill:none;stroke:var(--ok);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:okdraw 420ms var(--ease-out) 120ms forwards}
 @keyframes okdraw{to{stroke-dashoffset:0}}
 @media (prefers-reduced-motion:reduce){ .okcheck path{animation:none;stroke-dashoffset:0} .okbox{transition:opacity 150ms ease;transform:none} }
-@media (max-width:480px){ .job>summary{grid-template-columns:1fr} .job .pos{text-align:left} }
+@media (max-width:480px){ .job>summary{grid-template-columns:1fr} .job .pos{text-align:left} .actions{flex-direction:column;align-items:stretch} .actions .btn.primary{width:100%} }
 @media (prefers-reduced-motion:reduce){ .btn:active{transform:none} .notice,section[id^=view]{transition:opacity 150ms ease;transform:none} .seg .thumb,.job .caret,.meter i{transition:none} }
 </style>
 </head>
@@ -398,7 +401,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 00:53</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 01:01</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
