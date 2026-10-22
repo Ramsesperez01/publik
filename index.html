@@ -388,7 +388,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 09:12</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 17:38</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -600,7 +600,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const ratio = lim ? Math.min(1, pubsHoy / lim) : 0;
     const chip = $('hoyChip'); chip.textContent = lim ? `Hoy ${pubsHoy} de ${lim}` : `Hoy ${pubsHoy}`; chip.className = 'chip ' + (topeLleno ? 'bad' : ratio >= .8 ? 'warn' : 'ok');
     if (!S.enviando) { $('send').disabled = topeLleno; $('send').textContent = topeLleno ? 'Tope de hoy alcanzado' : 'Publicar'; }
-    $('rules').textContent = topeLleno ? `Llegaste a tus ${lim} avisos de hoy. El cupo se reinicia mañana.` : 'Sale en orden de llegada, dentro de tu tope diario.';
+    $('rules').textContent = topeLleno ? `Llegaste a tus ${lim} avisos de hoy. El cupo se reinicia mañana.` : (lim ? 'Sale en orden de llegada, dentro de tu tope diario.' : 'Sale en orden de llegada. Sin tope diario.');
     $('greetText').textContent = (S.colaTotal ? (miosEnCola ? `${plural(miosEnCola, 'lote tuyo', 'lotes tuyos')} en cola.` : `${plural(S.colaTotal, 'lote', 'lotes')} en cola antes del tuyo.`) : 'La cola está vacía.') + (ultimoCupo ? ` Cupo en Compre o Alquile: ${ultimoCupo.resumen.cupoCoa}.` : '');
     const box = $('jobs'); box.innerHTML = '';
     $('jobsEmpty').hidden = mios.length > 0;
@@ -646,7 +646,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
       const d = document.createElement('div'); d.className = 'cli' + (c.activo ? '' : ' off'); d.dataset.id = c.id;
       const faltan = (!c.e24_correo || !c.coa_correo) && !c.es_admin;
       d.innerHTML = `<div class="top"><span class="avatar">${esc(iniciales(c.nombre))}</span><span class="txt"><span class="n">${esc(c.nombre)}${c.es_admin ? ' <span class="chip neutral">admin</span>' : ''}</span><span class="m"><span>${esc(c.correo)}</span>${c.celular ? `<span>${esc(c.celular)}</span>` : ''}</span></span>${c.activo ? '<span class="chip ok"><span class="dot"></span>Activo</span>' : '<span class="chip bad"><span class="dot"></span>Apagado</span>'}</div>` +
-        (c.es_admin ? '' : `<div class="meta"><span class="mono">${esc(c.codigo)}</span><span>Plan ${esc(c.plan)}${c.precio_mes ? ` · $${c.precio_mes}/mes` : ''}</span><span>${c.limite_dia} por día</span><span>${plural(porCliente[c.id] || 0, 'aviso', 'avisos')} este mes</span>${faltan ? '<span class="chip bad">faltan cuentas de portales</span>' : ''}</div>` +
+        (c.es_admin ? '' : `<div class="meta"><span class="mono">${esc(c.codigo)}</span><span>Plan ${esc(c.plan)}${c.precio_mes ? ` · $${c.precio_mes}/mes` : ''}</span><span>${c.limite_dia ? c.limite_dia + ' por día' : 'sin tope'}</span><span>${plural(porCliente[c.id] || 0, 'aviso', 'avisos')} este mes</span>${faltan ? '<span class="chip bad">faltan cuentas de portales</span>' : ''}</div>` +
         `<div class="acts"><button class="btn" data-a="toggle" type="button">${c.activo ? 'Apagar' : 'Activar'}</button><button class="btn" data-a="plan" type="button">Plan</button><button class="btn" data-a="cuentas" type="button">Cuentas</button><button class="btn" data-a="enlace" type="button">Enlace</button></div>`) +
         `<div class="panel"></div>`;
       box.appendChild(d);
