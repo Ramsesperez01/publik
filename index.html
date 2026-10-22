@@ -194,6 +194,17 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
 .cli .panel:empty{display:none}
 .linkbox code{font-family:var(--mono);font-size:12.5px;overflow-wrap:anywhere;color:var(--fg-2)}
 .inlineacts{display:flex;gap:8px;flex-wrap:wrap}
+.okwrap{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:24px;background:rgba(27,20,20,.45);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);transition:opacity 220ms var(--ease-out)}
+@starting-style{ .okwrap{opacity:0} }
+.okbox{background:var(--panel);color:var(--fg);border-radius:var(--r);padding:30px 26px 24px;max-width:380px;width:100%;text-align:center;display:grid;gap:12px;justify-items:center;box-shadow:var(--shadow);transform-origin:center;transition:transform 260ms var(--ease-out),opacity 260ms var(--ease-out)}
+@starting-style{ .okbox{transform:scale(.94);opacity:0} }
+.okbox h2{font-size:28px}
+.okbox .okmsg{color:var(--fg-2);font-size:16px;max-width:30ch}
+.okcheck{width:84px;height:84px}
+.okcheck circle{fill:var(--ok-soft)}
+.okcheck path{fill:none;stroke:var(--ok);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:okdraw 420ms var(--ease-out) 120ms forwards}
+@keyframes okdraw{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){ .okcheck path{animation:none;stroke-dashoffset:0} .okbox{transition:opacity 150ms ease;transform:none} }
 @media (max-width:480px){ .job>summary{grid-template-columns:1fr} .job .pos{text-align:left} }
 @media (prefers-reduced-motion:reduce){ .btn:active{transform:none} .notice,section[id^=view]{transition:opacity 150ms ease;transform:none} .seg .thumb,.job .caret,.meter i{transition:none} }
 </style>
@@ -377,8 +388,17 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     </section>
   </section>
 
+  <div class="okwrap" id="okModal" hidden role="dialog" aria-modal="true" aria-labelledby="okTitle">
+    <div class="okbox">
+      <svg class="okcheck" viewBox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="40"/><path d="M26 44l11 11 22-24"/></svg>
+      <h2 id="okTitle">¡Recibido!</h2>
+      <p class="okmsg" id="okMsg"></p>
+      <button class="btn primary" id="okBtn" type="button" style="padding:12px 28px;font-size:16px;box-shadow:none">Listo</button>
+    </div>
+  </div>
+
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 00:50</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 00:53</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -484,6 +504,22 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   $('btnAdmin').addEventListener('click', () => { location.hash = '#admin'; show('viewAdmin'); tituloBanda(); cargarAdmin(); });
   $('adminBack').addEventListener('click', () => { location.hash = ''; show('viewApp'); tituloBanda(); });
 
+  // ---------- confirmación con sonido ----------
+  function sonidoCaja() {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+      const ctx = new AC(); const t0 = ctx.currentTime;
+      const nota = (f, t, dur, vol) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(f, t); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + dur + 0.05); };
+      nota(1318.5, t0, 0.35, 0.22); nota(1760, t0 + 0.11, 0.55, 0.22); nota(2637, t0 + 0.11, 0.4, 0.06);
+      if (navigator.vibrate) navigator.vibrate([18, 40, 18]);
+      setTimeout(() => ctx.close && ctx.close(), 1500);
+    } catch (e) {}
+  }
+  function confirmarRecibido(msg) { $('okMsg').textContent = msg; $('okModal').hidden = false; sonidoCaja(); $('okBtn').focus(); }
+  const cerrarOk = () => { $('okModal').hidden = true; };
+  $('okBtn').addEventListener('click', cerrarOk); $('okModal').addEventListener('click', (ev) => { if (ev.target === $('okModal')) cerrarOk(); });
+  document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && !$('okModal').hidden) cerrarOk(); });
+
   // ---------- formulario de lote ----------
   const toggleHora = () => { const h = $('cHora').checked; $('fHora').hidden = !h; $('seg').dataset.i = h ? '1' : '0'; };
   $('cAhora').addEventListener('change', toggleHora); $('cHora').addEventListener('change', toggleHora);
@@ -517,7 +553,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
       $('form').reset(); toggleHora();
       await cargar();
       const pos = S.posiciones[data.id] || 1;
-      const s = $('sent'); s.textContent = v.hora ? `Listo. El lote ${v.share} queda para el ${fmtDT(v.hora)}. Bob prepara las fichas antes y publica a esa hora.` : `Listo. El lote ${v.share} entró en la cola en el lugar ${pos}. Bob lo toma en los próximos minutos.`; s.hidden = false; clearTimeout(S.sentTimer); S.sentTimer = setTimeout(() => { s.hidden = true; }, 12000);
+      confirmarRecibido(v.hora ? `Tu lote ${v.share} queda programado para el ${fmtDT(v.hora)}. Te avisamos cuando esté publicado.` : `Tu lote ${v.share} entró en la cola${pos > 1 ? `, lugar ${pos}` : ''}. Lo publicamos en los próximos minutos y te avisamos.`);
     }
     btn.disabled = false; btn.textContent = 'Publicar'; renderAll();
   });
