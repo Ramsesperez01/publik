@@ -257,15 +257,8 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
 
   <!-- APP -->
   <section id="viewApp" hidden style="display:grid;gap:28px">
-    <div class="stats">
-      <div class="stat"><span class="lbl">Lotes este mes</span><span class="val num" id="stLotes">0</span><span class="sub" id="stLotesSub">&nbsp;</span></div>
-      <div class="stat"><span class="lbl">Avisos publicados</span><span class="val num" id="stAvisos">0</span><span class="sub">este mes, en los dos portales</span></div>
-      <div class="stat"><span class="lbl">En cola ahora</span><span class="val num" id="stCola">0</span><span class="sub" id="stColaSub">la cola está vacía</span></div>
-      <div class="stat"><span class="lbl">Hoy</span><span class="val num" id="stHoy">0</span><div class="meter" id="stMeter"><i></i></div><span class="sub" id="stHoySub">publicaciones de tu plan</span></div>
-    </div>
-
-    <section class="card">
-      <div class="card-head"><div style="display:grid;gap:6px"><span class="eyebrow">Nuevo lote</span><h2 id="greetTitle">Hola.</h2><p class="muted" id="greetText"></p></div></div>
+    <section class="card lift">
+      <div class="card-head"><div style="display:grid;gap:6px"><h2 id="greetTitle">Nuevo lote</h2><p class="muted" id="greetText"></p></div><span class="chip" id="hoyChip"></span></div>
       <form id="form" novalidate>
         <div class="field">
           <label for="share">Link de Flex</label>
@@ -273,7 +266,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
             <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>
             <input class="big" type="url" id="share" placeholder="https://www.flexmls.com/share/XXXXX/Selected" autocomplete="off" inputmode="url" spellcheck="false">
           </div>
-          <span class="hint">Se publica todo lo que traiga el share, con los datos exactos de Flex, en plan gratis y sin resaltar.</span>
+          <span class="hint">Se publica todo lo que traiga el share, tal como está en Flex.</span>
           <span class="err" id="errShare" hidden></span>
         </div>
         <div class="row">
@@ -299,12 +292,12 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
             </div>
           </div>
         </div>
-        <div class="field">
-          <label for="notas">Nota para Bob <span class="muted" style="font-weight:400;font-family:var(--body)">(si hace falta)</span></label>
-          <textarea id="notas" placeholder="Por ejemplo: 4 propiedades cada hora empezando a las 4:30"></textarea>
-        </div>
+        <details class="field" id="notaBox">
+          <summary class="hint" style="cursor:pointer;list-style:none;font-weight:700;color:var(--fg-2)">+ Agregar una nota</summary>
+          <textarea id="notas" placeholder="Por ejemplo: 4 propiedades cada hora empezando a las 4:30" style="margin-top:8px"></textarea>
+        </details>
         <div class="actions">
-          <div class="rules" id="rules">Los lotes salen en orden de llegada y dentro del tope diario de tu plan. Si tu cuenta de Compre o Alquile no tiene cupo, te lo decimos aquí.</div>
+          <div class="rules" id="rules">Sale en orden de llegada, dentro de tu tope diario.</div>
           <button class="btn primary" id="send" type="submit">Publicar</button>
         </div>
         <div class="notice ok" id="sent" hidden></div>
@@ -313,7 +306,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
 
     <section style="display:grid;gap:14px">
       <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">
-        <div style="display:grid;gap:4px"><span class="eyebrow">Historial</span><h2>Tus lotes</h2></div>
+        <h2>Tus lotes</h2>
         <span class="small muted" id="jobsCount"></span>
       </div>
       <div class="jobs" id="jobs"></div>
@@ -373,7 +366,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
 
   <footer>
     <span>Publik · Operado por Bob.</span>
-    <span id="connState" class="mono">conectando…</span>
+    <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
 
@@ -398,7 +391,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   const activo = (t) => ['En cola', 'En proceso', 'Programado'].includes(t.estado);
   const sitio = () => location.origin + location.pathname;
   const VIEWS = ['viewLoading', 'viewLogin', 'viewActivar', 'viewBlocked', 'viewApp', 'viewAdmin'];
-  function show(v) { VIEWS.forEach((id) => { $(id).hidden = id !== v; }); $('who').hidden = !S.user || v === 'viewActivar'; $('steps').hidden = v === 'viewAdmin'; }
+  function show(v) { VIEWS.forEach((id) => { $(id).hidden = id !== v; }); $('who').hidden = !S.user || v === 'viewActivar'; const dentro = v === 'viewApp' || v === 'viewAdmin'; $('steps').hidden = dentro; $('bandLead').hidden = dentro; }
   function banner(text, kind) { const b = $('banner'); if (!text) { b.hidden = true; return; } b.textContent = text; b.className = 'notice ' + (kind || 'warn'); b.hidden = false; }
   const errMsg = (e) => { const m = (e && (e.message || e.error_description || e.error)) || ''; if (/invalid login|invalid credentials/i.test(m)) return 'Correo o contraseña incorrectos.'; if (/rate limit/i.test(m)) return 'Demasiados intentos. Espera un minuto.'; if (/network|fetch/i.test(m)) return 'Sin conexión. Intenta otra vez.'; return m || 'Algo salió mal. Intenta otra vez.'; };
 
@@ -428,7 +421,6 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     $('whoAvatar').textContent = iniciales(c.nombre); $('whoName').textContent = c.nombre; $('whoPlan').textContent = `Plan ${c.plan}${c.limite_dia ? ' · ' + c.limite_dia + ' por día' : ''}`;
     $('btnAdmin').hidden = !c.es_admin;
     if (!c.activo) { $('blockedTitle').textContent = `${nombre}, tu plan no está activo`; show('viewBlocked'); $('who').hidden = false; return; }
-    $('greetTitle').textContent = `Hola, ${nombre}.`;
     $('bandTitle').textContent = `Hola, ${nombre}. ¿Qué publicamos hoy?`;
     $('coaSub').textContent = c.coa_correo ? `Cuenta ${c.coa_correo}, plan Simple` : 'Plan Simple';
     document.querySelector('label.portal span:not(.tick)').textContent = c.e24_correo ? `Cuenta ${c.e24_correo}, con tu contacto` : 'Con tu contacto';
@@ -474,7 +466,8 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     $('aPass').value = ''; $('aPass2').value = ''; await entrar();
   });
   const salir = async () => { await sb.auth.signOut(); location.hash = ''; };
-  $('logout').addEventListener('click', salir); $('blockedOut').addEventListener('click', salir);
+  $('logout').addEventListener('click', salir);
+  sb.auth.onAuthStateChange((ev) => { if (ev === 'SIGNED_OUT') { $('bandTitle').textContent = 'Pega tu link. Nosotros publicamos.'; } }); $('blockedOut').addEventListener('click', salir);
   $('btnAdmin').addEventListener('click', () => { location.hash = '#admin'; show('viewAdmin'); cargarAdmin(); });
   $('adminBack').addEventListener('click', () => { location.hash = ''; show('viewApp'); });
 
@@ -520,17 +513,10 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const lim = c.limite_dia || 0, pubsHoy = S.pubsHoy;
     const topeLleno = lim > 0 && pubsHoy >= lim;
     const ratio = lim ? Math.min(1, pubsHoy / lim) : 0;
-    $('stLotes').textContent = mes.length;
-    $('stLotesSub').textContent = mes.length ? `${plural(mios.length, 'lote', 'lotes')} en total` : 'todavía ninguno este mes';
-    $('stAvisos').textContent = pubs;
-    $('stCola').textContent = S.colaTotal;
-    $('stColaSub').textContent = S.colaTotal ? (miosEnCola ? `${plural(miosEnCola, 'lote tuyo', 'lotes tuyos')} esperando` : 'de otros agentes, antes que el tuyo') : 'la cola está vacía';
-    $('stHoy').innerHTML = lim ? `${pubsHoy}<small> / ${lim}</small>` : `${pubsHoy}`;
-    const meter = $('stMeter'); meter.className = 'meter' + (topeLleno ? ' bad' : ratio >= .8 ? ' warn' : ''); meter.firstElementChild.style.width = (ratio * 100) + '%';
-    $('stHoySub').textContent = topeLleno ? 'tope de hoy alcanzado' : lim ? `publicaciones de tu plan ${c.plan}` : 'sin tope diario';
+    const chip = $('hoyChip'); chip.textContent = lim ? `Hoy ${pubsHoy} de ${lim}` : `Hoy ${pubsHoy}`; chip.className = 'chip ' + (topeLleno ? 'bad' : ratio >= .8 ? 'warn' : 'ok');
     $('send').disabled = topeLleno; $('send').textContent = topeLleno ? 'Tope de hoy alcanzado' : 'Publicar';
-    $('rules').textContent = topeLleno ? `Llegaste a las ${lim} publicaciones de hoy. El siguiente lote sale mañana; puedes dejarlo programado.` : 'Los lotes salen en orden de llegada y dentro del tope diario de tu plan. Si tu cuenta de Compre o Alquile no tiene cupo, te lo decimos aquí.';
-    $('greetText').textContent = (ultimoCupo ? `Tu cupo en Compre o Alquile tras el último lote: ${ultimoCupo.resumen.cupoCoa}. ` : '') + 'Una publicación es una propiedad en un portal; una propiedad en los dos portales cuenta dos.';
+    $('rules').textContent = topeLleno ? `Llegaste a tus ${lim} publicaciones de hoy. Puedes dejar el siguiente programado para mañana.` : 'Sale en orden de llegada, dentro de tu tope diario.';
+    $('greetText').textContent = (S.colaTotal ? (miosEnCola ? `${plural(miosEnCola, 'lote tuyo', 'lotes tuyos')} en cola.` : `${plural(S.colaTotal, 'lote', 'lotes')} en cola antes del tuyo.`) : 'La cola está vacía.') + (ultimoCupo ? ` Cupo en Compre o Alquile: ${ultimoCupo.resumen.cupoCoa}.` : '');
     const box = $('jobs'); box.innerHTML = '';
     $('jobsEmpty').hidden = mios.length > 0;
     $('jobsCount').textContent = mios.length ? plural(mios.length, 'lote', 'lotes') : '';
