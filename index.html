@@ -379,7 +379,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </section>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 00:25</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 00:28</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -567,7 +567,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const [{ data: cs }, { data: ts }] = await Promise.all([sb.from('clientes').select('*').order('nombre'), sb.from('trabajos').select('cliente_id, creado, resultados')]);
     S.clientes = cs || [];
     const porCliente = {}; (ts || []).forEach((t) => { if (!mesActual(t.creado)) return; porCliente[t.cliente_id] = (porCliente[t.cliente_id] || 0) + (t.resultados || []).filter((r) => r.estado === 'Activo').length; });
-    const abierto = S.panelDe; const panelViejo = abierto ? document.querySelector(`.cli[data-id="${abierto}"] .panel`) : null; const contenidoViejo = panelViejo ? [...panelViejo.childNodes] : [];
+    const abierto = S.panelDe; const panelViejo = abierto ? document.querySelector(`.cli[data-id="${abierto}"] .panel`) : null; const formDentro = panelViejo && panelViejo.contains($('formCuentas')); if (formDentro) $('viewAdmin').querySelector('.card').appendChild($('formCuentas')); const contenidoViejo = panelViejo ? [...panelViejo.childNodes] : [];
     const box = $('clist'); box.innerHTML = '';
     S.clientes.forEach((c) => {
       const d = document.createElement('div'); d.className = 'cli' + (c.activo ? '' : ' off'); d.dataset.id = c.id;
@@ -578,9 +578,10 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
         `<div class="panel"></div>`;
       box.appendChild(d);
     });
-    if (abierto && contenidoViejo.length) { const np = document.querySelector(`.cli[data-id="${abierto}"] .panel`); if (np) contenidoViejo.forEach((n) => np.appendChild(n)); }
+    if (abierto) { const np = document.querySelector(`.cli[data-id="${abierto}"] .panel`); if (np) { contenidoViejo.forEach((n) => np.appendChild(n)); if (formDentro) np.appendChild($('formCuentas')); } }
   }
-  function panelDe(id) { S.panelDe = id; const p = document.querySelector(`.cli[data-id="${id}"] .panel`); if (p) p.innerHTML = ''; return p; }
+  function rescatarFormCuentas() { const f = $('formCuentas'); if (f) { f.hidden = true; $('viewAdmin').querySelector('.card').appendChild(f); } }
+  function panelDe(id) { S.panelDe = id; rescatarFormCuentas(); const p = document.querySelector(`.cli[data-id="${id}"] .panel`); if (p) p.innerHTML = ''; return p; }
   $('clist').addEventListener('click', async (ev) => {
     const b = ev.target.closest('button[data-a]'); if (!b) return;
     const card = b.closest('.cli'); const c = S.clientes.find((x) => x.id === card.dataset.id); if (!c) return;
@@ -616,7 +617,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     donde.innerHTML = `<b>Enlace de activación para ${esc(c.nombre)}</b><code>${esc(enlace)}</code><div class="inlineacts"><button class="btn sm" type="button" data-copy>Copiar enlace</button>${tel ? `<a class="btn sm" href="https://wa.me/${tel}?text=${encodeURIComponent(texto)}" target="_blank" rel="noopener">Mandar por WhatsApp</a>` : ''}</div><span class="hint">Vence en una hora. Si vence, pulsa "Enlace" en su fila y sale uno nuevo.</span>`;
     donde.querySelector('[data-copy]').addEventListener('click', async (ev) => { try { await navigator.clipboard.writeText(enlace); ev.target.textContent = 'Copiado'; } catch (e) { const r = document.createRange(); r.selectNodeContents(donde.querySelector('code')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } });
   }
-  $('cuCancelar').addEventListener('click', () => { $('formCuentas').hidden = true; $('viewAdmin').querySelector('.card').appendChild($('formCuentas')); S.cuentasDe = null; S.panelDe = null; });
+  $('cuCancelar').addEventListener('click', () => { rescatarFormCuentas(); S.cuentasDe = null; S.panelDe = null; });
   $('formCuentas').addEventListener('submit', async (ev) => {
     ev.preventDefault(); const c = S.clientes.find((x) => x.id === S.cuentasDe); if (!c) return;
     const e = $('cuErr'); e.textContent = ''; const b = $('cuGuardar');
@@ -627,7 +628,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     if (coak) portales.coa = { correo: coac, clave: coak }; else if (coac.toLowerCase() !== (c.coa_correo || '').toLowerCase()) { e.textContent = 'Cambiaste el correo de Compre o Alquile: escribe también su contraseña.'; return; }
     if (!Object.keys(portales).length) { e.textContent = 'No cambiaste nada.'; return; }
     b.disabled = true; b.textContent = 'Guardando…';
-    try { await llamarAdmin({ accion: 'actualizar', id: c.id, cambios: {}, portales }); $('formCuentas').hidden = true; $('viewAdmin').querySelector('.card').appendChild($('formCuentas')); S.cuentasDe = null; S.panelDe = null; adminMsg(`${c.nombre}: cuentas de portales guardadas.`, 'ok'); await cargarAdmin(); }
+    try { await llamarAdmin({ accion: 'actualizar', id: c.id, cambios: {}, portales }); rescatarFormCuentas(); S.cuentasDe = null; S.panelDe = null; adminMsg(`${c.nombre}: cuentas de portales guardadas.`, 'ok'); await cargarAdmin(); }
     catch (err) { e.textContent = errMsg(err); }
     b.disabled = false; b.textContent = 'Guardar cuentas';
   });
