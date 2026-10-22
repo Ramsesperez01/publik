@@ -388,7 +388,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 08:24</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 09:12</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -600,7 +600,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const ratio = lim ? Math.min(1, pubsHoy / lim) : 0;
     const chip = $('hoyChip'); chip.textContent = lim ? `Hoy ${pubsHoy} de ${lim}` : `Hoy ${pubsHoy}`; chip.className = 'chip ' + (topeLleno ? 'bad' : ratio >= .8 ? 'warn' : 'ok');
     if (!S.enviando) { $('send').disabled = topeLleno; $('send').textContent = topeLleno ? 'Tope de hoy alcanzado' : 'Publicar'; }
-    $('rules').textContent = topeLleno ? `Llegaste a tus ${lim} publicaciones de hoy. Puedes dejar el siguiente programado para mañana.` : 'Sale en orden de llegada, dentro de tu tope diario.';
+    $('rules').textContent = topeLleno ? `Llegaste a tus ${lim} avisos de hoy. El cupo se reinicia mañana.` : 'Sale en orden de llegada, dentro de tu tope diario.';
     $('greetText').textContent = (S.colaTotal ? (miosEnCola ? `${plural(miosEnCola, 'lote tuyo', 'lotes tuyos')} en cola.` : `${plural(S.colaTotal, 'lote', 'lotes')} en cola antes del tuyo.`) : 'La cola está vacía.') + (ultimoCupo ? ` Cupo en Compre o Alquile: ${ultimoCupo.resumen.cupoCoa}.` : '');
     const box = $('jobs'); box.innerHTML = '';
     $('jobsEmpty').hidden = mios.length > 0;
