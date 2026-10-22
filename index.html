@@ -176,6 +176,20 @@ tr:last-child td{border-bottom:0}
 .empty svg{width:44px;height:44px;color:var(--line-2)}
 footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--line)}
 .linkbox{display:grid;gap:10px;padding:14px;border-radius:var(--r-s);background:var(--panel-2);border:1px solid var(--line)}
+.clist{display:grid;gap:10px}
+.cli{border:1px solid var(--line);border-radius:var(--r-s);padding:14px 16px;display:grid;gap:10px;background:var(--panel)}
+.cli.off{opacity:.75}
+.cli .top{display:flex;align-items:center;gap:12px;min-width:0}
+.cli .avatar{width:40px;height:40px;border-radius:50%;background:var(--red-soft);color:var(--red);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:14px;flex:none}
+.cli.off .avatar{background:var(--panel-2);color:var(--fg-3)}
+.cli .txt{flex:1;min-width:0;display:grid;line-height:1.3}
+.cli .n{font-family:var(--display);font-weight:800;font-size:16px}
+.cli .m{font-size:13.5px;color:var(--fg-2);overflow-wrap:anywhere}
+.cli .meta{display:flex;gap:6px 14px;flex-wrap:wrap;font-size:13.5px;color:var(--fg-2)}
+.cli .acts{display:flex;gap:6px;flex-wrap:wrap}
+.cli .acts .btn{padding:6px 12px;font-size:13px}
+.cli .panel{display:grid;gap:10px}
+.cli .panel:empty{display:none}
 .linkbox code{font-family:var(--mono);font-size:12.5px;overflow-wrap:anywhere;color:var(--fg-2)}
 .inlineacts{display:flex;gap:8px;flex-wrap:wrap}
 @media (max-width:480px){ .job>summary{grid-template-columns:1fr} .job .pos{text-align:left} }
@@ -320,10 +334,10 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   <!-- ADMIN -->
   <section id="viewAdmin" hidden style="display:grid;gap:24px" class="lift">
     <section class="card">
-      <div class="card-head"><div style="display:grid;gap:6px"><span class="eyebrow">Administración</span><h2>Clientes</h2><p class="muted">Crea cuentas, cambia planes y apaga el acceso de quien no pague. Cada cambio aplica la próxima vez que el agente abra la página.</p></div><button class="btn" id="adminBack" type="button">Volver a mis lotes</button></div>
-      <div class="tablewrap"><table id="tblClientes"><thead><tr><th>Agente</th><th>Código</th><th>Plan</th><th class="num">Tope/día</th><th class="num">Mes</th><th>Portales</th><th>Estado</th><th></th></tr></thead><tbody></tbody></table></div>
+      <div class="card-head"><h2>Clientes</h2><div class="inlineacts"><button class="btn" id="adminBack" type="button">Mis lotes</button><button class="btn primary" id="btnNuevo" type="button" style="padding:11px 20px;font-size:15px;box-shadow:none">+ Nuevo cliente</button></div></div>
+      <div class="clist" id="clist"></div>
       <div id="adminMsg" class="notice info" hidden style="margin-top:14px"></div>
-      <form id="formCuentas" hidden style="margin-top:18px;padding:18px;border:1px solid var(--line);border-radius:var(--r-s);background:var(--bg)">
+      <form id="formCuentas" hidden style="margin-top:12px;padding:16px;border:1px solid var(--line);border-radius:var(--r-s);background:var(--bg)">
         <div style="display:grid;gap:4px"><span class="eyebrow">Cuentas en los portales</span><h3 id="cuTitulo">Agente</h3><p class="hint">Escribe la contraseña solo si la vas a cambiar o si cambias el correo. Vacía = se conserva la guardada.</p></div>
         <div class="row">
           <div class="field"><label for="cuE24c">Encuentra24 · correo</label><input id="cuE24c" type="email" inputmode="email" autocapitalize="none" autocomplete="off"></div>
@@ -334,8 +348,8 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
         <div class="actions" style="border-top:0;padding-top:0;margin-top:0"><span class="rules err" id="cuErr"></span><div class="inlineacts"><button class="btn" id="cuCancelar" type="button">Cancelar</button><button class="btn primary" id="cuGuardar" type="submit">Guardar cuentas</button></div></div>
       </form>
     </section>
-    <section class="card">
-      <div class="card-head"><div style="display:grid;gap:6px"><span class="eyebrow">Alta</span><h2>Nuevo cliente</h2><p class="muted">Al guardar sale un enlace de activación: mándaselo por WhatsApp. Con él elige su contraseña y entra.</p></div></div>
+    <section class="card" id="cardNuevo" hidden>
+      <div class="card-head"><div style="display:grid;gap:6px"><h2>Nuevo cliente</h2><p class="muted">Al guardar sale un enlace de activación para mandarle por WhatsApp.</p></div><button class="btn" id="btnCerrarNuevo" type="button">Cancelar</button></div>
       <form id="formNuevo" novalidate>
         <div class="row">
           <div class="field"><label for="nNombre">Nombre completo</label><input id="nNombre" autocomplete="off"></div>
@@ -365,7 +379,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </section>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 00:22</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 00:25</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -378,7 +392,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   const sb = window.supabase.createClient(SB_URL, SB_KEY);
   const SHARE_RE = /^https?:\/\/(?:www\.)?flexmls\.com\/share\/([A-Za-z0-9]+)(?:\/[A-Za-z0-9\-]+)?\/?$/i;
   const $ = (id) => document.getElementById(id);
-  const S = { user: null, cliente: null, trabajos: [], colaTotal: 0, posiciones: {}, pubsHoy: 0, canal: null, sentTimer: 0, clientes: [], cuentasDe: null };
+  const S = { user: null, cliente: null, trabajos: [], colaTotal: 0, posiciones: {}, pubsHoy: 0, canal: null, sentTimer: 0, clientes: [], cuentasDe: null, panelDe: null };
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const iniciales = (n) => (n || '?').trim().split(/\s+/).filter(Boolean).slice(0, 2).map((w) => Array.from(w)[0].toUpperCase()).join('') || '?';
   const fmtDT = (iso) => { if (!iso) return '—'; const d = new Date(iso); if (isNaN(d)) return iso; return d.toLocaleString('es-PA', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); };
@@ -553,38 +567,48 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const [{ data: cs }, { data: ts }] = await Promise.all([sb.from('clientes').select('*').order('nombre'), sb.from('trabajos').select('cliente_id, creado, resultados')]);
     S.clientes = cs || [];
     const porCliente = {}; (ts || []).forEach((t) => { if (!mesActual(t.creado)) return; porCliente[t.cliente_id] = (porCliente[t.cliente_id] || 0) + (t.resultados || []).filter((r) => r.estado === 'Activo').length; });
-    const tb = $('tblClientes').querySelector('tbody'); tb.innerHTML = '';
+    const abierto = S.panelDe; const panelViejo = abierto ? document.querySelector(`.cli[data-id="${abierto}"] .panel`) : null; const contenidoViejo = panelViejo ? [...panelViejo.childNodes] : [];
+    const box = $('clist'); box.innerHTML = '';
     S.clientes.forEach((c) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td class="wrap"><b>${esc(c.nombre)}</b>${c.es_admin ? ' <span class="chip neutral">admin</span>' : ''}<span class="small muted">${esc(c.correo)}${c.celular ? ' · ' + esc(c.celular) : ''}</span></td><td class="mono">${esc(c.codigo)}</td><td>${esc(c.plan)}${c.precio_mes ? ` <span class="small muted">$${c.precio_mes}</span>` : ''}</td><td class="num">${c.limite_dia}</td><td class="num">${porCliente[c.id] || 0}</td><td class="small wrap">E24: ${c.e24_correo ? esc(c.e24_correo) : '<span class="chip bad">falta</span>'}<br>CoA: ${c.coa_correo ? esc(c.coa_correo) : '<span class="chip bad">falta</span>'}</td><td>${c.activo ? '<span class="chip ok"><span class="dot"></span>Activo</span>' : '<span class="chip bad"><span class="dot"></span>Apagado</span>'}</td><td><div class="inlineacts"><button class="btn sm" data-a="toggle" data-id="${c.id}" type="button">${c.activo ? 'Apagar' : 'Activar'}</button><button class="btn sm" data-a="plan" data-id="${c.id}" type="button">Plan</button><button class="btn sm" data-a="cuentas" data-id="${c.id}" type="button">Cuentas</button><button class="btn sm" data-a="enlace" data-id="${c.id}" type="button">Enlace</button></div></td>`;
-      tb.appendChild(tr);
+      const d = document.createElement('div'); d.className = 'cli' + (c.activo ? '' : ' off'); d.dataset.id = c.id;
+      const faltan = (!c.e24_correo || !c.coa_correo) && !c.es_admin;
+      d.innerHTML = `<div class="top"><span class="avatar">${esc(iniciales(c.nombre))}</span><span class="txt"><span class="n">${esc(c.nombre)}${c.es_admin ? ' <span class="chip neutral">admin</span>' : ''}</span><span class="m">${esc(c.correo)}${c.celular ? ' · ' + esc(c.celular) : ''}</span></span>${c.activo ? '<span class="chip ok"><span class="dot"></span>Activo</span>' : '<span class="chip bad"><span class="dot"></span>Apagado</span>'}</div>` +
+        (c.es_admin ? '' : `<div class="meta"><span class="mono">${esc(c.codigo)}</span><span>Plan ${esc(c.plan)}${c.precio_mes ? ` · $${c.precio_mes}/mes` : ''}</span><span>${c.limite_dia} por día</span><span>${plural(porCliente[c.id] || 0, 'aviso', 'avisos')} este mes</span>${faltan ? '<span class="chip bad">faltan cuentas de portales</span>' : ''}</div>` +
+        `<div class="acts"><button class="btn" data-a="toggle" type="button">${c.activo ? 'Apagar' : 'Activar'}</button><button class="btn" data-a="plan" type="button">Plan</button><button class="btn" data-a="cuentas" type="button">Cuentas</button><button class="btn" data-a="enlace" type="button">Enlace</button></div>`) +
+        `<div class="panel"></div>`;
+      box.appendChild(d);
     });
+    if (abierto && contenidoViejo.length) { const np = document.querySelector(`.cli[data-id="${abierto}"] .panel`); if (np) contenidoViejo.forEach((n) => np.appendChild(n)); }
   }
-  $('tblClientes').addEventListener('click', async (ev) => {
+  function panelDe(id) { S.panelDe = id; const p = document.querySelector(`.cli[data-id="${id}"] .panel`); if (p) p.innerHTML = ''; return p; }
+  $('clist').addEventListener('click', async (ev) => {
     const b = ev.target.closest('button[data-a]'); if (!b) return;
-    const c = S.clientes.find((x) => x.id === b.dataset.id); if (!c) return;
+    const card = b.closest('.cli'); const c = S.clientes.find((x) => x.id === card.dataset.id); if (!c) return;
     b.disabled = true;
     try {
       if (b.dataset.a === 'toggle') { await llamarAdmin({ accion: 'actualizar', id: c.id, cambios: { activo: !c.activo } }); adminMsg(`${c.nombre}: ${c.activo ? 'acceso apagado' : 'acceso activado'}.`, 'ok'); }
       else if (b.dataset.a === 'plan') {
-        const tr = b.closest('tr'); const celda = tr.children[2];
-        celda.innerHTML = `<div class="inlineacts"><select class="btn sm" data-f="plan">${['Piloto', 'Básico', 'Pro', 'Oficina'].map((p) => `<option ${p === c.plan ? 'selected' : ''}>${p}</option>`).join('')}</select><input class="btn sm" data-f="lim" type="number" min="0" value="${c.limite_dia}" style="width:72px" aria-label="Tope por día"><input class="btn sm" data-f="precio" type="number" min="0" step="0.01" value="${c.precio_mes}" style="width:88px" aria-label="Precio mensual"><button class="btn sm primary" data-a="guardarPlan" data-id="${c.id}" type="button">Guardar</button></div>`;
+        const p = panelDe(c.id);
+        p.innerHTML = `<div class="row" style="gap:10px"><div class="field"><label>Plan</label><select data-f="plan">${['Piloto', 'Básico', 'Pro', 'Oficina'].map((x) => `<option ${x === c.plan ? 'selected' : ''}>${x}</option>`).join('')}</select></div><div class="field"><label>Publicaciones por día</label><input data-f="lim" type="number" inputmode="numeric" min="0" value="${c.limite_dia}"></div><div class="field"><label>Precio mensual (USD)</label><input data-f="precio" type="number" inputmode="decimal" min="0" step="0.01" value="${c.precio_mes}"></div></div><div class="inlineacts"><button class="btn" data-a="cerrar" type="button">Cancelar</button><button class="btn primary" data-a="guardarPlan" type="button" style="padding:11px 20px;font-size:15px;box-shadow:none">Guardar plan</button></div>`;
         b.disabled = false; return;
       }
       else if (b.dataset.a === 'guardarPlan') {
-        const tr = b.closest('tr'); const plan = tr.querySelector('[data-f=plan]').value, lim = Number(tr.querySelector('[data-f=lim]').value), precio = Number(tr.querySelector('[data-f=precio]').value);
-        await llamarAdmin({ accion: 'actualizar', id: c.id, cambios: { plan, limite_dia: lim, precio_mes: precio } }); adminMsg(`${c.nombre}: plan ${plan}, ${lim} por día, $${precio}/mes.`, 'ok');
+        const p = card.querySelector('.panel'); const plan = p.querySelector('[data-f=plan]').value, lim = Number(p.querySelector('[data-f=lim]').value), precio = Number(p.querySelector('[data-f=precio]').value);
+        await llamarAdmin({ accion: 'actualizar', id: c.id, cambios: { plan, limite_dia: lim, precio_mes: precio } }); S.panelDe = null; adminMsg(`${c.nombre}: plan ${plan}, ${lim} por día, $${precio}/mes.`, 'ok');
       }
       else if (b.dataset.a === 'cuentas') {
         S.cuentasDe = c.id; adminMsg('');
         $('cuTitulo').textContent = c.nombre; $('cuE24c').value = c.e24_correo || ''; $('cuCoac').value = c.coa_correo || ''; $('cuE24k').value = ''; $('cuCoak').value = ''; $('cuErr').textContent = '';
-        const f = $('formCuentas'); f.hidden = false; f.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const p = panelDe(c.id); const f = $('formCuentas'); f.hidden = false; p.appendChild(f);
         b.disabled = false; return;
       }
-      else if (b.dataset.a === 'enlace') { const r = await llamarAdmin({ accion: 'enlace', id: c.id }); mostrarEnlace(c, r.enlace, $('adminMsg')); b.disabled = false; return; }
+      else if (b.dataset.a === 'enlace') { const r = await llamarAdmin({ accion: 'enlace', id: c.id }); const p = panelDe(c.id); const box = document.createElement('div'); p.appendChild(box); mostrarEnlace(c, r.enlace, box); b.disabled = false; return; }
+      else if (b.dataset.a === 'cerrar') { S.panelDe = null; card.querySelector('.panel').innerHTML = ''; b.disabled = false; return; }
       await cargarAdmin();
     } catch (e) { adminMsg(errMsg(e), 'bad'); b.disabled = false; }
   });
+  $('btnNuevo').addEventListener('click', () => { const c = $('cardNuevo'); c.hidden = false; c.scrollIntoView({ behavior: 'smooth', block: 'start' }); $('nNombre').focus(); });
+  $('btnCerrarNuevo').addEventListener('click', () => { $('cardNuevo').hidden = true; });
   function mostrarEnlace(c, enlace, donde) {
     const tel = String(c.celular || '').replace(/\D/g, '');
     const texto = `Hola ${c.nombre.split(' ')[0]}, tu acceso a Publik está listo. Entra aquí y elige tu contraseña (el enlace vence en una hora): ${enlace}`;
@@ -592,7 +616,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     donde.innerHTML = `<b>Enlace de activación para ${esc(c.nombre)}</b><code>${esc(enlace)}</code><div class="inlineacts"><button class="btn sm" type="button" data-copy>Copiar enlace</button>${tel ? `<a class="btn sm" href="https://wa.me/${tel}?text=${encodeURIComponent(texto)}" target="_blank" rel="noopener">Mandar por WhatsApp</a>` : ''}</div><span class="hint">Vence en una hora. Si vence, pulsa "Enlace" en su fila y sale uno nuevo.</span>`;
     donde.querySelector('[data-copy]').addEventListener('click', async (ev) => { try { await navigator.clipboard.writeText(enlace); ev.target.textContent = 'Copiado'; } catch (e) { const r = document.createRange(); r.selectNodeContents(donde.querySelector('code')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } });
   }
-  $('cuCancelar').addEventListener('click', () => { $('formCuentas').hidden = true; S.cuentasDe = null; });
+  $('cuCancelar').addEventListener('click', () => { $('formCuentas').hidden = true; $('viewAdmin').querySelector('.card').appendChild($('formCuentas')); S.cuentasDe = null; S.panelDe = null; });
   $('formCuentas').addEventListener('submit', async (ev) => {
     ev.preventDefault(); const c = S.clientes.find((x) => x.id === S.cuentasDe); if (!c) return;
     const e = $('cuErr'); e.textContent = ''; const b = $('cuGuardar');
@@ -603,7 +627,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     if (coak) portales.coa = { correo: coac, clave: coak }; else if (coac.toLowerCase() !== (c.coa_correo || '').toLowerCase()) { e.textContent = 'Cambiaste el correo de Compre o Alquile: escribe también su contraseña.'; return; }
     if (!Object.keys(portales).length) { e.textContent = 'No cambiaste nada.'; return; }
     b.disabled = true; b.textContent = 'Guardando…';
-    try { await llamarAdmin({ accion: 'actualizar', id: c.id, cambios: {}, portales }); $('formCuentas').hidden = true; S.cuentasDe = null; adminMsg(`${c.nombre}: cuentas de portales guardadas.`, 'ok'); await cargarAdmin(); }
+    try { await llamarAdmin({ accion: 'actualizar', id: c.id, cambios: {}, portales }); $('formCuentas').hidden = true; $('viewAdmin').querySelector('.card').appendChild($('formCuentas')); S.cuentasDe = null; S.panelDe = null; adminMsg(`${c.nombre}: cuentas de portales guardadas.`, 'ok'); await cargarAdmin(); }
     catch (err) { e.textContent = errMsg(err); }
     b.disabled = false; b.textContent = 'Guardar cuentas';
   });
@@ -618,7 +642,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     b.disabled = true; b.textContent = 'Creando…';
     try {
       const r = await llamarAdmin({ accion: 'crear', cliente, portales });
-      mostrarEnlace({ ...cliente }, r.enlace, $('nLink'));
+      mostrarEnlace({ ...cliente }, r.enlace, $('nLink')); $('nLink').scrollIntoView({ behavior: 'smooth', block: 'center' });
       $('formNuevo').reset(); $('nOficina').value = 'Rent-A-House Panamá VIP'; $('nLim').value = 15; $('nPrecio').value = 0;
       await cargarAdmin();
     } catch (err) { e.textContent = errMsg(err); }
