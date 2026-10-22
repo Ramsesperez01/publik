@@ -346,14 +346,14 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
         </div>
         <div class="field"><label for="nNotas">Notas internas</label><textarea id="nNotas" placeholder="Solo las ven los administradores."></textarea></div>
         <div style="display:grid;gap:10px">
-          <span class="lbl" style="font-family:var(--display);font-weight:700">Cuentas del agente en los portales <span class="muted" style="font-weight:400;font-family:var(--body)">(opcional: vacío = publicamos con la cuenta de la oficina)</span></span>
+          <span class="lbl" style="font-family:var(--display);font-weight:700">Cuentas del agente en los portales <span class="muted" style="font-weight:400;font-family:var(--body)">(obligatorio: con ellas publica Bob)</span></span>
           <div class="row">
             <div class="field"><label for="nE24Correo">Encuentra24 · correo</label><input id="nE24Correo" type="email" inputmode="email" autocapitalize="none" autocomplete="off"></div>
             <div class="field"><label for="nE24Clave">Encuentra24 · contraseña</label><input id="nE24Clave" type="password" autocomplete="new-password"></div>
             <div class="field"><label for="nCoaCorreo">Compre o Alquile · correo</label><input id="nCoaCorreo" type="email" inputmode="email" autocapitalize="none" autocomplete="off"></div>
             <div class="field"><label for="nCoaClave">Compre o Alquile · contraseña</label><input id="nCoaClave" type="password" autocomplete="new-password"></div>
           </div>
-          <span class="hint">Las contraseñas se guardan cifradas en la bóveda del servidor; solo Bob las usa para entrar al portal a publicar. No se vuelven a mostrar: para cambiarlas usa "Cuentas" en la lista.</span>
+          <span class="hint">Si el agente publica con la cuenta de la oficina, pon aquí la de la oficina. Las contraseñas se guardan cifradas en la bóveda del servidor; solo Bob las usa para entrar al portal. No se vuelven a mostrar: para cambiarlas usa "Cuentas" en la lista.</span>
         </div>
         <div class="actions"><span class="rules" id="nErr"></span><button class="btn primary" id="nBtn" type="submit">Crear cuenta</button></div>
         <div class="linkbox" id="nLink" hidden></div>
@@ -420,8 +420,8 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     if (!c.activo) { $('blockedTitle').textContent = `${nombre}, tu plan no está activo`; show('viewBlocked'); $('who').hidden = false; return; }
     $('greetTitle').textContent = `Hola, ${nombre}.`;
     $('bandTitle').textContent = `Hola, ${nombre}. ¿Qué publicamos hoy?`;
-    $('coaSub').textContent = c.coa_correo ? 'Tu cuenta, plan Simple' : 'Cuenta de la oficina, plan Simple';
-    document.querySelector('label.portal span:not(.tick)').textContent = c.e24_correo ? 'Tu cuenta, con tu contacto' : 'Cuenta de la oficina, con tu contacto';
+    $('coaSub').textContent = c.coa_correo ? `Cuenta ${c.coa_correo}, plan Simple` : 'Plan Simple';
+    document.querySelector('label.portal span:not(.tick)').textContent = c.e24_correo ? `Cuenta ${c.e24_correo}, con tu contacto` : 'Con tu contacto';
     $('connState').textContent = 'conectado';
     await cargar();
     show(location.hash === '#admin' && c.es_admin ? 'viewAdmin' : 'viewApp');
@@ -562,7 +562,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const tb = $('tblClientes').querySelector('tbody'); tb.innerHTML = '';
     S.clientes.forEach((c) => {
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td class="wrap"><b>${esc(c.nombre)}</b>${c.es_admin ? ' <span class="chip neutral">admin</span>' : ''}<span class="small muted">${esc(c.correo)}${c.celular ? ' · ' + esc(c.celular) : ''}</span></td><td class="mono">${esc(c.codigo)}</td><td>${esc(c.plan)}${c.precio_mes ? ` <span class="small muted">$${c.precio_mes}</span>` : ''}</td><td class="num">${c.limite_dia}</td><td class="num">${porCliente[c.id] || 0}</td><td class="small">E24: ${c.e24_correo ? 'propia' : 'oficina'}<br>CoA: ${c.coa_correo ? 'propia' : 'oficina'}</td><td>${c.activo ? '<span class="chip ok"><span class="dot"></span>Activo</span>' : '<span class="chip bad"><span class="dot"></span>Apagado</span>'}</td><td><div class="inlineacts"><button class="btn sm" data-a="toggle" data-id="${c.id}" type="button">${c.activo ? 'Apagar' : 'Activar'}</button><button class="btn sm" data-a="plan" data-id="${c.id}" type="button">Plan</button><button class="btn sm" data-a="cuentas" data-id="${c.id}" type="button">Cuentas</button><button class="btn sm" data-a="enlace" data-id="${c.id}" type="button">Enlace</button></div></td>`;
+      tr.innerHTML = `<td class="wrap"><b>${esc(c.nombre)}</b>${c.es_admin ? ' <span class="chip neutral">admin</span>' : ''}<span class="small muted">${esc(c.correo)}${c.celular ? ' · ' + esc(c.celular) : ''}</span></td><td class="mono">${esc(c.codigo)}</td><td>${esc(c.plan)}${c.precio_mes ? ` <span class="small muted">$${c.precio_mes}</span>` : ''}</td><td class="num">${c.limite_dia}</td><td class="num">${porCliente[c.id] || 0}</td><td class="small wrap">E24: ${c.e24_correo ? esc(c.e24_correo) : '<span class="chip bad">falta</span>'}<br>CoA: ${c.coa_correo ? esc(c.coa_correo) : '<span class="chip bad">falta</span>'}</td><td>${c.activo ? '<span class="chip ok"><span class="dot"></span>Activo</span>' : '<span class="chip bad"><span class="dot"></span>Apagado</span>'}</td><td><div class="inlineacts"><button class="btn sm" data-a="toggle" data-id="${c.id}" type="button">${c.activo ? 'Apagar' : 'Activar'}</button><button class="btn sm" data-a="plan" data-id="${c.id}" type="button">Plan</button><button class="btn sm" data-a="cuentas" data-id="${c.id}" type="button">Cuentas</button><button class="btn sm" data-a="enlace" data-id="${c.id}" type="button">Enlace</button></div></td>`;
       tb.appendChild(tr);
     });
   }
@@ -583,15 +583,17 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
       }
       else if (b.dataset.a === 'cuentas') {
         const tr = b.closest('tr'); const celda = tr.children[5];
-        celda.innerHTML = `<div style="display:grid;gap:6px;min-width:260px"><input class="btn sm" data-f="e24c" type="email" placeholder="Encuentra24 · correo" value="${esc(c.e24_correo || '')}"><input class="btn sm" data-f="e24k" type="password" placeholder="Encuentra24 · contraseña ${c.e24_correo ? '(guardada; escribe para cambiar)' : ''}" autocomplete="new-password"><input class="btn sm" data-f="coac" type="email" placeholder="Compre o Alquile · correo" value="${esc(c.coa_correo || '')}"><input class="btn sm" data-f="coak" type="password" placeholder="Compre o Alquile · contraseña ${c.coa_correo ? '(guardada; escribe para cambiar)' : ''}" autocomplete="new-password"><div class="inlineacts"><button class="btn sm primary" data-a="guardarCuentas" data-id="${c.id}" type="button">Guardar</button><span class="hint">Correo vacío = volver a la cuenta de la oficina.</span></div></div>`;
+        celda.innerHTML = `<div style="display:grid;gap:6px;min-width:260px"><input class="btn sm" data-f="e24c" type="email" placeholder="Encuentra24 · correo" value="${esc(c.e24_correo || '')}"><input class="btn sm" data-f="e24k" type="password" placeholder="Encuentra24 · contraseña ${c.e24_correo ? '(guardada; escribe para cambiar)' : ''}" autocomplete="new-password"><input class="btn sm" data-f="coac" type="email" placeholder="Compre o Alquile · correo" value="${esc(c.coa_correo || '')}"><input class="btn sm" data-f="coak" type="password" placeholder="Compre o Alquile · contraseña ${c.coa_correo ? '(guardada; escribe para cambiar)' : ''}" autocomplete="new-password"><div class="inlineacts"><button class="btn sm primary" data-a="guardarCuentas" data-id="${c.id}" type="button">Guardar</button><span class="hint">Deja la contraseña vacía para conservar la guardada.</span></div></div>`;
         b.disabled = false; return;
       }
       else if (b.dataset.a === 'guardarCuentas') {
         const tr = b.closest('tr'); const g = (f) => tr.querySelector(`[data-f=${f}]`).value.trim();
         const portales = {};
         const e24c = g('e24c'), e24k = g('e24k'), coac = g('coac'), coak = g('coak');
-        if (!e24c) portales.e24 = null; else if (e24k) portales.e24 = { correo: e24c, clave: e24k }; else if (e24c !== (c.e24_correo || '')) { adminMsg('Para cambiar el correo de Encuentra24 escribe también la contraseña.', 'bad'); b.disabled = false; return; }
-        if (!coac) portales.coa = null; else if (coak) portales.coa = { correo: coac, clave: coak }; else if (coac !== (c.coa_correo || '')) { adminMsg('Para cambiar el correo de Compre o Alquile escribe también la contraseña.', 'bad'); b.disabled = false; return; }
+        if (!e24c || !coac) { adminMsg('Los correos de los dos portales son obligatorios.', 'bad'); b.disabled = false; return; }
+        if (e24k) portales.e24 = { correo: e24c, clave: e24k }; else if (e24c !== (c.e24_correo || '')) { adminMsg('Para cambiar el correo de Encuentra24 escribe también la contraseña.', 'bad'); b.disabled = false; return; }
+        if (coak) portales.coa = { correo: coac, clave: coak }; else if (coac !== (c.coa_correo || '')) { adminMsg('Para cambiar el correo de Compre o Alquile escribe también la contraseña.', 'bad'); b.disabled = false; return; }
+        if (!Object.keys(portales).length) { adminMsg('Sin cambios.', 'info'); b.disabled = false; return; }
         await llamarAdmin({ accion: 'actualizar', id: c.id, cambios: {}, portales }); adminMsg(`${c.nombre}: cuentas de portales guardadas.`, 'ok');
       }
       else if (b.dataset.a === 'enlace') { const r = await llamarAdmin({ accion: 'enlace', id: c.id }); mostrarEnlace(c, r.enlace, $('adminMsg')); b.disabled = false; return; }
@@ -609,10 +611,10 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     ev.preventDefault(); const e = $('nErr'); e.textContent = ''; const b = $('nBtn');
     const cliente = { nombre: $('nNombre').value.trim(), correo: $('nCorreo').value.trim().toLowerCase(), celular: $('nCel').value.trim(), codigo: $('nCodigo').value.trim().toUpperCase(), oficina: $('nOficina').value.trim(), plan: $('nPlan').value, limite_dia: Number($('nLim').value), precio_mes: Number($('nPrecio').value), notas: $('nNotas').value.trim() };
     if (!cliente.nombre || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(cliente.correo) || !cliente.codigo) { e.textContent = 'Faltan nombre, correo válido o código.'; return; }
-    const portales = {};
     const e24c = $('nE24Correo').value.trim(), e24k = $('nE24Clave').value, coac = $('nCoaCorreo').value.trim(), coak = $('nCoaClave').value;
-    if (e24c || e24k) { if (!e24c || !e24k) { e.textContent = 'Encuentra24: faltan correo o contraseña.'; return; } portales.e24 = { correo: e24c, clave: e24k }; }
-    if (coac || coak) { if (!coac || !coak) { e.textContent = 'Compre o Alquile: faltan correo o contraseña.'; return; } portales.coa = { correo: coac, clave: coak }; }
+    if (!e24c || !e24k) { e.textContent = 'Encuentra24: faltan correo o contraseña (obligatorios).'; return; }
+    if (!coac || !coak) { e.textContent = 'Compre o Alquile: faltan correo o contraseña (obligatorios).'; return; }
+    const portales = { e24: { correo: e24c, clave: e24k }, coa: { correo: coac, clave: coak } };
     b.disabled = true; b.textContent = 'Creando…';
     try {
       const r = await llamarAdmin({ accion: 'crear', cliente, portales });
