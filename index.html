@@ -365,7 +365,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </section>
 
   <footer>
-    <span>Publik · Operado por Bob. <span class="mono" style="opacity:.6">v2026-10-22 00:19</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 00:20</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -419,7 +419,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     S.cliente = c;
     const nombre = c.nombre.split(' ')[0];
     $('whoAvatar').textContent = iniciales(c.nombre); $('whoName').textContent = c.nombre; $('whoPlan').textContent = `Plan ${c.plan}${c.limite_dia ? ' · ' + c.limite_dia + ' por día' : ''}`;
-    $('btnAdmin').hidden = !c.es_admin;
+    $('btnAdmin').hidden = !c.es_admin; $('ver').hidden = !c.es_admin;
     if (!c.activo) { $('blockedTitle').textContent = `${nombre}, tu plan no está activo`; show('viewBlocked'); $('who').hidden = false; return; }
     $('bandTitle').textContent = `Hola, ${nombre}. ¿Qué publicamos hoy?`;
     $('connState').textContent = 'conectado';
