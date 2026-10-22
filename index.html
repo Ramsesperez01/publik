@@ -328,7 +328,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   <section id="viewAdmin" hidden style="display:grid;gap:24px" class="lift">
     <section class="card">
       <div class="card-head"><div style="display:grid;gap:6px"><span class="eyebrow">Administración</span><h2>Clientes</h2><p class="muted">Crea cuentas, cambia planes y apaga el acceso de quien no pague. Cada cambio aplica la próxima vez que el agente abra la página.</p></div><button class="btn" id="adminBack" type="button">Volver a mis lotes</button></div>
-      <div class="tablewrap"><table id="tblClientes"><thead><tr><th>Agente</th><th>Código</th><th>Plan</th><th class="num">Tope/día</th><th class="num">Mes</th><th>CoA</th><th>Estado</th><th></th></tr></thead><tbody></tbody></table></div>
+      <div class="tablewrap"><table id="tblClientes"><thead><tr><th>Agente</th><th>Código</th><th>Plan</th><th class="num">Tope/día</th><th class="num">Mes</th><th>Portales</th><th>Estado</th><th></th></tr></thead><tbody></tbody></table></div>
       <div id="adminMsg" class="notice info" hidden style="margin-top:14px"></div>
     </section>
     <section class="card">
@@ -340,12 +340,21 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
           <div class="field"><label for="nCel">Celular (WhatsApp)</label><input id="nCel" type="tel" inputmode="tel" placeholder="+507 6xxx xxxx"></div>
           <div class="field"><label for="nCodigo">Código de agente</label><input id="nCodigo" autocapitalize="characters" placeholder="AECC" style="text-transform:uppercase"><span class="hint">Las letras que van en los títulos de los avisos.</span></div>
           <div class="field"><label for="nOficina">Oficina</label><input id="nOficina" value="Rent-A-House Panamá VIP"></div>
-          <div class="field"><label for="nCoa">Cuenta de Compre o Alquile</label><select id="nCoa"><option value="oficina">La de la oficina</option><option value="propia">La suya (clave al llavero de Bob)</option></select></div>
           <div class="field"><label for="nPlan">Plan</label><select id="nPlan"><option value="Piloto">Piloto (gratis)</option><option value="Básico">Básico</option><option value="Pro">Pro</option><option value="Oficina">Oficina</option></select></div>
           <div class="field"><label for="nLim">Tope de publicaciones por día</label><input id="nLim" type="number" inputmode="numeric" min="0" value="15"></div>
           <div class="field"><label for="nPrecio">Precio mensual (USD)</label><input id="nPrecio" type="number" inputmode="decimal" min="0" step="0.01" value="0"></div>
         </div>
         <div class="field"><label for="nNotas">Notas internas</label><textarea id="nNotas" placeholder="Solo las ven los administradores."></textarea></div>
+        <div style="display:grid;gap:10px">
+          <span class="lbl" style="font-family:var(--display);font-weight:700">Cuentas del agente en los portales <span class="muted" style="font-weight:400;font-family:var(--body)">(opcional: vacío = publicamos con la cuenta de la oficina)</span></span>
+          <div class="row">
+            <div class="field"><label for="nE24Correo">Encuentra24 · correo</label><input id="nE24Correo" type="email" inputmode="email" autocapitalize="none" autocomplete="off"></div>
+            <div class="field"><label for="nE24Clave">Encuentra24 · contraseña</label><input id="nE24Clave" type="password" autocomplete="new-password"></div>
+            <div class="field"><label for="nCoaCorreo">Compre o Alquile · correo</label><input id="nCoaCorreo" type="email" inputmode="email" autocapitalize="none" autocomplete="off"></div>
+            <div class="field"><label for="nCoaClave">Compre o Alquile · contraseña</label><input id="nCoaClave" type="password" autocomplete="new-password"></div>
+          </div>
+          <span class="hint">Las contraseñas se guardan cifradas en la bóveda del servidor; solo Bob las usa para entrar al portal a publicar. No se vuelven a mostrar: para cambiarlas usa "Cuentas" en la lista.</span>
+        </div>
         <div class="actions"><span class="rules" id="nErr"></span><button class="btn primary" id="nBtn" type="submit">Crear cuenta</button></div>
         <div class="linkbox" id="nLink" hidden></div>
       </form>
@@ -411,7 +420,8 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     if (!c.activo) { $('blockedTitle').textContent = `${nombre}, tu plan no está activo`; show('viewBlocked'); $('who').hidden = false; return; }
     $('greetTitle').textContent = `Hola, ${nombre}.`;
     $('bandTitle').textContent = `Hola, ${nombre}. ¿Qué publicamos hoy?`;
-    $('coaSub').textContent = c.cuenta_coa === 'propia' ? 'Tu cuenta, plan Simple' : 'Cuenta de la oficina, plan Simple';
+    $('coaSub').textContent = c.coa_correo ? 'Tu cuenta, plan Simple' : 'Cuenta de la oficina, plan Simple';
+    document.querySelector('label.portal span:not(.tick)').textContent = c.e24_correo ? 'Tu cuenta, con tu contacto' : 'Cuenta de la oficina, con tu contacto';
     $('connState').textContent = 'conectado';
     await cargar();
     show(location.hash === '#admin' && c.es_admin ? 'viewAdmin' : 'viewApp');
@@ -552,7 +562,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const tb = $('tblClientes').querySelector('tbody'); tb.innerHTML = '';
     S.clientes.forEach((c) => {
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td class="wrap"><b>${esc(c.nombre)}</b>${c.es_admin ? ' <span class="chip neutral">admin</span>' : ''}<span class="small muted">${esc(c.correo)}${c.celular ? ' · ' + esc(c.celular) : ''}</span></td><td class="mono">${esc(c.codigo)}</td><td>${esc(c.plan)}${c.precio_mes ? ` <span class="small muted">$${c.precio_mes}</span>` : ''}</td><td class="num">${c.limite_dia}</td><td class="num">${porCliente[c.id] || 0}</td><td>${c.cuenta_coa === 'propia' ? 'propia' : 'oficina'}</td><td>${c.activo ? '<span class="chip ok"><span class="dot"></span>Activo</span>' : '<span class="chip bad"><span class="dot"></span>Apagado</span>'}</td><td><div class="inlineacts"><button class="btn sm" data-a="toggle" data-id="${c.id}" type="button">${c.activo ? 'Apagar' : 'Activar'}</button><button class="btn sm" data-a="plan" data-id="${c.id}" type="button">Plan</button><button class="btn sm" data-a="enlace" data-id="${c.id}" type="button">Enlace</button></div></td>`;
+      tr.innerHTML = `<td class="wrap"><b>${esc(c.nombre)}</b>${c.es_admin ? ' <span class="chip neutral">admin</span>' : ''}<span class="small muted">${esc(c.correo)}${c.celular ? ' · ' + esc(c.celular) : ''}</span></td><td class="mono">${esc(c.codigo)}</td><td>${esc(c.plan)}${c.precio_mes ? ` <span class="small muted">$${c.precio_mes}</span>` : ''}</td><td class="num">${c.limite_dia}</td><td class="num">${porCliente[c.id] || 0}</td><td class="small">E24: ${c.e24_correo ? 'propia' : 'oficina'}<br>CoA: ${c.coa_correo ? 'propia' : 'oficina'}</td><td>${c.activo ? '<span class="chip ok"><span class="dot"></span>Activo</span>' : '<span class="chip bad"><span class="dot"></span>Apagado</span>'}</td><td><div class="inlineacts"><button class="btn sm" data-a="toggle" data-id="${c.id}" type="button">${c.activo ? 'Apagar' : 'Activar'}</button><button class="btn sm" data-a="plan" data-id="${c.id}" type="button">Plan</button><button class="btn sm" data-a="cuentas" data-id="${c.id}" type="button">Cuentas</button><button class="btn sm" data-a="enlace" data-id="${c.id}" type="button">Enlace</button></div></td>`;
       tb.appendChild(tr);
     });
   }
@@ -571,6 +581,19 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
         const tr = b.closest('tr'); const plan = tr.querySelector('[data-f=plan]').value, lim = Number(tr.querySelector('[data-f=lim]').value), precio = Number(tr.querySelector('[data-f=precio]').value);
         await llamarAdmin({ accion: 'actualizar', id: c.id, cambios: { plan, limite_dia: lim, precio_mes: precio } }); adminMsg(`${c.nombre}: plan ${plan}, ${lim} por día, $${precio}/mes.`, 'ok');
       }
+      else if (b.dataset.a === 'cuentas') {
+        const tr = b.closest('tr'); const celda = tr.children[5];
+        celda.innerHTML = `<div style="display:grid;gap:6px;min-width:260px"><input class="btn sm" data-f="e24c" type="email" placeholder="Encuentra24 · correo" value="${esc(c.e24_correo || '')}"><input class="btn sm" data-f="e24k" type="password" placeholder="Encuentra24 · contraseña ${c.e24_correo ? '(guardada; escribe para cambiar)' : ''}" autocomplete="new-password"><input class="btn sm" data-f="coac" type="email" placeholder="Compre o Alquile · correo" value="${esc(c.coa_correo || '')}"><input class="btn sm" data-f="coak" type="password" placeholder="Compre o Alquile · contraseña ${c.coa_correo ? '(guardada; escribe para cambiar)' : ''}" autocomplete="new-password"><div class="inlineacts"><button class="btn sm primary" data-a="guardarCuentas" data-id="${c.id}" type="button">Guardar</button><span class="hint">Correo vacío = volver a la cuenta de la oficina.</span></div></div>`;
+        b.disabled = false; return;
+      }
+      else if (b.dataset.a === 'guardarCuentas') {
+        const tr = b.closest('tr'); const g = (f) => tr.querySelector(`[data-f=${f}]`).value.trim();
+        const portales = {};
+        const e24c = g('e24c'), e24k = g('e24k'), coac = g('coac'), coak = g('coak');
+        if (!e24c) portales.e24 = null; else if (e24k) portales.e24 = { correo: e24c, clave: e24k }; else if (e24c !== (c.e24_correo || '')) { adminMsg('Para cambiar el correo de Encuentra24 escribe también la contraseña.', 'bad'); b.disabled = false; return; }
+        if (!coac) portales.coa = null; else if (coak) portales.coa = { correo: coac, clave: coak }; else if (coac !== (c.coa_correo || '')) { adminMsg('Para cambiar el correo de Compre o Alquile escribe también la contraseña.', 'bad'); b.disabled = false; return; }
+        await llamarAdmin({ accion: 'actualizar', id: c.id, cambios: {}, portales }); adminMsg(`${c.nombre}: cuentas de portales guardadas.`, 'ok');
+      }
       else if (b.dataset.a === 'enlace') { const r = await llamarAdmin({ accion: 'enlace', id: c.id }); mostrarEnlace(c, r.enlace, $('adminMsg')); b.disabled = false; return; }
       await cargarAdmin();
     } catch (e) { adminMsg(errMsg(e), 'bad'); b.disabled = false; }
@@ -584,11 +607,15 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   }
   $('formNuevo').addEventListener('submit', async (ev) => {
     ev.preventDefault(); const e = $('nErr'); e.textContent = ''; const b = $('nBtn');
-    const cliente = { nombre: $('nNombre').value.trim(), correo: $('nCorreo').value.trim().toLowerCase(), celular: $('nCel').value.trim(), codigo: $('nCodigo').value.trim().toUpperCase(), oficina: $('nOficina').value.trim(), cuenta_coa: $('nCoa').value, plan: $('nPlan').value, limite_dia: Number($('nLim').value), precio_mes: Number($('nPrecio').value), notas: $('nNotas').value.trim() };
+    const cliente = { nombre: $('nNombre').value.trim(), correo: $('nCorreo').value.trim().toLowerCase(), celular: $('nCel').value.trim(), codigo: $('nCodigo').value.trim().toUpperCase(), oficina: $('nOficina').value.trim(), plan: $('nPlan').value, limite_dia: Number($('nLim').value), precio_mes: Number($('nPrecio').value), notas: $('nNotas').value.trim() };
     if (!cliente.nombre || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(cliente.correo) || !cliente.codigo) { e.textContent = 'Faltan nombre, correo válido o código.'; return; }
+    const portales = {};
+    const e24c = $('nE24Correo').value.trim(), e24k = $('nE24Clave').value, coac = $('nCoaCorreo').value.trim(), coak = $('nCoaClave').value;
+    if (e24c || e24k) { if (!e24c || !e24k) { e.textContent = 'Encuentra24: faltan correo o contraseña.'; return; } portales.e24 = { correo: e24c, clave: e24k }; }
+    if (coac || coak) { if (!coac || !coak) { e.textContent = 'Compre o Alquile: faltan correo o contraseña.'; return; } portales.coa = { correo: coac, clave: coak }; }
     b.disabled = true; b.textContent = 'Creando…';
     try {
-      const r = await llamarAdmin({ accion: 'crear', cliente });
+      const r = await llamarAdmin({ accion: 'crear', cliente, portales });
       mostrarEnlace({ ...cliente }, r.enlace, $('nLink'));
       $('formNuevo').reset(); $('nOficina').value = 'Rent-A-House Panamá VIP'; $('nLim').value = 15; $('nPrecio').value = 0;
       await cargarAdmin();
