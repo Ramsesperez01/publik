@@ -134,9 +134,9 @@ form{display:grid;gap:20px}
 .field textarea{min-height:70px;resize:vertical}
 .hint{font-size:13.5px;color:var(--fg-3)}
 .links{display:grid;gap:14px}
-.linkrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:start}
-.linkmain{display:grid;gap:10px;min-width:0}
-.linkrow .x{margin-top:7px}
+.linkrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 8px;align-items:center}
+.linkrow .pills{grid-column:1/-1}
+.linkrow:not(:has(.x)) input[type=url]{grid-column:1/-1}
 .linkrow .x{width:40px;height:40px;border-radius:50%;border:0;background:transparent;color:var(--fg-3);font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center;transition:background-color 150ms ease,color 150ms ease}
 .linkrow .x:hover{background:var(--panel-2);color:var(--fg)}
 .field input.bad{border-color:var(--bad)}
@@ -146,7 +146,7 @@ form{display:grid;gap:20px}
 .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
 .pills{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .pill{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 10px;white-space:nowrap;min-width:0;border-radius:999px;border:2px solid var(--line-2);background:var(--bg);font-size:13.5px;font-weight:700;color:var(--fg-2);cursor:pointer;transition:border-color 150ms ease,background-color 150ms ease,color 150ms ease}
-.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--line-2);transition:background-color 150ms ease}
+.pill::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--line-2);transition:background-color 150ms ease}
 .pill input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
 .pill:has(input:checked){border-color:var(--red);background:var(--red-tint);color:var(--fg)}
 .pill:has(input:checked)::before{background:var(--red)}
@@ -298,7 +298,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
         <div class="field">
           <label for="share">Link de Flex</label>
           <div class="links" id="links">
-            <div class="linkrow"><div class="linkmain"><input class="big" type="url" id="share" placeholder="https://www.flexmls.com/share/XXXXX/Selected" autocomplete="off" inputmode="url" spellcheck="false"><div class="pills"><label class="pill"><input type="checkbox" data-p="e24" checked>Encuentra24</label><label class="pill"><input type="checkbox" data-p="coa" checked>Compre o Alquile</label></div></div></div>
+            <div class="linkrow"><input class="big" type="url" id="share" placeholder="https://www.flexmls.com/share/XXXXX/Selected" autocomplete="off" inputmode="url" spellcheck="false"><div class="pills"><label class="pill"><input type="checkbox" data-p="e24" checked>Encuentra24</label><label class="pill"><input type="checkbox" data-p="coa" checked>Compre o Alquile</label></div></div>
           </div>
           <span class="hint">Se publica todo lo que traiga cada share, tal como está en Flex.</span>
           <button class="addlink" id="addLink" type="button">+ Otro link</button>
@@ -401,7 +401,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 07:33</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 07:48</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -539,7 +539,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const prev = portalesDe(rows[rows.length - 1]);
     const defecto = prev.length === 1 ? ['e24', 'coa'].filter((p) => p !== prev[0]) : ['e24', 'coa'];
     const row = document.createElement('div'); row.className = 'linkrow';
-    row.innerHTML = '<div class="linkmain"><input class="big" type="url" placeholder="https://www.flexmls.com/share/XXXXX/Selected" autocomplete="off" inputmode="url" spellcheck="false" aria-label="Otro link de Flex">' + PILLS + '</div><button class="x" type="button" aria-label="Quitar este link">×</button>';
+    row.innerHTML = '<input class="big" type="url" placeholder="https://www.flexmls.com/share/XXXXX/Selected" autocomplete="off" inputmode="url" spellcheck="false" aria-label="Otro link de Flex"><button class="x" type="button" aria-label="Quitar este link">×</button>' + PILLS;
     row.querySelectorAll('input[data-p]').forEach((c) => { c.checked = defecto.includes(c.dataset.p); });
     row.querySelector('.x').addEventListener('click', () => { row.remove(); $('addLink').hidden = false; });
     $('links').appendChild(row);
