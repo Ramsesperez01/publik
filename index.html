@@ -379,7 +379,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </section>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 00:28</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-22 00:33</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -390,9 +390,9 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   const SB_URL = 'https://vjivvprjtydmkxsrwygf.supabase.co';
   const SB_KEY = 'sb_publishable_iPGhThzxWVApDJomhbcL8w_PFMrvwqx';
   const sb = window.supabase.createClient(SB_URL, SB_KEY);
-  const SHARE_RE = /^https?:\/\/(?:www\.)?flexmls\.com\/share\/([A-Za-z0-9]+)(?:\/[A-Za-z0-9\-]+)?\/?$/i;
+  const SHARE_RE = /^https?:\/\/(?:www\.)?flexmls\.com\/share\/([A-Za-z0-9]+)(?:\/[A-Za-z0-9\-]+)*\/?(?:[?#].*)?$/i;
   const $ = (id) => document.getElementById(id);
-  const S = { user: null, cliente: null, trabajos: [], colaTotal: 0, posiciones: {}, pubsHoy: 0, canal: null, sentTimer: 0, clientes: [], cuentasDe: null, panelDe: null };
+  const S = { user: null, cliente: null, trabajos: [], colaTotal: 0, posiciones: {}, pubsHoy: 0, canal: null, sentTimer: 0, clientes: [], cuentasDe: null, panelDe: null, confirmarRepetido: null };
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const iniciales = (n) => (n || '?').trim().split(/\s+/).filter(Boolean).slice(0, 2).map((w) => Array.from(w)[0].toUpperCase()).join('') || '?';
   const fmtDT = (iso) => { if (!iso) return '—'; const d = new Date(iso); if (isNaN(d)) return iso; return d.toLocaleString('es-PA', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); };
@@ -424,12 +424,13 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     if (!session) { show('viewLogin'); $('connState').textContent = 'listo'; return; }
     S.user = session.user; await entrar();
   }
-  sb.auth.onAuthStateChange((ev, session) => { if (ev === 'SIGNED_OUT') { S.user = null; S.cliente = null; if (S.canal) { sb.removeChannel(S.canal); S.canal = null; } show('viewLogin'); } });
+  sb.auth.onAuthStateChange((ev, session) => { if (ev === 'SIGNED_OUT') { S.user = null; S.cliente = null; if (S.canal) { sb.removeChannel(S.canal); S.canal = null; } $('bandTitle').textContent = 'Pega tu link. Nosotros publicamos.'; show('viewLogin'); } });
 
   async function entrar() {
     show('viewLoading');
-    const { data: c, error } = await sb.from('clientes').select('*').eq('id', S.user.id).single();
-    if (error || !c) { show('viewLogin'); banner('Tu usuario existe pero no tiene ficha de cliente. Escríbele a Ramsés.', 'bad'); await sb.auth.signOut(); return; }
+    const { data: c, error } = await sb.from('clientes').select('*').eq('id', S.user.id).maybeSingle();
+    if (error) { show('viewLogin'); $('who').hidden = true; banner('No pudimos cargar tu cuenta (sin conexión o servidor ocupado). Recarga la página en un momento.', 'bad'); return; }
+    if (!c) { show('viewLogin'); banner('Tu usuario existe pero no tiene ficha de cliente. Escríbele a Ramsés.', 'bad'); await sb.auth.signOut(); return; }
     S.cliente = c;
     const nombre = c.nombre.split(' ')[0];
     $('whoAvatar').textContent = iniciales(c.nombre); $('whoName').textContent = c.nombre; $('whoPlan').textContent = `Plan ${c.plan}${c.limite_dia ? ' · ' + c.limite_dia + ' por día' : ''}`;
@@ -479,7 +480,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   });
   const salir = async () => { await sb.auth.signOut(); location.hash = ''; };
   $('logout').addEventListener('click', salir);
-  sb.auth.onAuthStateChange((ev) => { if (ev === 'SIGNED_OUT') { $('bandTitle').textContent = 'Pega tu link. Nosotros publicamos.'; } }); $('blockedOut').addEventListener('click', salir);
+  $('blockedOut').addEventListener('click', salir);
   $('btnAdmin').addEventListener('click', () => { location.hash = '#admin'; show('viewAdmin'); cargarAdmin(); });
   $('adminBack').addEventListener('click', () => { location.hash = ''; show('viewApp'); });
 
@@ -500,11 +501,17 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   $('form').addEventListener('submit', async (ev) => {
     ev.preventDefault(); if (!S.cliente) return;
     const v = validar(); if (!v) return;
+    const activoIgual = S.trabajos.find((t) => t.share.toLowerCase() === v.share.toLowerCase() && activo(t));
+    if (activoIgual) { setErr('errShare', `Ese lote ya está ${activoIgual.estado === 'Programado' ? 'programado' : 'en la cola'}; no hace falta mandarlo otra vez.`); return; }
+    const reciente = S.trabajos.find((t) => t.share.toLowerCase() === v.share.toLowerCase() && !activo(t) && (Date.now() - new Date(t.creado).getTime()) < 7 * 86400000);
+    if (reciente && S.confirmarRepetido !== v.share) { S.confirmarRepetido = v.share; setErr('errShare', `Este lote ya lo publicamos el ${fmtDT(reciente.fin || reciente.creado)}. Si quieres repetirlo, pulsa Publicar otra vez.`); return; }
+    S.confirmarRepetido = null;
     const btn = $('send'); btn.disabled = true; btn.textContent = 'Enviando…';
     const doc = { cliente_id: S.user.id, share: v.share, url: v.url, portales: v.portales, cuando: v.hora ? 'hora' : 'ahora', hora_pedida: v.hora, notas: $('notas').value.trim() || null, estado: v.hora ? 'Programado' : 'En cola', origen: 'web' };
     const { data, error } = await sb.from('trabajos').insert(doc).select().single();
     if (error) {
-      banner(/row-level security|42501/i.test(error.message + error.code) ? 'No se pudo guardar: llegaste al tope de hoy o tu plan no está activo.' : 'No pudimos guardar el lote. Intenta otra vez en un momento.', 'bad');
+      const txt = error.message + ' ' + error.code;
+      banner(/23505|trabajos_share_activo_unico/i.test(txt) ? 'Ese lote ya está en la cola.' : /row-level security|42501/i.test(txt) ? 'No se pudo guardar: llegaste al tope de hoy o tu plan no está activo.' : 'No pudimos guardar el lote. Intenta otra vez en un momento.', 'bad');
     } else {
       banner('');
       $('form').reset(); toggleHora();
