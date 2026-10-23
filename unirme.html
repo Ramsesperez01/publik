@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+<title>Únete a Publik</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23e30e0e' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 40 36 16l24 24'/%3E%3Cpath d='M36 16v42'/%3E%3Cpath d='M18 46v14h36V46'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700&display=swap">
+<style>
+:root{--bg:#faf5f5;--panel:#fff;--line:#efd6d6;--line-2:#e3bcbc;--fg:#1b1414;--fg-2:#5c4f4f;--fg-3:#937f7f;--red:#e30e0e;--red-ink:#fff;--red-soft:#fde3e3;--band:#e30e0e;--band-2:#c20c0c;--band-fg:#fff;--band-fg-2:rgba(255,255,255,.82);--ok:#1f8a4c;--ok-soft:#dff3e7;--bad:#c21f1f;--display:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--body:"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--r:22px;--r-s:14px;--shadow:0 18px 40px -22px rgba(120,20,20,.28),0 2px 6px -2px rgba(120,20,20,.08)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#161010;--panel:#1f1717;--line:#3a2828;--line-2:#4f3535;--fg:#f4eeee;--fg-2:#c7b8b8;--fg-3:#8f7f7f;--red:#ff4b4b;--red-ink:#1a0d0d;--red-soft:#3c1b1b;--band:#c90e0e;--band-2:#a50b0b;--ok:#5fd38f;--ok-soft:#1c3a28;--bad:#ff8a80;--shadow:0 18px 40px -22px rgba(0,0,0,.85);color-scheme:dark}}
+*{box-sizing:border-box}html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.55;margin:0;min-height:100dvh}
+button{font:inherit;cursor:pointer}p{margin:0}h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
+h1{font-size:clamp(30px,5vw,46px);font-weight:800;letter-spacing:-.03em}h2{font-size:21px;font-weight:800;letter-spacing:-.02em}h3{font-size:16px;font-weight:700}
+.eyebrow{font-family:var(--display);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--band-fg-2)}
+.gutter{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}.inner{max-width:720px;margin:0 auto}
+.top{background:var(--panel);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}.top .inner{display:flex;align-items:center;min-height:64px;padding-block:10px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--red);text-decoration:none}.brand svg{width:34px;height:34px;flex:none}.brand .name{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-.03em;color:var(--fg)}.brand .name b{color:var(--red)}
+.band{background:var(--band);color:var(--band-fg);position:relative;overflow:hidden}
+.band::before{content:"";position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='104' height='104' viewBox='0 0 104 104'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.11' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M26 56 52 30l26 26'/%3E%3Cpath d='M52 30v48'/%3E%3Cpath d='M32 62v16h40V62'/%3E%3C/g%3E%3C/svg%3E") 0 0/104px 104px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),rgba(0,0,0,.25));-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),rgba(0,0,0,.25))}
+.band::after{content:"";position:absolute;inset:auto -10% -40% -10%;height:60%;background:radial-gradient(60% 100% at 50% 100%,var(--band-2),transparent 70%);opacity:.9}
+.band .inner{position:relative;padding-block:36px 64px;display:grid;gap:12px}.band .lead{font-size:clamp(16px,2vw,18px);color:var(--band-fg-2);max-width:52ch}
+main{padding-block:0 60px}.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:26px;box-shadow:var(--shadow);margin-top:-34px;position:relative}
+.sec{display:grid;gap:14px;padding-block:18px;border-top:1px solid var(--line)}.sec:first-of-type{border-top:0;padding-top:0}.sec h2{display:flex;align-items:center;gap:10px}.sec h2 .n{width:28px;height:28px;border-radius:50%;background:var(--red);color:var(--red-ink);font-size:14px;display:grid;place-items:center;flex:none}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.field{display:grid;gap:7px;min-width:0}.field label{font-weight:700;font-size:15px;font-family:var(--display)}.field input:not([type=checkbox]):not([type=radio]),.field textarea,.field select{width:100%;font:inherit;font-size:16px;padding:14px 16px;border-radius:var(--r-s);border:2px solid var(--line-2);background:var(--bg);color:var(--fg);transition:border-color 150ms,box-shadow 150ms}.field>*{min-width:0;max-width:100%}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--red);box-shadow:0 0 0 4px var(--red-soft);outline:none}.field textarea{min-height:70px;resize:vertical}.field input.bad{border-color:var(--bad)}
+.hint{font-size:13.5px;color:var(--fg-3)}.muted{color:var(--fg-2)}
+.planes{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.plan{position:relative;display:grid;gap:4px;border:2px solid var(--line-2);border-radius:var(--r-s);padding:14px;cursor:pointer;background:var(--bg)}.plan input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}.plan b{font-family:var(--display);font-size:17px}.plan .p{font-family:var(--display);font-weight:800;color:var(--red);font-size:22px;letter-spacing:-.02em}.plan .d{font-size:13.5px;color:var(--fg-2)}.plan:has(input:checked){border-color:var(--red);box-shadow:0 0 0 4px var(--red-soft)}.plan .tag{position:absolute;top:-10px;right:12px;background:var(--red);color:var(--red-ink);font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;font-family:var(--display)}
+.check{display:flex;align-items:center;gap:10px;font-size:15px;cursor:pointer}.check input{width:20px;height:20px;accent-color:var(--red);flex:none}
+.btn{border:2px solid var(--red);background:var(--red);color:var(--red-ink);padding:15px 28px;border-radius:999px;font-weight:800;font-size:17px;font-family:var(--display);width:100%;box-shadow:0 12px 24px -12px rgba(227,14,14,.55);transition:transform 160ms}.btn:active{transform:scale(.98)}.btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+.err{font-size:14px;color:var(--bad);font-weight:700;min-height:1em}
+.done{display:grid;gap:14px;text-align:center;padding:14px 0}.done .ok{width:72px;height:72px;border-radius:50%;background:var(--ok-soft);color:var(--ok);display:grid;place-items:center;margin:0 auto}.done .ok svg{width:36px;height:36px}
+footer{text-align:center;color:var(--fg-3);font-size:13px;padding:10px 16px 30px}
+@media (max-width:420px){.card{padding:20px 16px}}
+</style>
+</head>
+<body>
+<header class="top gutter"><div class="inner"><a class="brand" href="https://publikpanama.com"><svg viewBox="0 0 72 72" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 40 36 16l24 24"/><path d="M36 16v42"/><path d="M18 46v14h36V46"/></g></svg><span class="name">publi<b>k</b></span></a></div></header>
+<section class="band gutter"><div class="inner"><span class="eyebrow">Registro de agentes</span><h1>Pega tu link. Nosotros publicamos.</h1><p class="lead">Llena esto una sola vez. Con tus datos creamos tu acceso a Publik y publicamos tus propiedades en Encuentra24 y Compre o Alquile en minutos.</p></div></section>
+<main class="gutter"><div class="inner">
+<form class="card" id="f" novalidate>
+  <div class="sec">
+    <h2><span class="n">1</span>Tus datos</h2>
+    <div class="row">
+      <div class="field"><label for="nombre">Nombre y apellido</label><input id="nombre" autocomplete="name" required></div>
+      <div class="field"><label for="celular">Celular (WhatsApp)</label><input id="celular" type="tel" inputmode="tel" autocomplete="tel" placeholder="6000-0000" required></div>
+    </div>
+    <div class="row">
+      <div class="field"><label for="correo">Correo</label><input id="correo" type="email" inputmode="email" autocomplete="email" required><span class="hint">Con este correo entras a Publik.</span></div>
+      <div class="field"><label for="codigo">Tu código de agente</label><input id="codigo" maxlength="8" autocapitalize="characters" placeholder="Ej. AECC" required><span class="hint">Tus iniciales. Va en el título de cada aviso.</span></div>
+    </div>
+    <div class="field"><label for="oficina">Oficina</label><input id="oficina" value="Rent-A-House Panamá VIP"></div>
+  </div>
+  <div class="sec">
+    <h2><span class="n">2</span>Tu plan</h2>
+    <div class="planes" id="planes">
+      <label class="plan"><input type="radio" name="plan" value="Agente"><b>Agente</b><span class="p">$45<small style="font-size:13px;color:var(--fg-3)">/mes</small></span><span class="d">10 avisos por día</span></label>
+      <label class="plan"><input type="radio" name="plan" value="Pro" checked><span class="tag">Más elegido</span><b>Pro</b><span class="p">$55<small style="font-size:13px;color:var(--fg-3)">/mes</small></span><span class="d">15 avisos por día</span></label>
+      <label class="plan"><input type="radio" name="plan" value="Max"><b>Max</b><span class="p">$65<small style="font-size:13px;color:var(--fg-3)">/mes</small></span><span class="d">20 avisos por día</span></label>
+    </div>
+    <p class="hint">Un aviso es una propiedad en un portal. Los 7 días, los dos portales, reporte por WhatsApp. Pago por Yappy.</p>
+  </div>
+  <div class="sec">
+    <h2><span class="n">3</span>Tus cuentas en los portales</h2>
+    <p class="muted" style="font-size:15px">Publicamos desde tu cuenta, con tu nombre y tu contacto. Las contraseñas se guardan cifradas y solo se usan para entrar a publicar.</p>
+    <div class="row">
+      <div class="field" style="gap:10px"><h3>Encuentra24</h3>
+        <label class="check"><input type="checkbox" id="e24of"> Publico con la cuenta de mi oficina</label>
+        <div id="e24campos" style="display:grid;gap:10px"><input id="e24correo" type="email" inputmode="email" placeholder="Correo de Encuentra24"><input id="e24clave" type="password" placeholder="Contraseña de Encuentra24"></div>
+      </div>
+      <div class="field" style="gap:10px"><h3>Compre o Alquile</h3>
+        <label class="check"><input type="checkbox" id="coaof"> Publico con la cuenta de mi oficina</label>
+        <div id="coacampos" style="display:grid;gap:10px"><input id="coacorreo" type="email" inputmode="email" placeholder="Correo de Compre o Alquile"><input id="coaclave" type="password" placeholder="Contraseña de Compre o Alquile"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="field"><label for="notas">¿Algo que debamos saber? <span class="muted" style="font-weight:400">(opcional)</span></label><textarea id="notas" placeholder="Horarios, cómo prefieres que te avisemos…"></textarea></div>
+    <input id="miel" name="sitio_web" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
+    <div class="err" id="err" role="alert"></div>
+    <button class="btn" id="btn" type="submit">Quiero entrar a Publik</button>
+    <p class="hint" style="text-align:center">Al enviar, Ramsés revisa tu solicitud y te manda por WhatsApp el enlace para crear tu contraseña.</p>
+  </div>
+</form>
+<div class="card done" id="done" hidden>
+  <div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg></div>
+  <h2>¡Recibido!</h2>
+  <p class="muted">Ya tenemos tus datos, <b id="doneNombre"></b>. En cuanto Ramsés active tu cuenta te llega por WhatsApp el enlace para crear tu contraseña y empezar a publicar.</p>
+  <p class="hint">Después entras siempre por <a href="https://publikpanama.com">publikpanama.com</a>.</p>
+</div>
+</div></main>
+<footer>Publik · publikpanama.com</footer>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const FN = 'https://vjivvprjtydmkxsrwygf.supabase.co/functions/v1/solicitud';
+  const KEY = 'sb_publishable_iPGhThzxWVApDJomhbcL8w_PFMrvwqx';
+  const codigo = new URLSearchParams(location.search).get('c') || '';
+  const tog = (chk, box) => { $(box).hidden = $(chk).checked; };
+  $('e24of').addEventListener('change', () => tog('e24of', 'e24campos'));
+  $('coaof').addEventListener('change', () => tog('coaof', 'coacampos'));
+  $('codigo').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8); });
+  const v = id => $(id).value.trim();
+  const marcar = (ids) => { document.querySelectorAll('.bad').forEach(e => e.classList.remove('bad')); ids.forEach(id => $(id).classList.add('bad')); };
+  $('f').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const err = $('err'), btn = $('btn'); err.textContent = '';
+    const malos = [];
+    if (v('nombre').length < 3) malos.push('nombre');
+    if (v('celular').replace(/\D/g, '').length < 7) malos.push('celular');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('correo'))) malos.push('correo');
+    if (!/^[A-Z0-9]{2,8}$/.test(v('codigo'))) malos.push('codigo');
+    if (!$('e24of').checked) { if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('e24correo'))) malos.push('e24correo'); if ($('e24clave').value.length < 4) malos.push('e24clave'); }
+    if (!$('coaof').checked) { if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('coacorreo'))) malos.push('coacorreo'); if ($('coaclave').value.length < 4) malos.push('coaclave'); }
+    marcar(malos);
+    if (malos.length) { err.textContent = 'Revisa los campos marcados.'; $(malos[0]).focus(); return; }
+    if (!codigo) { err.textContent = 'Este link no trae el código de registro. Pídele a Ramsés el link completo.'; return; }
+    btn.disabled = true; btn.textContent = 'Enviando…';
+    const cuerpo = { codigo, miel: $('miel').value, nombre: v('nombre'), celular: v('celular'), correo: v('correo'), codigo_agente: v('codigo'), oficina: v('oficina'), plan: document.querySelector('input[name=plan]:checked').value, notas: v('notas'),
+      e24: $('e24of').checked ? { oficina: true } : { correo: v('e24correo'), clave: $('e24clave').value },
+      coa: $('coaof').checked ? { oficina: true } : { correo: v('coacorreo'), clave: $('coaclave').value } };
+    try {
+      const r = await fetch(FN, { method: 'POST', headers: { 'content-type': 'application/json', apikey: KEY, Authorization: 'Bearer ' + KEY }, body: JSON.stringify(cuerpo) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || j.error) throw new Error(j.error || ('Error ' + r.status));
+      $('doneNombre').textContent = v('nombre').split(' ')[0];
+      $('f').hidden = true; $('done').hidden = false; window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (j.aviso) $('done').querySelector('.hint').textContent = j.aviso;
+    } catch (e) {
+      err.textContent = e.message || 'No se pudo enviar. Intenta de nuevo.';
+      btn.disabled = false; btn.textContent = 'Quiero entrar a Publik';
+    }
+  });
+})();
+</script>
+</body>
+</html>
