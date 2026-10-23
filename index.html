@@ -401,7 +401,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 09:10</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 09:14</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -610,14 +610,13 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const mes = mios.filter((t) => mesActual(t.creado));
     const pubs = mes.reduce((n, t) => n + (t.resultados || []).filter((r) => r.estado === 'Activo').length, 0);
     const miosEnCola = mios.filter(activo).length;
-    const ultimoCupo = mios.filter((t) => t.resumen && t.resumen.cupoCoa != null).sort((a, b) => (b.fin || b.creado || '').localeCompare(a.fin || a.creado || ''))[0];
     const lim = c.limite_dia || 0, pubsHoy = S.pubsHoy;
     const topeLleno = lim > 0 && pubsHoy >= lim;
     const ratio = lim ? Math.min(1, pubsHoy / lim) : 0;
     const chip = $('hoyChip'); chip.textContent = lim ? `Hoy ${pubsHoy} de ${lim}` : `Hoy ${pubsHoy}`; chip.className = 'chip ' + (topeLleno ? 'bad' : ratio >= .8 ? 'warn' : 'ok');
     if (!S.enviando) { $('send').disabled = topeLleno; $('send').textContent = topeLleno ? 'Tope de hoy alcanzado' : 'Publicar'; }
     $('rules').textContent = topeLleno ? `Llegaste a tus ${lim} avisos de hoy. El cupo se reinicia mañana.` : (lim ? 'Sale en orden de llegada, dentro de tu tope diario.' : 'Sale en orden de llegada. Sin tope diario.');
-    $('greetText').textContent = (S.colaTotal ? (miosEnCola ? `${plural(miosEnCola, 'lote tuyo', 'lotes tuyos')} en cola.` : `${plural(S.colaTotal, 'lote', 'lotes')} en cola antes del tuyo.`) : 'La cola está vacía.') + (ultimoCupo ? ` Cupo en Compre o Alquile: ${ultimoCupo.resumen.cupoCoa}.` : '');
+    $('greetText').textContent = (S.colaTotal ? (miosEnCola ? `${plural(miosEnCola, 'lote tuyo', 'lotes tuyos')} en cola.` : `${plural(S.colaTotal, 'lote', 'lotes')} en cola antes del tuyo.`) : 'La cola está vacía.');  // 2026-10-23: Ramsés pidió no mostrar el cupo de Compre o Alquile al agente (irrelevante para él).
     const box = $('jobs'); box.innerHTML = '';
     $('jobsEmpty').hidden = mios.length > 0;
     $('jobsCount').textContent = mios.length ? plural(mios.length, 'lote', 'lotes') : '';
