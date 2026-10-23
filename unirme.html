@@ -65,15 +65,13 @@ footer{text-align:center;color:var(--fg-3);font-size:13px;padding:10px 16px 30px
   </div>
   <div class="sec">
     <h2><span class="n">3</span>Tus cuentas en los portales</h2>
-    <p class="muted" style="font-size:15px">Publicamos desde tu cuenta, con tu nombre y tu contacto. Las contraseñas se guardan cifradas y solo se usan para entrar a publicar.</p>
+    <p class="muted" style="font-size:15px">Publicamos desde tu cuenta, con tu nombre y tu contacto. Pon el correo y la contraseña con los que entras a cada portal. Se guardan cifradas y solo se usan para publicar.</p>
     <div class="row">
       <div class="field" style="gap:10px"><h3>Encuentra24</h3>
-        <label class="check"><input type="checkbox" id="e24of"> Publico con la cuenta de mi oficina</label>
-        <div id="e24campos" style="display:grid;gap:10px"><input id="e24correo" type="email" inputmode="email" placeholder="Correo de Encuentra24"><input id="e24clave" type="password" placeholder="Contraseña de Encuentra24"></div>
+        <input id="e24correo" type="email" inputmode="email" autocomplete="off" placeholder="Correo de Encuentra24" required><input id="e24clave" type="password" autocomplete="off" placeholder="Contraseña de Encuentra24" required>
       </div>
       <div class="field" style="gap:10px"><h3>Compre o Alquile</h3>
-        <label class="check"><input type="checkbox" id="coaof"> Publico con la cuenta de mi oficina</label>
-        <div id="coacampos" style="display:grid;gap:10px"><input id="coacorreo" type="email" inputmode="email" placeholder="Correo de Compre o Alquile"><input id="coaclave" type="password" placeholder="Contraseña de Compre o Alquile"></div>
+        <input id="coacorreo" type="email" inputmode="email" autocomplete="off" placeholder="Correo de Compre o Alquile" required><input id="coaclave" type="password" autocomplete="off" placeholder="Contraseña de Compre o Alquile" required>
       </div>
     </div>
   </div>
@@ -99,9 +97,6 @@ footer{text-align:center;color:var(--fg-3);font-size:13px;padding:10px 16px 30px
   const FN = 'https://vjivvprjtydmkxsrwygf.supabase.co/functions/v1/solicitud';
   const KEY = 'sb_publishable_iPGhThzxWVApDJomhbcL8w_PFMrvwqx';
   const codigo = new URLSearchParams(location.search).get('c') || '';
-  const tog = (chk, box) => { $(box).hidden = $(chk).checked; };
-  $('e24of').addEventListener('change', () => tog('e24of', 'e24campos'));
-  $('coaof').addEventListener('change', () => tog('coaof', 'coacampos'));
   $('codigo').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8); });
   const v = id => $(id).value.trim();
   const marcar = (ids) => { document.querySelectorAll('.bad').forEach(e => e.classList.remove('bad')); ids.forEach(id => $(id).classList.add('bad')); };
@@ -113,15 +108,15 @@ footer{text-align:center;color:var(--fg-3);font-size:13px;padding:10px 16px 30px
     if (v('celular').replace(/\D/g, '').length < 7) malos.push('celular');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('correo'))) malos.push('correo');
     if (!/^[A-Z0-9]{2,8}$/.test(v('codigo'))) malos.push('codigo');
-    if (!$('e24of').checked) { if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('e24correo'))) malos.push('e24correo'); if ($('e24clave').value.length < 4) malos.push('e24clave'); }
-    if (!$('coaof').checked) { if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('coacorreo'))) malos.push('coacorreo'); if ($('coaclave').value.length < 4) malos.push('coaclave'); }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('e24correo'))) malos.push('e24correo'); if ($('e24clave').value.length < 4) malos.push('e24clave');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('coacorreo'))) malos.push('coacorreo'); if ($('coaclave').value.length < 4) malos.push('coaclave');
     marcar(malos);
     if (malos.length) { err.textContent = 'Revisa los campos marcados.'; $(malos[0]).focus(); return; }
     if (!codigo) { err.textContent = 'Este link no trae el código de registro. Pídele a Ramsés el link completo.'; return; }
     btn.disabled = true; btn.textContent = 'Enviando…';
     const cuerpo = { codigo, miel: $('miel').value, nombre: v('nombre'), celular: v('celular'), correo: v('correo'), codigo_agente: v('codigo'), oficina: v('oficina'), plan: document.querySelector('input[name=plan]:checked').value, notas: v('notas'),
-      e24: $('e24of').checked ? { oficina: true } : { correo: v('e24correo'), clave: $('e24clave').value },
-      coa: $('coaof').checked ? { oficina: true } : { correo: v('coacorreo'), clave: $('coaclave').value } };
+      e24: { correo: v('e24correo'), clave: $('e24clave').value },
+      coa: { correo: v('coacorreo'), clave: $('coaclave').value } };
     try {
       const r = await fetch(FN, { method: 'POST', headers: { 'content-type': 'application/json', apikey: KEY, Authorization: 'Bearer ' + KEY }, body: JSON.stringify(cuerpo) });
       const j = await r.json().catch(() => ({}));
