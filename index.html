@@ -313,10 +313,6 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
             </div>
           </div>
         </div>
-        <details class="field" id="notaBox">
-          <summary class="hint" style="cursor:pointer;list-style:none;font-weight:700;color:var(--fg-2)">+ Agregar una nota</summary>
-          <textarea id="notas" placeholder="Por ejemplo: 4 propiedades cada hora empezando a las 4:30" style="margin-top:8px"></textarea>
-        </details>
         <div class="actions">
           <div class="rules" id="rules">Sale en orden de llegada, dentro de tu tope diario.</div>
           <button class="btn primary" id="send" type="submit">Publicar</button>
@@ -401,7 +397,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 09:14</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 16:14</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -583,8 +579,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     if (repetidos.length && S.confirmarRepetido !== claveRep) { S.confirmarRepetido = claveRep; const x = repetidos[0]; setErr('errShare', repetidos.length === 1 ? `El lote ${x.l.share} ya lo publicamos el ${fmtDT(x.t.fin || x.t.creado)}. Si quieres repetirlo, pulsa Publicar otra vez.` : `Los lotes ${repetidos.map((r) => r.l.share).join(', ')} ya los publicamos antes. Si quieres repetirlos, pulsa Publicar otra vez.`); return; }
     S.confirmarRepetido = null;
     const btn = $('send'); S.enviando = true; btn.disabled = true; btn.textContent = 'Enviando…';
-    const notas = $('notas').value.trim() || null;
-    const docs = v.lotes.map((l) => ({ cliente_id: S.user.id, share: l.share, url: l.url, portales: l.portales, cuando: v.hora ? 'hora' : 'ahora', hora_pedida: v.hora, notas, estado: v.hora ? 'Programado' : 'En cola', origen: 'web' }));
+    const docs = v.lotes.map((l) => ({ cliente_id: S.user.id, share: l.share, url: l.url, portales: l.portales, cuando: v.hora ? 'hora' : 'ahora', hora_pedida: v.hora, estado: v.hora ? 'Programado' : 'En cola', origen: 'web' }));
     const { data, error } = await sb.from('trabajos').insert(docs).select();
     if (error) {
       const txt = error.message + ' ' + error.code;
