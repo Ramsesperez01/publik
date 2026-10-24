@@ -134,10 +134,10 @@ form{display:grid;gap:20px}
 .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
 .pills{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .pill{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 10px;white-space:nowrap;min-width:0;border-radius:999px;border:2px solid var(--line-2);background:var(--bg);font-size:13.5px;font-weight:700;color:var(--fg-2);cursor:pointer;transition:border-color 150ms ease,background-color 150ms ease,color 150ms ease}
-.pill::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--line-2);transition:background-color 150ms ease}
+.pill::before{content:"";flex:none;width:10px;height:10px;box-sizing:border-box;border-radius:50%;border:2px solid var(--fg-3);background:transparent;transition:background-color 150ms ease,border-color 150ms ease}
 .pill input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
 .pill:has(input:checked){border-color:var(--red);background:var(--red-tint);color:var(--fg)}
-.pill:has(input:checked)::before{background:var(--red)}
+.pill:has(input:checked)::before{background:var(--red);border-color:var(--red)}
 .pill:has(input:focus-visible){outline:3px solid var(--red-soft);outline-offset:2px}
 .seg{position:relative;display:grid;grid-template-columns:1fr 1fr;background:var(--panel-2);border-radius:999px;padding:4px}
 .seg .thumb{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:999px;background:var(--panel);box-shadow:var(--shadow-s);transition:transform 220ms var(--ease-out)}
@@ -323,7 +323,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
         <div class="field">
           <label for="share">Link de Flex</label>
           <div class="links" id="links">
-            <div class="linkrow"><input class="big" type="url" id="share" placeholder="https://www.flexmls.com/share/XXXXX/Selected" autocomplete="off" inputmode="url" spellcheck="false"><div class="pills"><label class="pill"><input type="checkbox" data-p="e24">Encuentra24</label><label class="pill"><input type="checkbox" data-p="coa">Compre o Alquile</label></div></div>
+            <div class="linkrow"><input class="big" type="url" id="share" placeholder="https://www.flexmls.com/share/XXXXX/Selected" autocomplete="off" inputmode="url" spellcheck="false"><div class="pills"><label class="pill"><input type="checkbox" data-p="e24" autocomplete="off">Encuentra24</label><label class="pill"><input type="checkbox" data-p="coa" autocomplete="off">Compre o Alquile</label></div></div>
           </div>
           <span class="hint">Se publica todo lo que traiga cada share, tal como está en Flex.</span>
           <button class="addlink" id="addLink" type="button">+ Otro link</button>
@@ -444,7 +444,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-24 08:19</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-24 08:42</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -594,7 +594,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   // Ramsés 2026-10-24: un agente puede usar un solo portal; el que no registró no se ofrece ni se envía (se sabe por el correo de portal registrado en su fila).
   const portalOk = (p) => !S.cliente || S.cliente.es_admin || !!(p === 'e24' ? S.cliente.e24_correo : S.cliente.coa_correo);
   const portalesDe = (row) => [...row.querySelectorAll('input[data-p]')].filter((c) => c.checked && portalOk(c.dataset.p)).map((c) => c.dataset.p);
-  const PILLS = '<div class="pills"><label class="pill"><input type="checkbox" data-p="e24">Encuentra24</label><label class="pill"><input type="checkbox" data-p="coa">Compre o Alquile</label></div>';
+  const PILLS = '<div class="pills"><label class="pill"><input type="checkbox" data-p="e24" autocomplete="off">Encuentra24</label><label class="pill"><input type="checkbox" data-p="coa" autocomplete="off">Compre o Alquile</label></div>';
   function agregarLink(focus = true) {
     const rows = linkRows(); if (rows.length >= MAX_LINKS) return;
     // Si el link anterior va a un solo portal, el nuevo arranca con el otro (Ramsés, 22/oct); si va a los dos, con los dos.
@@ -608,6 +608,9 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     $('addLink').hidden = linkRows().length >= MAX_LINKS;
     if (focus) row.querySelector('input[type=url]').focus();
   }
+  // Ramsés 2026-10-24: los portales SIEMPRE arrancan apagados, también si el navegador restaura el formulario (recarga o botón atrás).
+  const apagarPortales = () => document.querySelectorAll('#links input[data-p]').forEach((c) => { c.checked = false; });
+  window.addEventListener('pageshow', apagarPortales); apagarPortales(); setTimeout(apagarPortales, 400);
   function resetLinks() { linkRows().slice(1).forEach((r) => r.remove()); linkInputs().forEach((i) => i.classList.remove('bad')); $('links').querySelectorAll('input[data-p]').forEach((c) => { c.checked = false; }); $('addLink').hidden = false; }
   $('addLink').addEventListener('click', () => agregarLink());
   $('links').addEventListener('input', (ev) => { if (ev.target.type === 'url') ev.target.classList.remove('bad'); });
