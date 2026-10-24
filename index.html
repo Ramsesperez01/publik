@@ -435,7 +435,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 21:13</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 21:16</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -706,7 +706,9 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const orden = Object.entries(zonas).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])), top = orden.slice(0, 5), zmax = top.length ? top[0][1] : 1;
     if (S.zona && !zonas[S.zona]) S.zona = '';
     $('dZonas').innerHTML = top.length ? top.map(([z, n], i) => `<div class="zrow${S.zona === z ? ' sel' : ''}" data-z="${esc(z)}"><span class="rk">${i + 1}</span><span><span class="nm">${esc(z)}</span><span class="tr" style="display:block"><i style="width:${Math.round(100 * n / zmax)}%"></i></span></span><span class="n">${n}</span></div>`).join('') : '<p class="small muted">Aparecen cuando publiques tu primer lote.</p>';
-    const sel = $('dZona'); sel.innerHTML = `<option value="">Todas las zonas (${props2.length})</option>` + orden.slice().sort((a, b) => a[0].localeCompare(b[0])).map(([z, n]) => `<option value="${esc(z)}"${S.zona === z ? ' selected' : ''}>${esc(z)} (${n})</option>`).join('');
+    const sel = $('dZona'), opts = `<option value="">Todas las zonas (${props2.length})</option>` + orden.slice().sort((a, b) => a[0].localeCompare(b[0])).map(([z, n]) => `<option value="${esc(z)}">${esc(z)} (${n})</option>`).join('');
+    if (sel.dataset.o !== opts) { sel.innerHTML = opts; sel.dataset.o = opts; }  // no reconstruir si no cambió: en el celular cerraba el selector abierto
+    sel.value = S.zona;
     const enZona = props2.filter((r) => !S.zona || (r.zona || '').trim() === S.zona);
     const rango = (op, suf) => {
       const v = enZona.filter((r) => r.operacion === op && Number(r.precio) > 0).map((r) => Number(r.precio)).sort((a, b) => a - b), tit = op === 'Venta' ? 'En venta' : 'En alquiler';
