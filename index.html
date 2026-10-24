@@ -176,7 +176,7 @@ form{display:grid;gap:20px}
 .zrow{cursor:pointer}.zrow:hover .nm{color:var(--red)}.zrow.sel .nm{color:var(--red)}
 .rng{display:grid;gap:8px}.rng .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.rng .top b{font-family:var(--display);font-size:15px}
 .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.nums div{background:var(--panel-2);border-radius:var(--r-xs);padding:10px}.nums small{display:block;font-size:12px;color:var(--fg-3)}.nums b{font-family:var(--display);font-weight:800;font-size:17px;letter-spacing:-.01em}.nums .md b{color:var(--red)}
-.plist{display:grid;gap:2px;font-size:14px}.plist a{display:flex;justify-content:space-between;gap:10px;padding:8px 2px;border-bottom:1px solid var(--line);color:var(--fg);text-decoration:none}.plist a b{font-family:var(--mono);font-size:13px;color:var(--red)}.plist a:hover b{text-decoration:underline}
+.plist{display:grid;gap:2px;font-size:14px;max-height:340px;overflow:auto}.plist a{display:flex;justify-content:space-between;gap:10px;padding:8px 2px;border-bottom:1px solid var(--line);color:var(--fg);text-decoration:none}.plist a b{font-family:var(--mono);font-size:13px;color:var(--red)}.plist a:hover b{text-decoration:underline}
 .legend{display:flex;gap:14px;font-size:12.5px;color:var(--fg-2)}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 .zrow{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;font-size:14.5px}
 .zrow .rk{width:22px;height:22px;border-radius:50%;background:var(--red-soft);color:var(--red);font:800 12px var(--display);display:grid;place-items:center}
@@ -427,7 +427,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 21:38</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 21:54</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -685,12 +685,10 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const props2 = [...vistas.values()].map((x) => ({ ...x.r, url: x.t.url }));
     $('dashSub').textContent = filas.length ? '' : 'Se llena con tu primer lote publicado';
     $('dKpis').innerHTML = [[unicas(ok.filter((x) => mesActual(x.t.creado))), 'propiedades este mes'], [unicas(ok.filter((x) => new Date(x.t.creado).getTime() >= hace7)), 'esta semana'], [new Set(props2.map((r) => (r.zona || '').trim()).filter(Boolean)).size, 'zonas']].map(([n, l]) => `<div class="kpi"><b>${n}</b><span>${l}</span></div>`).join('');
-    // barras: por mes si ya hay más de un mes con datos; si no, por semana (últimas 6)
-    const ahora = new Date(), meses = []; for (let i = 5; i >= 0; i--) { const d = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1); meses.push({ y: d.getFullYear(), m: d.getMonth(), set: new Set(), et: MESES[d.getMonth()] }); }
-    ok.forEach((x) => { const d = new Date(x.t.creado), k = meses.find((m) => m.y === d.getFullYear() && m.m === d.getMonth()); if (k) k.set.add(x.r.mls); });
-    let cols = meses, titulo = 'Propiedades publicadas por mes';
-    if (meses.filter((m) => m.set.size).length <= 1) { titulo = 'Propiedades publicadas por semana'; cols = []; for (let i = 5; i >= 0; i--) { const ini = Date.now() - (i + 1) * 7 * 864e5, fin = ini + 7 * 864e5, d = new Date(ini + 864e5); cols.push({ set: new Set(ok.filter((x) => { const c = new Date(x.t.creado).getTime(); return c >= ini && c < fin; }).map((x) => x.r.mls)), et: `${d.getDate()} ${MESES[d.getMonth()]}` }); } }
-    $('dBarsT').textContent = titulo;
+    // barras: siempre por mes (últimos 6)
+    const ahora = new Date(), cols = []; for (let i = 5; i >= 0; i--) { const d = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1); cols.push({ y: d.getFullYear(), m: d.getMonth(), set: new Set(), et: MESES[d.getMonth()] }); }
+    ok.forEach((x) => { const d = new Date(x.t.creado), k = cols.find((m) => m.y === d.getFullYear() && m.m === d.getMonth()); if (k) k.set.add(x.r.mls); });
+    $('dBarsT').textContent = 'Propiedades publicadas por mes';
     const max = Math.max(1, ...cols.map((m) => m.set.size));
     $('dBars').innerHTML = cols.map((m, i) => { const n = m.set.size; return `<div class="col${i === cols.length - 1 ? ' now' : ''}"><span class="v">${n || ''}</span><div class="stack" style="height:${Math.round(100 * n / max)}%"><i style="background:var(--red);height:100%"></i></div><span class="m">${m.et}</span></div>`; }).join('');
     // top 5 zonas
@@ -713,9 +711,9 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
       return `<div class="rng"><div class="top"><b>${tit}</b><span class="small muted">${plural(v.length, 'propiedad', 'propiedades')}</span></div><div class="nums">${v.length === 1 ? caja('Precio', v[0], 'md') : caja('Desde', v[0]) + caja('Típico', cuantil(v, .5), 'md') + caja('Hasta', v[v.length - 1])}</div>${pm.length ? `<span class="small muted">Por m²: típico ${usd(cuantil(pm, .5))}${suf}</span>` : ''}</div>`;
     };
     $('dPrecios').innerHTML = (rango('Alquiler', '/mes') + rango('Venta', '')) || '<p class="small muted">Aparecen cuando publiques tu primer lote.</p>';
-    // con una zona elegida: sus propiedades, cada una enlaza a su lote en Flex
-    const lst = S.zona ? sel.slice().sort((a, b) => Number(b.precio) - Number(a.precio)) : [];
-    $('dLista').innerHTML = lst.length ? `<div class="plist">${lst.slice(0, 10).map((r) => `<a href="${esc(r.url || '#')}" target="_blank" rel="noopener"><span><b>${esc(r.mls)}</b> ${esc(r.tipo || '')}</span><span>${Number(r.precio) > 0 ? usd(r.precio) + (r.operacion === 'Alquiler' ? '/mes' : '') : ''}</span></a>`).join('')}${lst.length > 10 ? `<span class="small muted" style="padding-top:6px">y ${lst.length - 10} más</span>` : ''}</div>` : '';
+    // siempre: las propiedades de donde sale lo que se ve (según los filtros), cada una enlaza a su lote en Flex
+    const lst = sel.slice().sort((a, b) => Number(b.precio) - Number(a.precio));
+    $('dLista').innerHTML = lst.length ? `<h3 style="margin:4px 0 6px">Propiedades (${lst.length})</h3><div class="plist">${lst.map((r) => `<a href="${esc(r.url || '#')}" target="_blank" rel="noopener"><span><b>${esc(r.mls)}</b> ${esc(r.tipo || '')}${S.zona ? '' : ` · ${esc((r.zona || '').trim())}`} · ${r.operacion === 'Alquiler' ? 'Alquiler' : 'Venta'}</span><span>${Number(r.precio) > 0 ? usd(r.precio) + (r.operacion === 'Alquiler' ? '/mes' : '') : ''}</span></a>`).join('')}</div>` : '';
   }
   $('tabs').addEventListener('change', () => { S.tab = document.querySelector('input[name=tab]:checked').value; $('tabs').dataset.i = S.tab === 'dash' ? '1' : '0'; renderDash(); });
   $('dZona').addEventListener('change', () => { S.zona = $('dZona').value; renderDash(); });
