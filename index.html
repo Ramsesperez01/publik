@@ -189,6 +189,7 @@ form{display:grid;gap:20px}
 .rng .ends{display:flex;justify-content:space-between;font-size:13px;color:var(--fg-2)}
 .mix{display:flex;height:14px;border-radius:99px;overflow:hidden;background:var(--panel-2)}.mix i{display:block;height:100%}
 @media (max-width:640px){.dgrid{grid-template-columns:1fr}.kpi b{font-size:25px}}
+.seg.tabs label{padding:9px 10px;font-size:14.5px}
 .job .title .code{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:-.01em;color:var(--red);text-decoration:none}.job .title a.code:hover{text-decoration:underline}
 .job .pos{text-align:right;font-size:14px;color:var(--fg-2)}
 .job .meta{font-size:13.5px;color:var(--fg-3);display:flex;gap:4px 16px;flex-wrap:wrap;grid-column:1/-1}
@@ -349,7 +350,16 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
       </form>
     </section>
 
-    <section class="card" id="dash" hidden>
+    <section style="display:grid;gap:14px">
+      <div style="display:grid;justify-items:center;gap:8px">
+        <div class="seg tabs" id="tabs" data-i="0" style="max-width:360px;width:100%">
+          <span class="thumb" aria-hidden="true"></span>
+          <label><input type="radio" name="tab" value="links" checked>Mis links</label>
+          <label><input type="radio" name="tab" value="dash">Dashboard</label>
+        </div>
+        <span class="small muted" id="jobsCount"></span>
+      </div>
+      <section class="card" id="dash" hidden>
       <div class="dh"><h2>Tus números</h2><span class="small muted" id="dashSub"></span></div>
       <div class="kpis" id="dKpis"></div>
       <div class="dgrid">
@@ -358,12 +368,6 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
         <div class="dbox"><h3>Rango de precios</h3><div id="dPrecios" style="display:grid;gap:18px"></div><div id="dMix" style="display:grid;gap:8px"></div></div>
       </div>
     </section>
-
-    <section style="display:grid;gap:14px">
-      <div style="display:grid;justify-items:center;gap:8px">
-        <h2 style="font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.01em;margin:0">Mis links</h2>
-        <span class="small muted" id="jobsCount"></span>
-      </div>
       <div class="jobs" id="jobs"></div>
       <div class="empty" id="jobsEmpty" hidden>
         <svg viewBox="0 0 72 72" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 40 36 16l24 24"/><path d="M36 16v42"/><path d="M18 46v14h36V46"/></g></svg>
@@ -429,7 +433,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 21:06</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 21:09</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -445,7 +449,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   // Planes vigentes (Ramsés, 2026-10-22 23:1x): escalera de $10 por paso; Piloto = fundadores sin tope; Oficina se define aparte.
   const PLANES = { Piloto: { lim: 0, precio: 0 }, Agente: { lim: 10, precio: 45 }, Pro: { lim: 15, precio: 55 }, Max: { lim: 20, precio: 65 }, Oficina: null };
   const opcionesPlan = (actual) => [...new Set([...Object.keys(PLANES), ...(actual ? [actual] : [])])].map((x) => { const d = PLANES[x]; const t = x === 'Piloto' ? 'Piloto (gratis, sin tope)' : d ? `${x} · $${d.precio}/mes · ${d.lim} por día` : x; return `<option value="${x}" ${x === actual ? 'selected' : ''}>${t}</option>`; }).join('');
-  const S = { user: null, cliente: null, trabajos: [], colaTotal: 0, posiciones: {}, pubsHoy: 0, canal: null, enviando: false, clientes: [], cuentasDe: null, panelDe: null, confirmarRepetido: null };
+  const S = { tab: 'links', user: null, cliente: null, trabajos: [], colaTotal: 0, posiciones: {}, pubsHoy: 0, canal: null, enviando: false, clientes: [], cuentasDe: null, panelDe: null, confirmarRepetido: null };
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const iniciales = (n) => (n || '?').trim().split(/\s+/).filter(Boolean).slice(0, 2).map((w) => Array.from(w)[0].toUpperCase()).join('') || '?';
   const fmtDT = (iso) => { if (!iso) return '—'; const d = new Date(iso); if (isNaN(d)) return iso; return d.toLocaleString('es-PA', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); };
@@ -678,7 +682,9 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   function renderDash() {
     const box = $('dash'); if (!box) return;
     const filas = []; S.trabajos.forEach((t) => (t.resultados || []).forEach((r) => filas.push({ t, r })));
-    if (!filas.length) { box.hidden = true; return; }
+    const esDash = S.tab === 'dash';
+    $('jobs').hidden = esDash; $('jobsEmpty').hidden = esDash || S.trabajos.length > 0; $('jobsCount').textContent = esDash || !S.trabajos.length ? '' : plural(S.trabajos.length, 'link', 'links');
+    if (!filas.length || !esDash) { box.hidden = true; return; }
     box.hidden = false;
     const ahora = new Date(), delMes = filas.filter((x) => mesActual(x.t.creado));
     const activos = delMes.filter((x) => x.r.estado === 'Activo');
@@ -706,6 +712,8 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const nAlq = props2.filter((r) => r.operacion === 'Alquiler').length, nVen = props2.filter((r) => r.operacion === 'Venta').length, nt = nAlq + nVen;
     $('dMix').innerHTML = nt ? `<div class="mix"><i style="width:${100 * nAlq / nt}%;background:var(--red)"></i><i style="width:${100 * nVen / nt}%;background:var(--fg-2)"></i></div><div class="legend"><span><i style="background:var(--red)"></i>Alquiler ${Math.round(100 * nAlq / nt)}%</span><span><i style="background:var(--fg-2)"></i>Venta ${Math.round(100 * nVen / nt)}%</span></div>` : '';
   }
+
+  $('tabs').addEventListener('change', () => { S.tab = document.querySelector('input[name=tab]:checked').value; $('tabs').dataset.i = S.tab === 'dash' ? '1' : '0'; renderDash(); });
 
   // ---------- administración ----------
   async function llamarAdmin(body) {
