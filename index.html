@@ -163,9 +163,7 @@ form{display:grid;gap:20px}
 .kpi{background:var(--panel-2);border-radius:var(--r-s);padding:14px 14px 12px}
 .kpi b{display:block;font-family:var(--display);font-weight:800;font-size:30px;line-height:1.05;letter-spacing:-.02em}
 .kpi span{font-size:13px;color:var(--fg-2)}
-.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
 .dbox{display:grid;gap:12px;align-content:start}
-.dbox.full{grid-column:1/-1}
 .bars{display:flex;align-items:flex-end;gap:10px;height:150px;padding-top:6px}
 .bars .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%;min-width:0}
 .bars .stack{width:100%;max-width:46px;display:flex;flex-direction:column-reverse;border-radius:10px 10px 4px 4px;overflow:hidden;min-height:3px}
@@ -173,8 +171,12 @@ form{display:grid;gap:20px}
 .bars .v{font-family:var(--display);font-weight:800;font-size:13px}
 .bars .m{font-size:12px;color:var(--fg-3);text-transform:capitalize}
 .bars .col.now .m{color:var(--red);font-weight:800}
-#dZona{width:100%;font:700 15px var(--display);color:var(--fg);background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r-xs);padding:11px 12px}
+.filt{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#dZona,#dTipo{width:100%;min-width:0;font:700 15px var(--display);color:var(--fg);background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r-xs);padding:11px 12px}
 .zrow{cursor:pointer}.zrow:hover .nm{color:var(--red)}.zrow.sel .nm{color:var(--red)}
+.rng{display:grid;gap:8px}.rng .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.rng .top b{font-family:var(--display);font-size:15px}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.nums div{background:var(--panel-2);border-radius:var(--r-xs);padding:10px}.nums small{display:block;font-size:12px;color:var(--fg-3)}.nums b{font-family:var(--display);font-weight:800;font-size:17px;letter-spacing:-.01em}.nums .md b{color:var(--red)}
+.plist{display:grid;gap:2px;font-size:14px}.plist a{display:flex;justify-content:space-between;gap:10px;padding:8px 2px;border-bottom:1px solid var(--line);color:var(--fg);text-decoration:none}.plist a b{font-family:var(--mono);font-size:13px;color:var(--red)}.plist a:hover b{text-decoration:underline}
 .legend{display:flex;gap:14px;font-size:12.5px;color:var(--fg-2)}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 .zrow{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;font-size:14.5px}
 .zrow .rk{width:22px;height:22px;border-radius:50%;background:var(--red-soft);color:var(--red);font:800 12px var(--display);display:grid;place-items:center}
@@ -182,15 +184,7 @@ form{display:grid;gap:20px}
 .zrow .tr i{display:block;height:100%;border-radius:99px;background:var(--red)}
 .zrow .nm{font-weight:700;display:block;margin-bottom:4px}
 .zrow .n{font-family:var(--display);font-weight:800}
-.rng{display:grid;gap:8px}
-.rng .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.rng .top b{font-family:var(--display);font-size:15px}
-.rng .track{position:relative;height:12px;border-radius:99px;background:var(--panel-2)}
-.rng .q{position:absolute;top:0;bottom:0;border-radius:99px;background:var(--red-soft);box-shadow:inset 0 0 0 1px var(--line-2)}
-.rng .md{position:absolute;top:-4px;bottom:-4px;width:4px;margin-left:-2px;border-radius:3px;background:var(--red)}
-.rng .ends{display:flex;justify-content:space-between;font-size:13px;color:var(--fg-2)}
-.mix{display:flex;height:14px;border-radius:99px;overflow:hidden;background:var(--panel-2)}.mix i{display:block;height:100%}
-@media (max-width:640px){.dgrid{grid-template-columns:1fr}.kpi b{font-size:25px}}
+@media (max-width:640px){.kpi b{font-size:25px}}
 .seg.tabs label{padding:9px 10px;font-size:14.5px}
 .job .title .code{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:-.01em;color:var(--red);text-decoration:none}.job .title a.code:hover{text-decoration:underline}
 .job .pos{text-align:right;font-size:14px;color:var(--fg-2)}
@@ -364,11 +358,9 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
       <section class="card" id="dash" hidden>
       <div class="dh"><h2>Tus números</h2><span class="small muted" id="dashSub"></span></div>
       <div class="kpis" id="dKpis"></div>
-      <div class="dgrid">
-        <div class="dbox full"><h3>Propiedades publicadas por mes</h3><div class="bars" id="dBars"></div></div>
-        <div class="dbox"><h3>Top 5 zonas</h3><div id="dZonas" style="display:grid;gap:12px"></div></div>
-        <div class="dbox"><h3>Rango de precios por zona</h3><select id="dZona" aria-label="Zona"></select><div id="dPrecios" style="display:grid;gap:18px"></div><div id="dMix" style="display:grid;gap:8px"></div></div>
-      </div>
+      <div class="dbox"><h3 id="dBarsT">Propiedades publicadas</h3><div class="bars" id="dBars"></div></div>
+      <div class="dbox"><h3>Top 5 zonas</h3><div id="dZonas" style="display:grid;gap:12px"></div></div>
+      <div class="dbox"><h3>Precios</h3><div class="filt"><select id="dZona" aria-label="Zona"></select><select id="dTipo" aria-label="Tipo"></select></div><div id="dPrecios" style="display:grid;gap:18px"></div><div id="dLista"></div></div>
     </section>
       <div class="jobs" id="jobs"></div>
       <div class="empty" id="jobsEmpty" hidden>
@@ -435,7 +427,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 21:28</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 21:38</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -451,7 +443,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   // Planes vigentes (Ramsés, 2026-10-22 23:1x): escalera de $10 por paso; Piloto = fundadores sin tope; Oficina se define aparte.
   const PLANES = { Piloto: { lim: 0, precio: 0 }, Agente: { lim: 10, precio: 45 }, Pro: { lim: 15, precio: 55 }, Max: { lim: 20, precio: 65 }, Oficina: null };
   const opcionesPlan = (actual) => [...new Set([...Object.keys(PLANES), ...(actual ? [actual] : [])])].map((x) => { const d = PLANES[x]; const t = x === 'Piloto' ? 'Piloto (gratis, sin tope)' : d ? `${x} · $${d.precio}/mes · ${d.lim} por día` : x; return `<option value="${x}" ${x === actual ? 'selected' : ''}>${t}</option>`; }).join('');
-  const S = { tab: 'links', zona: '', user: null, cliente: null, trabajos: [], colaTotal: 0, posiciones: {}, pubsHoy: 0, canal: null, enviando: false, clientes: [], cuentasDe: null, panelDe: null, confirmarRepetido: null };
+  const S = { tab: 'links', zona: '', tipo: '', user: null, cliente: null, trabajos: [], colaTotal: 0, posiciones: {}, pubsHoy: 0, canal: null, enviando: false, clientes: [], cuentasDe: null, panelDe: null, confirmarRepetido: null };
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const iniciales = (n) => (n || '?').trim().split(/\s+/).filter(Boolean).slice(0, 2).map((w) => Array.from(w)[0].toUpperCase()).join('') || '?';
   const fmtDT = (iso) => { if (!iso) return '—'; const d = new Date(iso); if (isNaN(d)) return iso; return d.toLocaleString('es-PA', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); };
@@ -688,41 +680,46 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     $('jobs').hidden = esDash; $('jobsEmpty').hidden = esDash || S.trabajos.length > 0; $('jobsCount').textContent = esDash || !S.trabajos.length ? '' : plural(S.trabajos.length, 'link', 'links');
     if (!esDash) { box.hidden = true; return; }
     box.hidden = false;
-    const ahora = new Date(), delMes = filas.filter((x) => mesActual(x.t.creado));
-    const activos = delMes.filter((x) => x.r.estado === 'Activo');
-    const props = new Set(delMes.map((x) => x.r.mls)).size;
-    const exito = delMes.length ? Math.round(100 * activos.length / delMes.length) : 0;
-    $('dashSub').textContent = filas.length ? `${MESES[ahora.getMonth()]} ${ahora.getFullYear()}` : 'Se llena con tu primer lote publicado';
-    $('dKpis').innerHTML = [[props, 'propiedades publicadas este mes'], [new Set(delMes.map((x) => x.r.zona).filter(Boolean)).size, 'zonas distintas'], [exito + '%', 'publicadas con éxito']].map(([n, l]) => `<div class="kpi"><b>${n}</b><span>${l}</span></div>`).join('');
-    // propiedades publicadas por mes (últimos 6): una por MLS con al menos un aviso Activo ese mes, sin distinguir portal
-    const meses = []; for (let i = 5; i >= 0; i--) { const d = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1); meses.push({ y: d.getFullYear(), m: d.getMonth(), set: new Set() }); }
-    filas.forEach((x) => { if (x.r.estado !== 'Activo') return; const d = new Date(x.t.creado); const k = meses.find((m) => m.y === d.getFullYear() && m.m === d.getMonth()); if (k) k.set.add(x.r.mls); });
-    const max = Math.max(1, ...meses.map((m) => m.set.size));
-    $('dBars').innerHTML = meses.map((m, i) => { const n = m.set.size; return `<div class="col${i === 5 ? ' now' : ''}"><span class="v">${n || ''}</span><div class="stack" style="height:${Math.round(100 * n / max)}%"><i style="background:var(--red);height:100%"></i></div><span class="m">${MESES[m.m]}</span></div>`; }).join('');
-    // propiedades únicas con datos (una vez por MLS)
-    const vistas = new Map(); filas.forEach((x) => { if (x.r.zona !== undefined && !vistas.has(x.r.mls)) vistas.set(x.r.mls, x.r); });
-    const props2 = [...vistas.values()];
+    const ok = filas.filter((x) => x.r.estado === 'Activo'), unicas = (a) => new Set(a.map((x) => x.r.mls)).size, hace7 = Date.now() - 7 * 864e5;
+    const vistas = new Map(); ok.forEach((x) => { if (x.r.zona !== undefined && !vistas.has(x.r.mls)) vistas.set(x.r.mls, x); });
+    const props2 = [...vistas.values()].map((x) => ({ ...x.r, url: x.t.url }));
+    $('dashSub').textContent = filas.length ? '' : 'Se llena con tu primer lote publicado';
+    $('dKpis').innerHTML = [[unicas(ok.filter((x) => mesActual(x.t.creado))), 'propiedades este mes'], [unicas(ok.filter((x) => new Date(x.t.creado).getTime() >= hace7)), 'esta semana'], [new Set(props2.map((r) => (r.zona || '').trim()).filter(Boolean)).size, 'zonas']].map(([n, l]) => `<div class="kpi"><b>${n}</b><span>${l}</span></div>`).join('');
+    // barras: por mes si ya hay más de un mes con datos; si no, por semana (últimas 6)
+    const ahora = new Date(), meses = []; for (let i = 5; i >= 0; i--) { const d = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1); meses.push({ y: d.getFullYear(), m: d.getMonth(), set: new Set(), et: MESES[d.getMonth()] }); }
+    ok.forEach((x) => { const d = new Date(x.t.creado), k = meses.find((m) => m.y === d.getFullYear() && m.m === d.getMonth()); if (k) k.set.add(x.r.mls); });
+    let cols = meses, titulo = 'Propiedades publicadas por mes';
+    if (meses.filter((m) => m.set.size).length <= 1) { titulo = 'Propiedades publicadas por semana'; cols = []; for (let i = 5; i >= 0; i--) { const ini = Date.now() - (i + 1) * 7 * 864e5, fin = ini + 7 * 864e5, d = new Date(ini + 864e5); cols.push({ set: new Set(ok.filter((x) => { const c = new Date(x.t.creado).getTime(); return c >= ini && c < fin; }).map((x) => x.r.mls)), et: `${d.getDate()} ${MESES[d.getMonth()]}` }); } }
+    $('dBarsT').textContent = titulo;
+    const max = Math.max(1, ...cols.map((m) => m.set.size));
+    $('dBars').innerHTML = cols.map((m, i) => { const n = m.set.size; return `<div class="col${i === cols.length - 1 ? ' now' : ''}"><span class="v">${n || ''}</span><div class="stack" style="height:${Math.round(100 * n / max)}%"><i style="background:var(--red);height:100%"></i></div><span class="m">${m.et}</span></div>`; }).join('');
+    // top 5 zonas
     const zonas = {}; props2.forEach((r) => { const z = (r.zona || '').trim(); if (z) zonas[z] = (zonas[z] || 0) + 1; });
     const orden = Object.entries(zonas).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])), top = orden.slice(0, 5), zmax = top.length ? top[0][1] : 1;
     if (S.zona && !zonas[S.zona]) S.zona = '';
+    const tipos = {}; props2.forEach((r) => { if (r.tipo) tipos[r.tipo] = (tipos[r.tipo] || 0) + 1; });
+    if (S.tipo && !tipos[S.tipo]) S.tipo = '';
     $('dZonas').innerHTML = top.length ? top.map(([z, n], i) => `<div class="zrow${S.zona === z ? ' sel' : ''}" data-z="${esc(z)}"><span class="rk">${i + 1}</span><span><span class="nm">${esc(z)}</span><span class="tr" style="display:block"><i style="width:${Math.round(100 * n / zmax)}%"></i></span></span><span class="n">${n}</span></div>`).join('') : '<p class="small muted">Aparecen cuando publiques tu primer lote.</p>';
-    const sel = $('dZona'), opts = `<option value="">Todas las zonas (${props2.length})</option>` + orden.slice().sort((a, b) => a[0].localeCompare(b[0])).map(([z, n]) => `<option value="${esc(z)}">${esc(z)} (${n})</option>`).join('');
-    if (sel.dataset.o !== opts) { sel.innerHTML = opts; sel.dataset.o = opts; }  // no reconstruir si no cambió: en el celular cerraba el selector abierto
-    sel.value = S.zona;
-    const enZona = props2.filter((r) => !S.zona || (r.zona || '').trim() === S.zona);
+    // filtros (no se reconstruyen si no cambiaron: en el celular cerraba el selector abierto)
+    const llenar = (sel, html, val) => { if (sel.dataset.o !== html) { sel.innerHTML = html; sel.dataset.o = html; } sel.value = val; };
+    llenar($('dZona'), `<option value="">Todas las zonas</option>` + orden.slice().sort((a, b) => a[0].localeCompare(b[0])).map(([z]) => `<option value="${esc(z)}">${esc(z)}</option>`).join(''), S.zona);
+    llenar($('dTipo'), `<option value="">Todos los tipos</option>` + Object.keys(tipos).sort().map((t) => `<option value="${esc(t)}">${esc(t)}</option>`).join(''), S.tipo);
+    const sel = props2.filter((r) => (!S.zona || (r.zona || '').trim() === S.zona) && (!S.tipo || r.tipo === S.tipo));
     const rango = (op, suf) => {
-      const v = enZona.filter((r) => r.operacion === op && Number(r.precio) > 0).map((r) => Number(r.precio)).sort((a, b) => a - b), tit = op === 'Venta' ? 'En venta' : 'En alquiler';
-      if (!v.length) return S.zona ? `<div class="rng"><div class="top"><b>${tit}</b></div><span class="small muted">Sin propiedades ${op === 'Venta' ? 'en venta' : 'en alquiler'} en ${esc(S.zona)}.</span></div>` : '';
-      if (v.length === 1) return `<div class="rng"><div class="top"><b>${tit}</b><span class="small muted">1 propiedad</span></div><span style="font-family:var(--display);font-weight:800;font-size:20px">${usd(v[0])}${suf}</span></div>`;
-      const lo = v[0], hi = v[v.length - 1], span = Math.max(1, hi - lo), pos = (x) => Math.round(100 * (x - lo) / span), q1 = cuantil(v, .25), q3 = cuantil(v, .75), md = cuantil(v, .5);
-      return `<div class="rng"><div class="top"><b>${tit}</b><span class="small muted">${plural(v.length, 'propiedad', 'propiedades')} · típico ${usd(md)}${suf}</span></div><div class="track"><span class="q" style="left:${pos(q1)}%;width:${Math.max(2, pos(q3) - pos(q1))}%"></span><span class="md" style="left:${pos(md)}%"></span></div><div class="ends"><span>${usd(lo)}</span><span>${usd(hi)}</span></div></div>`;
+      const lista = sel.filter((r) => r.operacion === op && Number(r.precio) > 0), v = lista.map((r) => Number(r.precio)).sort((a, b) => a - b), tit = op === 'Venta' ? 'En venta' : 'En alquiler';
+      if (!v.length) return (S.zona || S.tipo) ? `<div class="rng"><div class="top"><b>${tit}</b></div><span class="small muted">Sin propiedades ${op === 'Venta' ? 'en venta' : 'en alquiler'} con ese filtro.</span></div>` : '';
+      const pm = lista.filter((r) => Number(r.m2) > 0).map((r) => Number(r.precio) / Number(r.m2)).sort((a, b) => a - b);
+      const caja = (l, n, c) => `<div${c ? ` class="${c}"` : ''}><small>${l}</small><b>${usd(n)}</b></div>`;
+      return `<div class="rng"><div class="top"><b>${tit}</b><span class="small muted">${plural(v.length, 'propiedad', 'propiedades')}</span></div><div class="nums">${v.length === 1 ? caja('Precio', v[0], 'md') : caja('Desde', v[0]) + caja('Típico', cuantil(v, .5), 'md') + caja('Hasta', v[v.length - 1])}</div>${pm.length ? `<span class="small muted">Por m²: típico ${usd(cuantil(pm, .5))}${suf}</span>` : ''}</div>`;
     };
     $('dPrecios').innerHTML = (rango('Alquiler', '/mes') + rango('Venta', '')) || '<p class="small muted">Aparecen cuando publiques tu primer lote.</p>';
-    const nAlq = enZona.filter((r) => r.operacion === 'Alquiler').length, nVen = enZona.filter((r) => r.operacion === 'Venta').length, nt = nAlq + nVen;
-    $('dMix').innerHTML = nt ? `<div class="mix"><i style="width:${100 * nAlq / nt}%;background:var(--red)"></i><i style="width:${100 * nVen / nt}%;background:var(--fg-2)"></i></div><div class="legend"><span><i style="background:var(--red)"></i>Alquiler ${Math.round(100 * nAlq / nt)}%</span><span><i style="background:var(--fg-2)"></i>Venta ${Math.round(100 * nVen / nt)}%</span></div>` : '';
+    // con una zona elegida: sus propiedades, cada una enlaza a su lote en Flex
+    const lst = S.zona ? sel.slice().sort((a, b) => Number(b.precio) - Number(a.precio)) : [];
+    $('dLista').innerHTML = lst.length ? `<div class="plist">${lst.slice(0, 10).map((r) => `<a href="${esc(r.url || '#')}" target="_blank" rel="noopener"><span><b>${esc(r.mls)}</b> ${esc(r.tipo || '')}</span><span>${Number(r.precio) > 0 ? usd(r.precio) + (r.operacion === 'Alquiler' ? '/mes' : '') : ''}</span></a>`).join('')}${lst.length > 10 ? `<span class="small muted" style="padding-top:6px">y ${lst.length - 10} más</span>` : ''}</div>` : '';
   }
   $('tabs').addEventListener('change', () => { S.tab = document.querySelector('input[name=tab]:checked').value; $('tabs').dataset.i = S.tab === 'dash' ? '1' : '0'; renderDash(); });
   $('dZona').addEventListener('change', () => { S.zona = $('dZona').value; renderDash(); });
+  $('dTipo').addEventListener('change', () => { S.tipo = $('dTipo').value; renderDash(); });
   $('dZonas').addEventListener('click', (ev) => { const r = ev.target.closest('.zrow'); if (!r) return; S.zona = S.zona === r.dataset.z ? '' : r.dataset.z; renderDash(); });
 
   // ---------- administración ----------
