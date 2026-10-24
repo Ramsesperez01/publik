@@ -435,7 +435,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 21:16</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 21:17</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -686,13 +686,13 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const filas = []; S.trabajos.forEach((t) => (t.resultados || []).forEach((r) => filas.push({ t, r })));
     const esDash = S.tab === 'dash';
     $('jobs').hidden = esDash; $('jobsEmpty').hidden = esDash || S.trabajos.length > 0; $('jobsCount').textContent = esDash || !S.trabajos.length ? '' : plural(S.trabajos.length, 'link', 'links');
-    if (!filas.length || !esDash) { box.hidden = true; return; }
+    if (!esDash) { box.hidden = true; return; }
     box.hidden = false;
     const ahora = new Date(), delMes = filas.filter((x) => mesActual(x.t.creado));
     const activos = delMes.filter((x) => x.r.estado === 'Activo');
     const props = new Set(delMes.map((x) => x.r.mls)).size;
     const exito = delMes.length ? Math.round(100 * activos.length / delMes.length) : 0;
-    $('dashSub').textContent = `${MESES[ahora.getMonth()]} ${ahora.getFullYear()}`;
+    $('dashSub').textContent = filas.length ? `${MESES[ahora.getMonth()]} ${ahora.getFullYear()}` : 'Se llena con tu primer lote publicado';
     $('dKpis').innerHTML = [[props, 'propiedades publicadas este mes'], [new Set(delMes.map((x) => x.r.zona).filter(Boolean)).size, 'zonas distintas'], [exito + '%', 'publicadas con éxito']].map(([n, l]) => `<div class="kpi"><b>${n}</b><span>${l}</span></div>`).join('');
     // propiedades publicadas por mes (últimos 6): una por MLS con al menos un aviso Activo ese mes, sin distinguir portal
     const meses = []; for (let i = 5; i >= 0; i--) { const d = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1); meses.push({ y: d.getFullYear(), m: d.getMonth(), set: new Set() }); }
