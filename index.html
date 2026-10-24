@@ -320,7 +320,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
         <div class="field">
           <label for="share">Link de Flex</label>
           <div class="links" id="links">
-            <div class="linkrow"><input class="big" type="url" id="share" placeholder="https://www.flexmls.com/share/XXXXX/Selected" autocomplete="off" inputmode="url" spellcheck="false"><div class="pills"><label class="pill"><input type="checkbox" data-p="e24" checked>Encuentra24</label><label class="pill"><input type="checkbox" data-p="coa" checked>Compre o Alquile</label></div></div>
+            <div class="linkrow"><input class="big" type="url" id="share" placeholder="https://www.flexmls.com/share/XXXXX/Selected" autocomplete="off" inputmode="url" spellcheck="false"><div class="pills"><label class="pill"><input type="checkbox" data-p="e24">Encuentra24</label><label class="pill"><input type="checkbox" data-p="coa">Compre o Alquile</label></div></div>
           </div>
           <span class="hint">Se publica todo lo que traiga cada share, tal como está en Flex.</span>
           <button class="addlink" id="addLink" type="button">+ Otro link</button>
@@ -373,7 +373,6 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     <details class="card" id="cuentasBox" style="padding:0">
       <summary style="padding:18px 22px;cursor:pointer;font-family:var(--display);font-weight:800;font-size:17px">Mis cuentas de portales</summary>
       <div style="padding:0 22px 22px;display:grid;gap:16px">
-        <p class="small muted">Si cambias tu contraseña en un portal, actualízala aquí para que Publik siga publicando. También puedes agregar el portal que todavía no usas. La contraseña no se muestra.</p>
         <form class="mc" data-portal="e24" novalidate style="display:grid;gap:10px"><h3 style="margin:0;font-size:16px">Encuentra24</h3>
           <div class="field"><label for="mcE24c">Correo</label><input type="email" id="mcE24c" inputmode="email" autocapitalize="none" autocomplete="off"></div>
           <div class="field"><label for="mcE24k">Contraseña</label><input type="password" id="mcE24k" autocomplete="new-password"></div>
@@ -418,14 +417,13 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
         </div>
         <div class="field"><label for="nNotas">Notas internas</label><textarea id="nNotas" placeholder="Solo las ven los administradores."></textarea></div>
         <div style="display:grid;gap:10px">
-          <span class="lbl" style="font-family:var(--display);font-weight:700">Cuentas del agente en los portales <span class="muted" style="font-weight:400;font-family:var(--body)">(al menos un portal: con ellas publica Bob)</span></span>
+          <span class="lbl" style="font-family:var(--display);font-weight:700">Cuentas del agente en los portales</span>
           <div class="row">
             <div class="field"><label for="nE24Correo">Encuentra24 · correo</label><input id="nE24Correo" type="email" inputmode="email" autocapitalize="none" autocomplete="off"></div>
             <div class="field"><label for="nE24Clave">Encuentra24 · contraseña</label><input id="nE24Clave" type="password" autocomplete="new-password"></div>
             <div class="field"><label for="nCoaCorreo">Compre o Alquile · correo</label><input id="nCoaCorreo" type="email" inputmode="email" autocapitalize="none" autocomplete="off"></div>
             <div class="field"><label for="nCoaClave">Compre o Alquile · contraseña</label><input id="nCoaClave" type="password" autocomplete="new-password"></div>
           </div>
-          <span class="hint">Si el agente publica con la cuenta de la oficina, pon aquí la de la oficina. Las contraseñas se guardan cifradas en la bóveda del servidor; solo Bob las usa para entrar al portal. No se vuelven a mostrar: para cambiarlas usa "Cuentas" en la lista.</span>
         </div>
         <div class="actions"><span class="rules" id="nErr"></span><button class="btn primary" id="nBtn" type="submit">Crear cuenta</button></div>
         <div class="linkbox" id="nLink" hidden></div>
@@ -443,7 +441,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-24 00:07</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-24 00:28</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -578,12 +576,12 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   // Ramsés 2026-10-24: un agente puede usar un solo portal; el que no registró no se ofrece ni se envía (se sabe por el correo de portal registrado en su fila).
   const portalOk = (p) => !S.cliente || S.cliente.es_admin || !!(p === 'e24' ? S.cliente.e24_correo : S.cliente.coa_correo);
   const portalesDe = (row) => [...row.querySelectorAll('input[data-p]')].filter((c) => c.checked && portalOk(c.dataset.p)).map((c) => c.dataset.p);
-  const PILLS = '<div class="pills"><label class="pill"><input type="checkbox" data-p="e24" checked>Encuentra24</label><label class="pill"><input type="checkbox" data-p="coa" checked>Compre o Alquile</label></div>';
+  const PILLS = '<div class="pills"><label class="pill"><input type="checkbox" data-p="e24">Encuentra24</label><label class="pill"><input type="checkbox" data-p="coa">Compre o Alquile</label></div>';
   function agregarLink(focus = true) {
     const rows = linkRows(); if (rows.length >= MAX_LINKS) return;
     // Si el link anterior va a un solo portal, el nuevo arranca con el otro (Ramsés, 22/oct); si va a los dos, con los dos.
     const prev = portalesDe(rows[rows.length - 1]);
-    const defecto = prev.length === 1 ? ['e24', 'coa'].filter((p) => p !== prev[0] && portalOk(p)) : ['e24', 'coa'].filter(portalOk);
+    const defecto = [];  // Ramsés 2026-10-24: los portales arrancan apagados; la persona elige uno o los dos
     const row = document.createElement('div'); row.className = 'linkrow';
     row.innerHTML = '<input class="big" type="url" placeholder="https://www.flexmls.com/share/XXXXX/Selected" autocomplete="off" inputmode="url" spellcheck="false" aria-label="Otro link de Flex"><button class="x" type="button" aria-label="Quitar este link">×</button>' + PILLS;
     row.querySelectorAll('input[data-p]').forEach((c) => { c.checked = defecto.includes(c.dataset.p); });
@@ -592,7 +590,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     $('addLink').hidden = linkRows().length >= MAX_LINKS;
     if (focus) row.querySelector('input[type=url]').focus();
   }
-  function resetLinks() { linkRows().slice(1).forEach((r) => r.remove()); linkInputs().forEach((i) => i.classList.remove('bad')); $('links').querySelectorAll('input[data-p]').forEach((c) => { c.checked = true; }); $('addLink').hidden = false; }
+  function resetLinks() { linkRows().slice(1).forEach((r) => r.remove()); linkInputs().forEach((i) => i.classList.remove('bad')); $('links').querySelectorAll('input[data-p]').forEach((c) => { c.checked = false; }); $('addLink').hidden = false; }
   $('addLink').addEventListener('click', () => agregarLink());
   $('links').addEventListener('input', (ev) => { if (ev.target.type === 'url') ev.target.classList.remove('bad'); });
   function validar() {
@@ -607,7 +605,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
       const k = m[1].toLowerCase();
       if (vistos.has(k)) { inp.classList.add('bad'); if (ok) setErr('errShare', `${n} está repetido (${m[1]}).`); ok = false; return; }
       const portales = portalesDe(row);
-      if (!portales.length) { inp.classList.add('bad'); if (ok) setErr('errShare', `${n} necesita al menos un portal.`); ok = false; return; }
+      if (!portales.length) { inp.classList.add('bad'); if (ok) setErr('errShare', `${n}: elige al menos un portal.`); ok = false; return; }
       vistos.add(k); lotes.push({ share: m[1], url, portales });
     });
     if (ok && !lotes.length) { linkInputs()[0].classList.add('bad'); setErr('errShare', 'Pega el link completo de Flex, con la forma flexmls.com/share/CÓDIGO.'); ok = false; }
