@@ -154,6 +154,41 @@ form{display:grid;gap:20px}
 .job>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:8px 14px;padding:16px 18px;align-items:center}
 .job>summary::-webkit-details-marker{display:none}
 .job .title{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+/* Panel de métricas del agente (2026-10-23) */
+#dash{display:grid;gap:18px}
+#dash .dh{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#dash h2,#dash h3{font-family:var(--display);margin:0;letter-spacing:-.01em}
+#dash h2{font-size:22px;font-weight:800}#dash h3{font-size:15px;font-weight:800;color:var(--fg-2)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.kpi{background:var(--panel-2);border-radius:var(--r-s);padding:14px 14px 12px}
+.kpi b{display:block;font-family:var(--display);font-weight:800;font-size:30px;line-height:1.05;letter-spacing:-.02em}
+.kpi span{font-size:13px;color:var(--fg-2)}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.dbox{display:grid;gap:12px;align-content:start}
+.dbox.full{grid-column:1/-1}
+.bars{display:flex;align-items:flex-end;gap:10px;height:150px;padding-top:6px}
+.bars .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%;min-width:0}
+.bars .stack{width:100%;max-width:46px;display:flex;flex-direction:column-reverse;border-radius:10px 10px 4px 4px;overflow:hidden;min-height:3px}
+.bars .stack i{display:block;width:100%}
+.bars .v{font-family:var(--display);font-weight:800;font-size:13px}
+.bars .m{font-size:12px;color:var(--fg-3);text-transform:capitalize}
+.bars .col.now .m{color:var(--red);font-weight:800}
+.legend{display:flex;gap:14px;font-size:12.5px;color:var(--fg-2)}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.zrow{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;font-size:14.5px}
+.zrow .rk{width:22px;height:22px;border-radius:50%;background:var(--red-soft);color:var(--red);font:800 12px var(--display);display:grid;place-items:center}
+.zrow .tr{height:10px;border-radius:99px;background:var(--panel-2);overflow:hidden;position:relative}
+.zrow .tr i{display:block;height:100%;border-radius:99px;background:var(--red)}
+.zrow .nm{font-weight:700;display:block;margin-bottom:4px}
+.zrow .n{font-family:var(--display);font-weight:800}
+.rng{display:grid;gap:8px}
+.rng .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.rng .top b{font-family:var(--display);font-size:15px}
+.rng .track{position:relative;height:12px;border-radius:99px;background:var(--panel-2)}
+.rng .q{position:absolute;top:0;bottom:0;border-radius:99px;background:var(--red-soft);box-shadow:inset 0 0 0 1px var(--line-2)}
+.rng .md{position:absolute;top:-4px;bottom:-4px;width:4px;margin-left:-2px;border-radius:3px;background:var(--red)}
+.rng .ends{display:flex;justify-content:space-between;font-size:13px;color:var(--fg-2)}
+.mix{display:flex;height:14px;border-radius:99px;overflow:hidden;background:var(--panel-2)}.mix i{display:block;height:100%}
+@media (max-width:640px){.dgrid{grid-template-columns:1fr}.kpi b{font-size:25px}}
 .job .title .code{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:-.01em;color:var(--red);text-decoration:none}.job .title a.code:hover{text-decoration:underline}
 .job .pos{text-align:right;font-size:14px;color:var(--fg-2)}
 .job .meta{font-size:13.5px;color:var(--fg-3);display:flex;gap:4px 16px;flex-wrap:wrap;grid-column:1/-1}
@@ -314,6 +349,16 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
       </form>
     </section>
 
+    <section class="card" id="dash" hidden>
+      <div class="dh"><h2>Tus números</h2><span class="small muted" id="dashSub"></span></div>
+      <div class="kpis" id="dKpis"></div>
+      <div class="dgrid">
+        <div class="dbox full"><h3>Publicaciones por mes</h3><div class="bars" id="dBars"></div><div class="legend"><span><i style="background:var(--red)"></i>Compre o Alquile</span><span><i style="background:var(--fg-2)"></i>Encuentra24</span></div></div>
+        <div class="dbox"><h3>Top 5 zonas</h3><div id="dZonas" style="display:grid;gap:12px"></div></div>
+        <div class="dbox"><h3>Rango de precios</h3><div id="dPrecios" style="display:grid;gap:18px"></div><div id="dMix" style="display:grid;gap:8px"></div></div>
+      </div>
+    </section>
+
     <section style="display:grid;gap:14px">
       <div style="display:grid;justify-items:center;gap:8px">
         <h2 style="font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.01em;margin:0">Mis links</h2>
@@ -384,7 +429,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 20:58</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 21:06</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -602,6 +647,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const box = $('jobs'); box.innerHTML = '';
     $('jobsEmpty').hidden = mios.length > 0;
     $('jobsCount').textContent = mios.length ? plural(mios.length, 'link', 'links') : '';
+    renderDash();
     mios.forEach((t, i) => {
       const d = document.createElement('details'); d.className = 'job'; d.dataset.k = estadoKind(t.estado); if (i === 0) d.open = true;
       const res = t.resultados || [];
@@ -623,6 +669,42 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
         </div>`;
       box.appendChild(d);
     });
+  }
+
+  // ---------- Panel de métricas (2026-10-23): todo sale de los lotes del agente; zona/operación/precio vienen en cada entrada de `resultados` ----------
+  const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  const usd = (n) => '$' + Math.round(n).toLocaleString('en-US');
+  const cuantil = (a, q) => { const i = (a.length - 1) * q, lo = Math.floor(i), hi = Math.ceil(i); return a[lo] + (a[hi] - a[lo]) * (i - lo); };
+  function renderDash() {
+    const box = $('dash'); if (!box) return;
+    const filas = []; S.trabajos.forEach((t) => (t.resultados || []).forEach((r) => filas.push({ t, r })));
+    if (!filas.length) { box.hidden = true; return; }
+    box.hidden = false;
+    const ahora = new Date(), delMes = filas.filter((x) => mesActual(x.t.creado));
+    const activos = delMes.filter((x) => x.r.estado === 'Activo');
+    const props = new Set(delMes.map((x) => x.r.mls)).size;
+    const exito = delMes.length ? Math.round(100 * activos.length / delMes.length) : 0;
+    $('dashSub').textContent = `${MESES[ahora.getMonth()]} ${ahora.getFullYear()}`;
+    $('dKpis').innerHTML = [[activos.length, 'avisos publicados este mes'], [props, 'propiedades este mes'], [exito + '%', 'publicados con éxito']].map(([n, l]) => `<div class="kpi"><b>${n}</b><span>${l}</span></div>`).join('');
+    // publicaciones por mes (últimos 6), apiladas por portal
+    const meses = []; for (let i = 5; i >= 0; i--) { const d = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1); meses.push({ y: d.getFullYear(), m: d.getMonth(), coa: 0, e24: 0 }); }
+    filas.forEach((x) => { if (x.r.estado !== 'Activo') return; const d = new Date(x.t.creado); const k = meses.find((m) => m.y === d.getFullYear() && m.m === d.getMonth()); if (k) k[x.r.portal === 'coa' ? 'coa' : 'e24']++; });
+    const max = Math.max(1, ...meses.map((m) => m.coa + m.e24));
+    $('dBars').innerHTML = meses.map((m, i) => { const tot = m.coa + m.e24; return `<div class="col${i === 5 ? ' now' : ''}"><span class="v">${tot || ''}</span><div class="stack" style="height:${Math.round(100 * tot / max)}%"><i style="background:var(--red);height:${tot ? 100 * m.coa / tot : 0}%"></i><i style="background:var(--fg-2);height:${tot ? 100 * m.e24 / tot : 0}%"></i></div><span class="m">${MESES[m.m]}</span></div>`; }).join('');
+    // propiedades únicas con datos (una vez por MLS)
+    const vistas = new Map(); filas.forEach((x) => { if (x.r.zona !== undefined && !vistas.has(x.r.mls)) vistas.set(x.r.mls, x.r); });
+    const props2 = [...vistas.values()];
+    const zonas = {}; props2.forEach((r) => { const z = (r.zona || '').trim(); if (z) zonas[z] = (zonas[z] || 0) + 1; });
+    const top = Object.entries(zonas).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 5), zmax = top.length ? top[0][1] : 1;
+    $('dZonas').innerHTML = top.length ? top.map(([z, n], i) => `<div class="zrow"><span class="rk">${i + 1}</span><span><span class="nm">${esc(z)}</span><span class="tr" style="display:block"><i style="width:${Math.round(100 * n / zmax)}%"></i></span></span><span class="n">${n}</span></div>`).join('') : '<p class="small muted">Aparecen cuando publiques tu primer lote.</p>';
+    const rango = (op, suf) => {
+      const v = props2.filter((r) => r.operacion === op && Number(r.precio) > 0).map((r) => Number(r.precio)).sort((a, b) => a - b); if (!v.length) return '';
+      const lo = v[0], hi = v[v.length - 1], span = Math.max(1, hi - lo), pos = (x) => Math.round(100 * (x - lo) / span), q1 = cuantil(v, .25), q3 = cuantil(v, .75), md = cuantil(v, .5);
+      return `<div class="rng"><div class="top"><b>${op === 'Venta' ? 'En venta' : 'En alquiler'}</b><span class="small muted">${plural(v.length, 'propiedad', 'propiedades')} · típico ${usd(md)}${suf}</span></div><div class="track"><span class="q" style="left:${pos(q1)}%;width:${Math.max(2, pos(q3) - pos(q1))}%"></span><span class="md" style="left:${pos(md)}%"></span></div><div class="ends"><span>${usd(lo)}</span><span>${usd(hi)}</span></div></div>`;
+    };
+    $('dPrecios').innerHTML = (rango('Alquiler', '/mes') + rango('Venta', '')) || '<p class="small muted">Aparecen cuando publiques tu primer lote.</p>';
+    const nAlq = props2.filter((r) => r.operacion === 'Alquiler').length, nVen = props2.filter((r) => r.operacion === 'Venta').length, nt = nAlq + nVen;
+    $('dMix').innerHTML = nt ? `<div class="mix"><i style="width:${100 * nAlq / nt}%;background:var(--red)"></i><i style="width:${100 * nVen / nt}%;background:var(--fg-2)"></i></div><div class="legend"><span><i style="background:var(--red)"></i>Alquiler ${Math.round(100 * nAlq / nt)}%</span><span><i style="background:var(--fg-2)"></i>Venta ${Math.round(100 * nVen / nt)}%</span></div>` : '';
   }
 
   // ---------- administración ----------
