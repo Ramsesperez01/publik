@@ -444,7 +444,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-24 08:04</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-24 08:06</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -555,10 +555,10 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const em = $('lEmail').value.trim(), ok = $('lOk'), er = $('lErr'); er.hidden = true; ok.hidden = true;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { er.textContent = 'Escribe tu correo arriba y vuelve a tocar.'; er.hidden = false; return; }
     const b = $('lOlvide'); b.disabled = true;
-    const { error } = await sb.auth.resetPasswordForEmail(em, { redirectTo: 'https://publikpanama.com/' });
+    const { data, error } = await sb.functions.invoke('recuperar', { body: { correo: em } });
     b.disabled = false;
-    if (error) { er.textContent = errMsg(error); er.hidden = false; return; }
-    ok.textContent = 'Si ese correo tiene cuenta, te llegó un enlace. Revisa también spam.'; ok.hidden = false;
+    if (error || (data && data.error)) { er.textContent = (data && data.error) || 'No se pudo enviar. Intenta de nuevo.'; er.hidden = false; return; }
+    ok.textContent = 'Si ese correo tiene cuenta, te llega un enlace por WhatsApp en unos minutos.'; ok.hidden = false;
   });
   const salir = async () => { await sb.auth.signOut(); location.hash = ''; };
   $('logout').addEventListener('click', salir);
