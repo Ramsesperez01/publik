@@ -66,13 +66,13 @@ footer{text-align:center;color:var(--fg-3);font-size:13px;padding:10px 16px 30px
   </div>
   <div class="sec">
     <h2><span class="n">3</span>Tus cuentas en los portales</h2>
-    <p class="muted" style="font-size:15px">Publicamos desde tu cuenta, con tu nombre y tu contacto. Pon el correo y la contraseña con los que entras a cada portal. Se guardan cifradas y solo se usan para publicar.</p>
+    <p class="muted" style="font-size:15px">Publicamos desde tu cuenta, con tu nombre y tu contacto. Pon el correo y la contraseña del portal donde publicas, o de los dos si usas ambos. Se guardan cifradas y solo se usan para publicar.</p>
     <div class="row">
       <div class="field" style="gap:10px"><h3>Encuentra24</h3>
-        <input id="e24correo" type="email" inputmode="email" autocomplete="off" placeholder="Correo de Encuentra24" required><input id="e24clave" type="password" autocomplete="off" placeholder="Contraseña de Encuentra24" required>
+        <input id="e24correo" type="email" inputmode="email" autocomplete="off" placeholder="Correo de Encuentra24"><input id="e24clave" type="password" autocomplete="off" placeholder="Contraseña de Encuentra24">
       </div>
       <div class="field" style="gap:10px"><h3>Compre o Alquile</h3>
-        <input id="coacorreo" type="email" inputmode="email" autocomplete="off" placeholder="Correo de Compre o Alquile" required><input id="coaclave" type="password" autocomplete="off" placeholder="Contraseña de Compre o Alquile" required>
+        <input id="coacorreo" type="email" inputmode="email" autocomplete="off" placeholder="Correo de Compre o Alquile"><input id="coaclave" type="password" autocomplete="off" placeholder="Contraseña de Compre o Alquile">
       </div>
     </div>
   </div>
@@ -112,15 +112,19 @@ footer{text-align:center;color:var(--fg-3);font-size:13px;padding:10px 16px 30px
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('correo'))) malos.push('correo');
     if (!/^[A-Z0-9]{2,8}$/.test(v('codigo'))) malos.push('codigo');
     if (v('oficina').length < 2) malos.push('oficina');
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('e24correo'))) malos.push('e24correo'); if ($('e24clave').value.length < 4) malos.push('e24clave');
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('coacorreo'))) malos.push('coacorreo'); if ($('coaclave').value.length < 4) malos.push('coaclave');
+    // Ramsés 2026-10-24: no hay que registrarse en los dos portales (muchos agentes usan uno solo): cada portal es opcional, pero cada uno que se llene va completo y al menos uno es obligatorio.
+    const mail = (id) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v(id));
+    const e24v = v('e24correo') || $('e24clave').value, coav = v('coacorreo') || $('coaclave').value;
+    if (e24v) { if (!mail('e24correo')) malos.push('e24correo'); if ($('e24clave').value.length < 4) malos.push('e24clave'); }
+    if (coav) { if (!mail('coacorreo')) malos.push('coacorreo'); if ($('coaclave').value.length < 4) malos.push('coaclave'); }
+    if (!e24v && !coav) { malos.push('e24correo'); malos.push('coacorreo'); }
     marcar(malos);
-    if (malos.length) { err.textContent = malos.includes('celular2') && t1 && t2 !== t1 ? 'Los dos celulares no coinciden.' : malos.includes('celular') || malos.includes('celular2') ? 'Revisa el celular: son 8 dígitos, por ejemplo 6000-0000.' : 'Revisa los campos marcados.'; $(malos[0]).focus(); return; }
+    if (malos.length) { err.textContent = (!e24v && !coav) ? 'Pon el correo y la contraseña de al menos un portal (Encuentra24 o Compre o Alquile).' : malos.includes('celular2') && t1 && t2 !== t1 ? 'Los dos celulares no coinciden.' : malos.includes('celular') || malos.includes('celular2') ? 'Revisa el celular: son 8 dígitos, por ejemplo 6000-0000.' : 'Revisa los campos marcados.'; $(malos[0]).focus(); return; }
     if (!codigo) { err.textContent = 'Este link no trae el código de registro. Pídele a Ramsés el link completo.'; return; }
     btn.disabled = true; btn.textContent = 'Enviando…';
     const cuerpo = { codigo, miel: $('miel').value, nombre: v('nombre'), celular: '+507 ' + t1.slice(0, 4) + ' ' + t1.slice(4), correo: v('correo'), codigo_agente: v('codigo'), oficina: v('oficina'), plan: document.querySelector('input[name=plan]:checked').value, notas: v('notas'),
-      e24: { correo: v('e24correo'), clave: $('e24clave').value },
-      coa: { correo: v('coacorreo'), clave: $('coaclave').value } };
+      e24: e24v ? { correo: v('e24correo'), clave: $('e24clave').value } : null,
+      coa: coav ? { correo: v('coacorreo'), clave: $('coaclave').value } : null };
     try {
       const r = await fetch(FN, { method: 'POST', headers: { 'content-type': 'application/json', apikey: KEY, Authorization: 'Bearer ' + KEY }, body: JSON.stringify(cuerpo) });
       const j = await r.json().catch(() => ({}));

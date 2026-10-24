@@ -186,6 +186,7 @@ form{display:grid;gap:20px}
 .zrow .n{font-family:var(--display);font-weight:800}
 @media (max-width:640px){.kpi b{font-size:25px}}
 .seg.tabs label{padding:9px 10px;font-size:14.5px}
+body.sin-e24 .pill:has(input[data-p="e24"]),body.sin-coa .pill:has(input[data-p="coa"]){display:none}
 .job .title .code{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:-.01em;color:var(--red);text-decoration:none}.job .title a.code:hover{text-decoration:underline}
 .job .pos{text-align:right;font-size:14px;color:var(--fg-2)}
 .job .meta{font-size:13.5px;color:var(--fg-3);display:flex;gap:4px 16px;flex-wrap:wrap;grid-column:1/-1}
@@ -402,7 +403,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
         </div>
         <div class="field"><label for="nNotas">Notas internas</label><textarea id="nNotas" placeholder="Solo las ven los administradores."></textarea></div>
         <div style="display:grid;gap:10px">
-          <span class="lbl" style="font-family:var(--display);font-weight:700">Cuentas del agente en los portales <span class="muted" style="font-weight:400;font-family:var(--body)">(obligatorio: con ellas publica Bob)</span></span>
+          <span class="lbl" style="font-family:var(--display);font-weight:700">Cuentas del agente en los portales <span class="muted" style="font-weight:400;font-family:var(--body)">(al menos un portal: con ellas publica Bob)</span></span>
           <div class="row">
             <div class="field"><label for="nE24Correo">Encuentra24 · correo</label><input id="nE24Correo" type="email" inputmode="email" autocapitalize="none" autocomplete="off"></div>
             <div class="field"><label for="nE24Clave">Encuentra24 · contraseña</label><input id="nE24Clave" type="password" autocomplete="new-password"></div>
@@ -427,7 +428,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 23:21</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 23:47</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -559,13 +560,15 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   const MAX_LINKS = 10;
   const linkRows = () => [...$('links').querySelectorAll('.linkrow')];
   const linkInputs = () => linkRows().map((r) => r.querySelector('input[type=url]'));
-  const portalesDe = (row) => [...row.querySelectorAll('input[data-p]')].filter((c) => c.checked).map((c) => c.dataset.p);
+  // Ramsés 2026-10-24: un agente puede usar un solo portal; el que no registró no se ofrece ni se envía (se sabe por el correo de portal registrado en su fila).
+  const portalOk = (p) => !S.cliente || S.cliente.es_admin || !!(p === 'e24' ? S.cliente.e24_correo : S.cliente.coa_correo);
+  const portalesDe = (row) => [...row.querySelectorAll('input[data-p]')].filter((c) => c.checked && portalOk(c.dataset.p)).map((c) => c.dataset.p);
   const PILLS = '<div class="pills"><label class="pill"><input type="checkbox" data-p="e24" checked>Encuentra24</label><label class="pill"><input type="checkbox" data-p="coa" checked>Compre o Alquile</label></div>';
   function agregarLink(focus = true) {
     const rows = linkRows(); if (rows.length >= MAX_LINKS) return;
     // Si el link anterior va a un solo portal, el nuevo arranca con el otro (Ramsés, 22/oct); si va a los dos, con los dos.
     const prev = portalesDe(rows[rows.length - 1]);
-    const defecto = prev.length === 1 ? ['e24', 'coa'].filter((p) => p !== prev[0]) : ['e24', 'coa'];
+    const defecto = prev.length === 1 ? ['e24', 'coa'].filter((p) => p !== prev[0] && portalOk(p)) : ['e24', 'coa'].filter(portalOk);
     const row = document.createElement('div'); row.className = 'linkrow';
     row.innerHTML = '<input class="big" type="url" placeholder="https://www.flexmls.com/share/XXXXX/Selected" autocomplete="off" inputmode="url" spellcheck="false" aria-label="Otro link de Flex"><button class="x" type="button" aria-label="Quitar este link">×</button>' + PILLS;
     row.querySelectorAll('input[data-p]').forEach((c) => { c.checked = defecto.includes(c.dataset.p); });
@@ -645,6 +648,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const box = $('jobs'); box.innerHTML = '';
     $('jobsEmpty').hidden = mios.length > 0;
     $('jobsCount').textContent = mios.length ? plural(mios.length, 'link', 'links') : '';
+    document.body.classList.toggle('sin-e24', !portalOk('e24')); document.body.classList.toggle('sin-coa', !portalOk('coa'));
     renderDash();
     mios.forEach((t, i) => {
       const d = document.createElement('details'); d.className = 'job'; d.dataset.k = estadoKind(t.estado); if (i === 0) d.open = true;
@@ -736,7 +740,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const box = $('clist'); box.innerHTML = '';
     S.clientes.forEach((c) => {
       const d = document.createElement('div'); d.className = 'cli' + (c.activo ? '' : ' off'); d.dataset.id = c.id;
-      const faltan = (!c.e24_correo || !c.coa_correo) && !c.es_admin;
+      const faltan = (!c.e24_correo && !c.coa_correo) && !c.es_admin;
       d.innerHTML = `<div class="top"><span class="avatar">${esc(iniciales(c.nombre))}</span><span class="txt"><span class="n">${esc(c.nombre)}${c.es_admin ? ' <span class="chip neutral">admin</span>' : ''}</span><span class="m"><span>${esc(c.correo)}</span>${c.celular ? `<span>${esc(c.celular)}</span>` : ''}</span></span>${c.activo ? '<span class="chip ok"><span class="dot"></span>Activo</span>' : '<span class="chip bad"><span class="dot"></span>Apagado</span>'}</div>` +
         (c.es_admin ? '' : `<div class="meta"><span class="mono">${esc(c.codigo)}</span><span>Plan ${esc(c.plan)}${c.precio_mes ? ` · $${c.precio_mes}/mes` : ''}</span><span>${c.limite_dia ? c.limite_dia + ' por día' : 'sin tope'}</span><span>${plural(porCliente[c.id] || 0, 'aviso', 'avisos')} este mes</span>${faltan ? '<span class="chip bad">faltan cuentas de portales</span>' : ''}</div>` +
         `<div class="acts"><button class="btn" data-a="toggle" type="button">${c.activo ? 'Apagar' : 'Activar'}</button><button class="btn" data-a="plan" type="button">Plan</button><button class="btn" data-a="cuentas" type="button">Cuentas</button><button class="btn" data-a="enlace" type="button">Enlace</button></div>`) +
@@ -788,10 +792,10 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     ev.preventDefault(); const c = S.clientes.find((x) => x.id === S.cuentasDe); if (!c) return;
     const e = $('cuErr'); e.textContent = ''; const b = $('cuGuardar');
     const e24c = $('cuE24c').value.trim().toLowerCase(), e24k = $('cuE24k').value, coac = $('cuCoac').value.trim(), coak = $('cuCoak').value;
-    if (!e24c || !coac) { e.textContent = 'Los correos de los dos portales son obligatorios.'; return; }
+    if (!e24c && !coac) { e.textContent = 'Deja al menos un portal con correo.'; return; }
     const portales = {};
-    if (e24k) portales.e24 = { correo: e24c, clave: e24k }; else if (e24c !== (c.e24_correo || '').toLowerCase()) { e.textContent = 'Cambiaste el correo de Encuentra24: escribe también su contraseña.'; return; }
-    if (coak) portales.coa = { correo: coac, clave: coak }; else if (coac.toLowerCase() !== (c.coa_correo || '').toLowerCase()) { e.textContent = 'Cambiaste el correo de Compre o Alquile: escribe también su contraseña.'; return; }
+    if (e24k && e24c) portales.e24 = { correo: e24c, clave: e24k }; else if (e24c && e24c !== (c.e24_correo || '').toLowerCase()) { e.textContent = 'Cambiaste el correo de Encuentra24: escribe también su contraseña.'; return; }
+    if (coak && coac) portales.coa = { correo: coac, clave: coak }; else if (coac && coac.toLowerCase() !== (c.coa_correo || '').toLowerCase()) { e.textContent = 'Cambiaste el correo de Compre o Alquile: escribe también su contraseña.'; return; }
     if (!Object.keys(portales).length) { e.textContent = 'No cambiaste nada.'; return; }
     b.disabled = true; b.textContent = 'Guardando…';
     try { await llamarAdmin({ accion: 'actualizar', id: c.id, cambios: {}, portales }); rescatarFormCuentas(); S.cuentasDe = null; S.panelDe = null; adminMsg(`${c.nombre}: cuentas de portales guardadas.`, 'ok'); await cargarAdmin(); }
@@ -804,9 +808,10 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const cliente = { nombre: $('nNombre').value.trim(), correo: $('nCorreo').value.trim().toLowerCase(), celular: $('nCel').value.trim(), codigo: $('nCodigo').value.trim().toUpperCase(), oficina: $('nOficina').value.trim(), plan: $('nPlan').value, limite_dia: Number($('nLim').value), precio_mes: Number($('nPrecio').value), notas: $('nNotas').value.trim() };
     if (!cliente.nombre || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(cliente.correo) || !cliente.codigo) { e.textContent = 'Faltan nombre, correo válido o código.'; return; }
     const e24c = $('nE24Correo').value.trim(), e24k = $('nE24Clave').value, coac = $('nCoaCorreo').value.trim(), coak = $('nCoaClave').value;
-    if (!e24c || !e24k) { e.textContent = 'Encuentra24: faltan correo o contraseña (obligatorios).'; return; }
-    if (!coac || !coak) { e.textContent = 'Compre o Alquile: faltan correo o contraseña (obligatorios).'; return; }
-    const portales = { e24: { correo: e24c, clave: e24k }, coa: { correo: coac, clave: coak } };
+    if ((e24c || e24k) && (!e24c || !e24k)) { e.textContent = 'Encuentra24: faltan correo o contraseña.'; return; }
+    if ((coac || coak) && (!coac || !coak)) { e.textContent = 'Compre o Alquile: faltan correo o contraseña.'; return; }
+    if (!e24c && !coac) { e.textContent = 'Pon al menos un portal (correo y contraseña).'; return; }
+    const portales = {}; if (e24c) portales.e24 = { correo: e24c, clave: e24k }; if (coac) portales.coa = { correo: coac, clave: coak };
     b.disabled = true; b.textContent = 'Creando…';
     try {
       const r = await llamarAdmin({ accion: 'crear', cliente, portales });
