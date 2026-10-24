@@ -149,6 +149,12 @@ form{display:grid;gap:20px}
 .rules{font-size:14px;color:var(--fg-2);max-width:44ch}
 
 .jobs{display:grid;gap:12px}
+.seg.tabs label{padding:9px 10px;font-size:14.5px}
+#linksTable td.link a{color:var(--red);font-weight:700;text-decoration:none;font-family:var(--display)}#linksTable td.link a:hover{text-decoration:underline}
+#linksTable tr.det td{background:var(--panel-2);white-space:normal;padding:12px 14px}
+#linksTable .mls{display:flex;flex-wrap:wrap;gap:6px}#linksTable .mls span{font-family:var(--mono);font-size:13px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:3px 8px}
+#linksTable .mls span.ok{border-color:var(--ok);color:var(--ok)}#linksTable .mls span.warn{border-color:var(--warn);color:var(--warn)}
+#linksTable button.ver{border:0;background:none;color:var(--fg);font-weight:800;font-size:15px;font-family:var(--display);padding:4px 0 4px 6px;display:inline-flex;align-items:center;gap:4px;pointer-events:none}#linksTable button.ver .caret{color:var(--fg-3)}#linksTable button.ver .caret{transition:transform 200ms var(--ease-out)}#linksTable tr.abierto button.ver .caret{transform:rotate(180deg)}
 .job{border:1px solid var(--line);border-left-width:5px;border-left-color:var(--fg-3);border-radius:var(--r-s);background:var(--panel);overflow:hidden;box-shadow:var(--shadow-s)}
 .job[data-k="ok"]{border-left-color:var(--ok)} .job[data-k="warn"]{border-left-color:var(--warn)} .job[data-k="info"]{border-left-color:var(--info)} .job[data-k="bad"]{border-left-color:var(--bad)}
 .job>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:8px 14px;padding:16px 18px;align-items:center}
@@ -316,9 +322,17 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
 
     <section style="display:grid;gap:14px">
       <div style="display:grid;justify-items:center;gap:8px">
+        <div class="seg tabs" id="tabs" data-i="0" style="max-width:360px;width:100%">
+          <span class="thumb" aria-hidden="true"></span>
+          <label><input type="radio" name="tab" value="lotes" checked>Tus lotes</label>
+          <label><input type="radio" name="tab" value="links">Mis links</label>
+        </div>
         <span class="small muted" id="jobsCount"></span>
       </div>
       <div class="jobs" id="jobs"></div>
+      <div class="card" id="linksBox" hidden style="padding:0;overflow:hidden">
+        <div class="tablewrap"><table id="linksTable"><thead><tr><th>Fecha</th><th>Link</th><th class="num">Propiedades</th></tr></thead><tbody id="linksBody"></tbody></table></div>
+      </div>
       <div class="empty" id="jobsEmpty" hidden>
         <svg viewBox="0 0 72 72" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 40 36 16l24 24"/><path d="M36 16v42"/><path d="M18 46v14h36V46"/></g></svg>
         <span>Todavía no has mandado ningún lote.<br>El primero aparece aquí con su lugar en la cola.</span>
@@ -383,7 +397,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 20:55</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 20:57</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -622,7 +636,37 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
         </div>`;
       box.appendChild(d);
     });
+    renderLinks();
+    if (S.tab === 'links') { $('jobs').hidden = true; $('jobsEmpty').hidden = true; $('jobsCount').textContent = mios.length ? plural(mios.length, 'link', 'links') : ''; }
   }
+
+  // ---------- Mis links (2026-10-23, pedido de Ramsés: fecha, link, cantidad de propiedades y detalle por MLS) ----------
+  function renderLinks() {
+    const body = $('linksBody'); if (!body) return; body.innerHTML = '';
+    const abiertos = new Set(S.linksAbiertos || []);
+    S.trabajos.forEach((t) => {
+      const res = t.resultados || [];
+      const lista = (t.mls && t.mls.length) ? t.mls : [...new Set(res.map((r) => r.mls).filter(Boolean))];
+      const estadoMls = (m) => { const rs = res.filter((r) => r.mls === m); if (!rs.length) return ''; return rs.every((r) => r.estado === 'Activo') ? 'ok' : 'warn'; };
+      const tr = document.createElement('tr'); tr.dataset.id = t.id; if (abiertos.has(t.id)) tr.classList.add('abierto');
+      tr.innerHTML = `<td class="num" style="text-align:left">${esc(fmtDT(t.creado))}</td><td class="link"><a href="${esc(t.url || '#')}" target="_blank" rel="noopener">${esc(t.share)}</a> <span class="small muted">${esc((t.portales || []).map(portalNombre).join(' + '))}</span></td><td class="num">${lista.length ? `<button class="ver" type="button">${lista.length} <span class="caret">▾</span></button>` : '<span class="muted">por leer</span>'}</td>`;
+      body.appendChild(tr);
+      if (lista.length) {
+        const det = document.createElement('tr'); det.className = 'det'; det.hidden = !abiertos.has(t.id);
+        det.innerHTML = `<td colspan="3"><div class="mls">${lista.map((m) => { const r = res.find((x) => x.mls === m && x.titulo); return `<span class="${estadoMls(m)}" title="${esc(r ? r.titulo : '')}">${esc(m)}</span>`; }).join('')}</div></td>`;
+        body.appendChild(det);
+        tr.style.cursor = 'pointer';
+        tr.addEventListener('click', (ev) => { if (ev.target.closest('a')) return; det.hidden = !det.hidden; tr.classList.toggle('abierto', !det.hidden); const ab = new Set(S.linksAbiertos || []); det.hidden ? ab.delete(t.id) : ab.add(t.id); S.linksAbiertos = [...ab]; });
+      }
+    });
+    $('linksBox').hidden = !(S.tab === 'links' && S.trabajos.length);
+  }
+  $('tabs').addEventListener('change', () => {
+    S.tab = document.querySelector('input[name=tab]:checked').value; $('tabs').dataset.i = S.tab === 'links' ? '1' : '0';
+    const esLinks = S.tab === 'links';
+    $('jobs').hidden = esLinks; $('jobsEmpty').hidden = esLinks || S.trabajos.length > 0; $('linksBox').hidden = !esLinks || !S.trabajos.length;
+    $('jobsCount').textContent = S.trabajos.length ? plural(S.trabajos.length, esLinks ? 'link' : 'lote', esLinks ? 'links' : 'lotes') : '';
+  });
 
   // ---------- administración ----------
   async function llamarAdmin(body) {
