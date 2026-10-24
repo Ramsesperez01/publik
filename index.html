@@ -184,6 +184,7 @@ form{display:grid;gap:20px}
 .zrow .tr i{display:block;height:100%;border-radius:99px;background:var(--red)}
 .zrow .nm{font-weight:700;display:block;margin-bottom:4px}
 .zrow .n{font-family:var(--display);font-weight:800}
+form.mc .bad-t{color:var(--bad)}form.mc .ok-t{color:var(--ok)}
 @media (max-width:640px){.kpi b{font-size:25px}}
 .seg.tabs label{padding:9px 10px;font-size:14.5px}
 body.sin-e24 .pill:has(input[data-p="e24"]),body.sin-coa .pill:has(input[data-p="coa"]){display:none}
@@ -250,6 +251,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
       <span class="avatar" id="whoAvatar"></span>
       <span class="txt"><span class="n" id="whoName"></span><span class="p" id="whoPlan"></span></span>
       <button class="btn" id="btnAdmin" type="button" hidden>Clientes</button>
+      <button class="btn" id="btnClave" type="button">Contraseña</button>
       <button class="btn" id="logout" type="button">Salir</button>
     </div>
   </div>
@@ -284,7 +286,8 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
         <div class="field"><label for="lEmail">Correo</label><input type="email" id="lEmail" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false"></div>
         <div class="field"><label for="lPass">Contraseña</label><input type="password" id="lPass" autocomplete="current-password"><span class="err" id="lErr" hidden></span></div>
         <button class="btn primary block" id="lBtn" type="submit">Entrar</button>
-        <p class="hint">¿Olvidaste tu contraseña o no tienes cuenta? Escríbele a Ramsés por WhatsApp y te mandamos un enlace nuevo.</p>
+        <button class="btn block" id="lOlvide" type="button" style="margin-top:10px">Olvidé mi contraseña</button>
+        <p class="hint" id="lOk" hidden></p>
       </form>
     </div>
   </section>
@@ -297,6 +300,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
         <div class="field"><label for="aPass">Contraseña nueva</label><input type="password" id="aPass" autocomplete="new-password"><span class="hint">Mínimo 8 caracteres.</span></div>
         <div class="field"><label for="aPass2">Repítela</label><input type="password" id="aPass2" autocomplete="new-password"><span class="err" id="aErr" hidden></span></div>
         <button class="btn primary block" id="aBtn" type="submit">Guardar y entrar</button>
+        <button class="btn block" id="aCancel" type="button" hidden style="margin-top:10px">Cancelar</button>
       </form>
     </div>
   </section>
@@ -369,6 +373,19 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
         <span>Todavía no has mandado ningún lote.<br>El primero aparece aquí con su lugar en la cola.</span>
       </div>
     </section>
+    <details class="card" id="cuentasBox" style="padding:0">
+      <summary style="padding:18px 22px;cursor:pointer;font-family:var(--display);font-weight:800;font-size:17px">Mis cuentas de portales</summary>
+      <div style="padding:0 22px 22px;display:grid;gap:16px">
+        <form class="mc" data-portal="e24" novalidate style="display:grid;gap:10px"><h3 style="margin:0;font-size:16px">Encuentra24</h3>
+          <div class="field"><label for="mcE24c">Correo</label><input type="email" id="mcE24c" inputmode="email" autocapitalize="none" autocomplete="off"></div>
+          <div class="field"><label for="mcE24k">Contraseña</label><input type="password" id="mcE24k" autocomplete="new-password"></div>
+          <span class="small" id="mcE24m" role="status"></span><button class="btn" type="submit">Guardar Encuentra24</button></form>
+        <form class="mc" data-portal="coa" novalidate style="display:grid;gap:10px"><h3 style="margin:0;font-size:16px">Compre o Alquile</h3>
+          <div class="field"><label for="mcCOAc">Correo</label><input type="email" id="mcCOAc" inputmode="email" autocapitalize="none" autocomplete="off"></div>
+          <div class="field"><label for="mcCOAk">Contraseña</label><input type="password" id="mcCOAk" autocomplete="new-password"></div>
+          <span class="small" id="mcCOAm" role="status"></span><button class="btn" type="submit">Guardar Compre o Alquile</button></form>
+      </div>
+    </details>
   </section>
 
   <!-- ADMIN -->
@@ -427,7 +444,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-24 07:36</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-24 08:04</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -471,8 +488,11 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
       if (error || !data.session) { show('viewLogin'); banner('El enlace ya no sirve (vence a las 24 horas o ya fue usado). Pide uno nuevo.', 'bad'); return; }
       S.user = data.session.user; show('viewActivar'); return;
     }
+    if (/error_code=/.test(h)) { history.replaceState(null, '', location.pathname + location.search); show('viewLogin'); banner('El enlace ya no sirve (vence o ya fue usado). Toca "Olvidé mi contraseña" para pedir otro.', 'bad'); return; }
+    const recup = /type=recovery/.test(h);
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { show('viewLogin'); $('connState').textContent = 'listo'; return; }
+    if (recup) { S.user = session.user; pedirClave(false); return; }
     S.user = session.user; await entrar();
   }
   sb.auth.onAuthStateChange((ev, session) => { if (ev === 'SIGNED_OUT') { S.user = null; S.cliente = null; if (S.canal) { sb.removeChannel(S.canal); S.canal = null; } $('bandTitle').textContent = 'Pega tu link. Nosotros publicamos.'; show('viewLogin'); } });
@@ -526,7 +546,19 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const { error } = await sb.auth.updateUser({ password: p });
     b.disabled = false; b.textContent = 'Guardar y entrar';
     if (error) { e.textContent = errMsg(error); e.hidden = false; return; }
-    $('aPass').value = ''; $('aPass2').value = ''; await entrar();
+    $('aPass').value = ''; $('aPass2').value = ''; S.cambioClave = false; history.replaceState(null, '', location.pathname + location.search); await entrar();
+  });
+  function pedirClave(cambio) { S.cambioClave = !!cambio; $('actTitle').textContent = cambio ? 'Cambia tu contraseña' : 'Elige tu contraseña'; $('aCancel').hidden = !cambio; $('aErr').hidden = true; show('viewActivar'); $('who').hidden = !cambio; }
+  $('btnClave').addEventListener('click', () => pedirClave(true));
+  $('aCancel').addEventListener('click', () => { S.cambioClave = false; entrar(); });
+  $('lOlvide').addEventListener('click', async () => {
+    const em = $('lEmail').value.trim(), ok = $('lOk'), er = $('lErr'); er.hidden = true; ok.hidden = true;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { er.textContent = 'Escribe tu correo arriba y vuelve a tocar.'; er.hidden = false; return; }
+    const b = $('lOlvide'); b.disabled = true;
+    const { error } = await sb.auth.resetPasswordForEmail(em, { redirectTo: 'https://publikpanama.com/' });
+    b.disabled = false;
+    if (error) { er.textContent = errMsg(error); er.hidden = false; return; }
+    ok.textContent = 'Si ese correo tiene cuenta, te llegó un enlace. Revisa también spam.'; ok.hidden = false;
   });
   const salir = async () => { await sb.auth.signOut(); location.hash = ''; };
   $('logout').addEventListener('click', salir);
@@ -647,7 +679,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const box = $('jobs'); box.innerHTML = '';
     $('jobsEmpty').hidden = mios.length > 0;
     $('jobsCount').textContent = mios.length ? plural(mios.length, 'link', 'links') : '';
-    document.body.classList.toggle('sin-e24', !portalOk('e24')); document.body.classList.toggle('sin-coa', !portalOk('coa'));
+    rellenarCuentas(); document.body.classList.toggle('sin-e24', !portalOk('e24')); document.body.classList.toggle('sin-coa', !portalOk('coa'));
     renderDash();
     mios.forEach((t, i) => {
       const d = document.createElement('details'); d.className = 'job'; d.dataset.k = estadoKind(t.estado); if (i === 0) d.open = true;
@@ -722,6 +754,24 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   $('dZona').addEventListener('change', () => { S.zona = $('dZona').value; renderDash(); });
   $('dTipo').addEventListener('change', () => { S.tipo = $('dTipo').value; renderDash(); });
   $('dZonas').addEventListener('click', (ev) => { const r = ev.target.closest('.zrow'); if (!r) return; S.zona = S.zona === r.dataset.z ? '' : r.dataset.z; renderDash(); });
+
+  // ---------- Mis cuentas de portales: el agente actualiza sus propias contraseñas de portal ----------
+  function rellenarCuentas() { if (!S.cliente) return; [['mcE24c', S.cliente.e24_correo], ['mcCOAc', S.cliente.coa_correo]].forEach(([id, v]) => { const el = $(id); if (el && !el.value && v) el.value = v; }); }
+  document.querySelectorAll('form.mc').forEach((f) => f.addEventListener('submit', async (ev) => {
+    ev.preventDefault(); const portal = f.dataset.portal, P = portal === 'e24' ? 'E24' : 'COA';
+    const correo = $(`mc${P}c`).value.trim(), clave = $(`mc${P}k`).value, m = $(`mc${P}m`), b = f.querySelector('button');
+    m.className = 'small'; m.textContent = '';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) { m.className = 'small bad-t'; m.textContent = 'Escribe un correo válido.'; return; }
+    if (clave.length < 4) { m.className = 'small bad-t'; m.textContent = 'Escribe la contraseña.'; return; }
+    b.disabled = true; const t = b.textContent; b.textContent = 'Guardando…';
+    try {
+      const { data, error } = await sb.functions.invoke('mis_cuentas', { body: { portal, correo, clave } });
+      let msg = data && data.error; if (error && !msg) { try { msg = (await error.context.json()).error; } catch (e) { msg = 'No se pudo guardar. Intenta de nuevo.'; } }
+      if (msg) throw new Error(msg);
+      $(`mc${P}k`).value = ''; S.cliente[portal === 'e24' ? 'e24_correo' : 'coa_correo'] = correo; m.className = 'small ok-t'; m.textContent = 'Guardada.'; renderAll();
+    } catch (e) { m.className = 'small bad-t'; m.textContent = e.message || 'No se pudo guardar.'; }
+    b.disabled = false; b.textContent = t;
+  }));
 
   // ---------- administración ----------
   async function llamarAdmin(body) {
