@@ -186,6 +186,7 @@ form{display:grid;gap:20px}
 .zrow .n{font-family:var(--display);font-weight:800}
 @media (max-width:640px){.kpi b{font-size:25px}}
 .seg.tabs label{padding:9px 10px;font-size:14.5px}
+form.mc .bad-t{color:var(--bad)}form.mc .ok-t{color:var(--ok)}
 body.sin-e24 .pill:has(input[data-p="e24"]),body.sin-coa .pill:has(input[data-p="coa"]){display:none}
 .job .title .code{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:-.01em;color:var(--red);text-decoration:none}.job .title a.code:hover{text-decoration:underline}
 .job .pos{text-align:right;font-size:14px;color:var(--fg-2)}
@@ -369,6 +370,20 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
         <span>Todavía no has mandado ningún lote.<br>El primero aparece aquí con su lugar en la cola.</span>
       </div>
     </section>
+    <details class="card" id="cuentasBox" style="padding:0">
+      <summary style="padding:18px 22px;cursor:pointer;font-family:var(--display);font-weight:800;font-size:17px">Mis cuentas de portales</summary>
+      <div style="padding:0 22px 22px;display:grid;gap:16px">
+        <p class="small muted">Si cambias tu contraseña en un portal, actualízala aquí para que Publik siga publicando. También puedes agregar el portal que todavía no usas. La contraseña no se muestra.</p>
+        <form class="mc" data-portal="e24" novalidate style="display:grid;gap:10px"><h3 style="margin:0;font-size:16px">Encuentra24</h3>
+          <div class="field"><label for="mcE24c">Correo</label><input type="email" id="mcE24c" inputmode="email" autocapitalize="none" autocomplete="off"></div>
+          <div class="field"><label for="mcE24k">Contraseña</label><input type="password" id="mcE24k" autocomplete="new-password"></div>
+          <span class="small" id="mcE24m" role="status"></span><button class="btn" type="submit">Guardar Encuentra24</button></form>
+        <form class="mc" data-portal="coa" novalidate style="display:grid;gap:10px"><h3 style="margin:0;font-size:16px">Compre o Alquile</h3>
+          <div class="field"><label for="mcCOAc">Correo</label><input type="email" id="mcCOAc" inputmode="email" autocapitalize="none" autocomplete="off"></div>
+          <div class="field"><label for="mcCOAk">Contraseña</label><input type="password" id="mcCOAk" autocomplete="new-password"></div>
+          <span class="small" id="mcCOAm" role="status"></span><button class="btn" type="submit">Guardar Compre o Alquile</button></form>
+      </div>
+    </details>
   </section>
 
   <!-- ADMIN -->
@@ -428,7 +443,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-23 23:47</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-24 00:07</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -648,7 +663,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const box = $('jobs'); box.innerHTML = '';
     $('jobsEmpty').hidden = mios.length > 0;
     $('jobsCount').textContent = mios.length ? plural(mios.length, 'link', 'links') : '';
-    document.body.classList.toggle('sin-e24', !portalOk('e24')); document.body.classList.toggle('sin-coa', !portalOk('coa'));
+    rellenarCuentas(); document.body.classList.toggle('sin-e24', !portalOk('e24')); document.body.classList.toggle('sin-coa', !portalOk('coa'));
     renderDash();
     mios.forEach((t, i) => {
       const d = document.createElement('details'); d.className = 'job'; d.dataset.k = estadoKind(t.estado); if (i === 0) d.open = true;
@@ -723,6 +738,24 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   $('dZona').addEventListener('change', () => { S.zona = $('dZona').value; renderDash(); });
   $('dTipo').addEventListener('change', () => { S.tipo = $('dTipo').value; renderDash(); });
   $('dZonas').addEventListener('click', (ev) => { const r = ev.target.closest('.zrow'); if (!r) return; S.zona = S.zona === r.dataset.z ? '' : r.dataset.z; renderDash(); });
+
+  // ---------- Mis cuentas de portales (2026-10-24): el agente actualiza sus propias contraseñas sin molestar a nadie ----------
+  function rellenarCuentas() { if (!S.cliente) return; [['mcE24c', S.cliente.e24_correo], ['mcCOAc', S.cliente.coa_correo]].forEach(([id, v]) => { const el = $(id); if (el && !el.value && v) el.value = v; }); }
+  document.querySelectorAll('form.mc').forEach((f) => f.addEventListener('submit', async (ev) => {
+    ev.preventDefault(); const portal = f.dataset.portal, P = portal === 'e24' ? 'E24' : 'COA';
+    const correo = $(`mc${P}c`).value.trim(), clave = $(`mc${P}k`).value, m = $(`mc${P}m`), b = f.querySelector('button');
+    m.className = 'small'; m.textContent = '';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) { m.className = 'small bad-t'; m.textContent = 'Escribe un correo válido.'; return; }
+    if (clave.length < 4) { m.className = 'small bad-t'; m.textContent = 'Escribe la contraseña.'; return; }
+    b.disabled = true; const t = b.textContent; b.textContent = 'Guardando…';
+    try {
+      const { data, error } = await sb.functions.invoke('mis_cuentas', { body: { portal, correo, clave } });
+      let msg = data && data.error; if (error && !msg) { try { msg = (await error.context.json()).error; } catch (e) { msg = 'No se pudo guardar. Intenta de nuevo.'; } }
+      if (msg) throw new Error(msg);
+      $(`mc${P}k`).value = ''; S.cliente[portal === 'e24' ? 'e24_correo' : 'coa_correo'] = correo; m.className = 'small ok-t'; m.textContent = 'Guardada. Publik ya usa esta cuenta.'; renderAll();
+    } catch (e) { m.className = 'small bad-t'; m.textContent = e.message || 'No se pudo guardar.'; }
+    b.disabled = false; b.textContent = t;
+  }));
 
   // ---------- administración ----------
   async function llamarAdmin(body) {
