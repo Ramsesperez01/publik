@@ -311,6 +311,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
       <span class="eyebrow">Acceso</span>
       <h2 id="blockedTitle">Tu plan no está activo</h2>
       <p class="muted" id="blockedText">No puedes mandar links a publicar. Cuando renueves el plan, el acceso vuelve solo y tus lotes anteriores siguen guardados.</p>
+      <div id="blockedPlanes" hidden style="display:grid;gap:8px"></div>
       <div><button class="btn" id="blockedOut" type="button">Salir</button></div>
     </div>
   </section>
@@ -414,7 +415,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
           <div class="field"><label for="nCel">Celular (WhatsApp)</label><input id="nCel" type="tel" inputmode="tel" placeholder="+507 6xxx xxxx"></div>
           <div class="field"><label for="nCodigo">Código de agente</label><input id="nCodigo" autocapitalize="characters" placeholder="AECC" style="text-transform:uppercase"><span class="hint">Las letras que van en los títulos de los avisos.</span></div>
           <div class="field"><label for="nOficina">Oficina</label><input id="nOficina" value="Rent-A-House Panamá VIP"></div>
-          <div class="field"><label for="nPlan">Plan</label><select id="nPlan"><option value="Piloto">Piloto (gratis, sin tope)</option><option value="Prueba">Prueba · gratis · 10 por día · 3 días</option><option value="Agente">Agente · $45/mes · 10 por día</option><option value="Pro" selected>Pro · $55/mes · 15 por día</option><option value="Max">Max · $65/mes · 20 por día</option><option value="Oficina">Oficina</option></select></div>
+          <div class="field"><label for="nPlan">Plan</label><select id="nPlan"><option value="Piloto">Piloto (gratis, sin tope)</option><option value="Prueba">Prueba · gratis · 10 por día · 3 días</option><option value="Agente">Agente · $50/mes · 10 por día</option><option value="Pro" selected>Pro · $60/mes · 15 por día</option><option value="Max">Max · $70/mes · 20 por día</option><option value="Oficina">Oficina</option></select></div>
           <div class="field"><label for="nLim">Tope de publicaciones por día</label><input id="nLim" type="number" inputmode="numeric" min="0" value="15"></div>
           <div class="field"><label for="nPrecio">Precio mensual (USD)</label><input id="nPrecio" type="number" inputmode="decimal" min="0" step="0.01" value="55"></div>
         </div>
@@ -444,7 +445,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-25 22:06</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-25 22:11</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -458,7 +459,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   const SHARE_RE = /^https?:\/\/(?:www\.)?flexmls\.com\/share\/([A-Za-z0-9]+)(?:\/[A-Za-z0-9\-]+)*\/?(?:[?#].*)?$/i;
   const $ = (id) => document.getElementById(id);
   // Planes vigentes (Ramsés, 2026-10-22 23:1x): escalera de $10 por paso; Piloto = fundadores sin tope; Oficina se define aparte.
-  const PLANES = { Piloto: { lim: 0, precio: 0 }, Prueba: { lim: 10, precio: 0 }, Agente: { lim: 10, precio: 45 }, Pro: { lim: 15, precio: 55 }, Max: { lim: 20, precio: 65 }, Oficina: null };
+  const PLANES = { Piloto: { lim: 0, precio: 0 }, Prueba: { lim: 10, precio: 0 }, Agente: { lim: 10, precio: 50 }, Pro: { lim: 15, precio: 60 }, Max: { lim: 20, precio: 70 }, Oficina: null };
   const opcionesPlan = (actual) => [...new Set([...Object.keys(PLANES), ...(actual ? [actual] : [])])].map((x) => { const d = PLANES[x]; const t = x === 'Piloto' ? 'Piloto (gratis, sin tope)' : x === 'Prueba' ? 'Prueba · gratis · 10 por día · 3 días' : d ? `${x} · $${d.precio}/mes · ${d.lim} por día` : x; return `<option value="${x}" ${x === actual ? 'selected' : ''}>${t}</option>`; }).join('');
   const S = { tab: 'links', zona: '', tipo: '', user: null, cliente: null, trabajos: [], colaTotal: 0, posiciones: {}, pubsHoy: 0, canal: null, enviando: false, clientes: [], cuentasDe: null, panelDe: null, confirmarRepetido: null };
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -507,7 +508,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     $('whoAvatar').textContent = iniciales(c.nombre); $('whoName').textContent = c.nombre; const venceTxt = c.prueba_hasta ? new Date(c.prueba_hasta).toLocaleString('es-PA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''; $('whoPlan').textContent = `Plan ${c.plan}${c.limite_dia ? ' · ' + c.limite_dia + ' por día' : ''}${c.plan === 'Prueba' && venceTxt ? ' · termina ' + venceTxt : ''}`;
     $('btnAdmin').hidden = !c.es_admin; $('ver').hidden = !c.es_admin;
     const pruebaVencida = c.plan === 'Prueba' && c.prueba_hasta && new Date(c.prueba_hasta) <= new Date();
-    if (!c.activo || pruebaVencida) { $('blockedTitle').textContent = c.plan === 'Prueba' ? `${nombre}, tu prueba gratis terminó` : `${nombre}, tu plan no está activo`; if (c.plan === 'Prueba') $('blockedText').textContent = 'Tu prueba de 3 días terminó. Para seguir publicando elige un plan y te activamos de nuevo; no necesitas crear otra cuenta y tus lotes anteriores siguen guardados.'; show('viewBlocked'); $('who').hidden = false; return; }
+    if (!c.activo || pruebaVencida) { $('blockedTitle').textContent = c.plan === 'Prueba' ? `${nombre}, tu prueba gratis terminó` : `${nombre}, tu plan no está activo`; if (c.plan === 'Prueba') { $('blockedText').textContent = 'Tu prueba de 3 días terminó. Si quieres seguir usando Publik, toca el plan que te interesa y te abrirá un WhatsApp con el mensaje listo para activar tu cuenta. No necesitas crear otra cuenta y tus lotes anteriores siguen guardados.'; const bp = $('blockedPlanes'); bp.innerHTML = [['Agente', 50, 10], ['Pro', 60, 15], ['Max', 70, 20]].map(([pl, pr, li]) => `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/50766276979?text=${encodeURIComponent(`Hola, soy ${c.nombre} (${c.codigo}). Mi prueba de Publik terminó y quiero activar mi cuenta con el plan ${pl} ($${pr}/mes, ${li} avisos por día).`)}">${pl} · $${pr}/mes · ${li} avisos por día</a>`).join(''); bp.hidden = false; } show('viewBlocked'); $('who').hidden = false; return; }
     $('bandTitle').textContent = `Hola, ${nombre}. ¿Qué publicamos hoy?`;
     $('connState').textContent = 'conectado';
     await cargar();
