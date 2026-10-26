@@ -444,7 +444,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-25 22:02</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-25 22:06</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -507,7 +507,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     $('whoAvatar').textContent = iniciales(c.nombre); $('whoName').textContent = c.nombre; const venceTxt = c.prueba_hasta ? new Date(c.prueba_hasta).toLocaleString('es-PA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''; $('whoPlan').textContent = `Plan ${c.plan}${c.limite_dia ? ' · ' + c.limite_dia + ' por día' : ''}${c.plan === 'Prueba' && venceTxt ? ' · termina ' + venceTxt : ''}`;
     $('btnAdmin').hidden = !c.es_admin; $('ver').hidden = !c.es_admin;
     const pruebaVencida = c.plan === 'Prueba' && c.prueba_hasta && new Date(c.prueba_hasta) <= new Date();
-    if (!c.activo || pruebaVencida) { $('blockedTitle').textContent = c.plan === 'Prueba' ? `${nombre}, tu prueba gratis terminó` : `${nombre}, tu plan no está activo`; if (c.plan === 'Prueba') $('blockedText').textContent = 'Tu prueba de 3 días terminó. Para seguir publicando elige un plan y el acceso vuelve solo; tus lotes anteriores siguen guardados.'; show('viewBlocked'); $('who').hidden = false; return; }
+    if (!c.activo || pruebaVencida) { $('blockedTitle').textContent = c.plan === 'Prueba' ? `${nombre}, tu prueba gratis terminó` : `${nombre}, tu plan no está activo`; if (c.plan === 'Prueba') $('blockedText').textContent = 'Tu prueba de 3 días terminó. Para seguir publicando elige un plan y te activamos de nuevo; no necesitas crear otra cuenta y tus lotes anteriores siguen guardados.'; show('viewBlocked'); $('who').hidden = false; return; }
     $('bandTitle').textContent = `Hola, ${nombre}. ¿Qué publicamos hoy?`;
     $('connState').textContent = 'conectado';
     await cargar();
