@@ -445,7 +445,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-25 22:11</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-25 22:17</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -490,6 +490,8 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
       S.user = data.session.user; show('viewActivar'); return;
     }
     if (/error_code=/.test(h)) { history.replaceState(null, '', location.pathname + location.search); show('viewLogin'); banner('El enlace ya no sirve (vence o ya fue usado). Toca "Olvidé mi contraseña" para pedir otro.', 'bad'); return; }
+    // Vista de muestra (sin sesión): publikpanama.com/?vista=prueba-terminada&n=Mariana muestra la pantalla de prueba terminada con un nombre de ejemplo.
+    { const q = new URLSearchParams(location.search); if (q.get('vista') === 'prueba-terminada') { pantallaPruebaTerminada({ nombre: q.get('n') || 'Mariana', codigo: 'DEMO' }); $('connState').textContent = 'vista de muestra'; return; } }
     const recup = /type=recovery/.test(h);
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { show('viewLogin'); $('connState').textContent = 'listo'; return; }
@@ -497,6 +499,15 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     S.user = session.user; await entrar();
   }
   sb.auth.onAuthStateChange((ev, session) => { if (ev === 'SIGNED_OUT') { S.user = null; S.cliente = null; if (S.canal) { sb.removeChannel(S.canal); S.canal = null; } $('bandTitle').textContent = 'Pega tu link. Nosotros publicamos.'; show('viewLogin'); } });
+
+  function pantallaPruebaTerminada(c) {
+    const nombre = c.nombre.split(' ')[0];
+    $('blockedTitle').textContent = `${nombre}, tu prueba gratis terminó`;
+    $('blockedText').textContent = 'Tu prueba de 3 días terminó. Si quieres seguir usando Publik, toca el plan que te interesa y te abrirá un WhatsApp con el mensaje listo para activar tu cuenta. No necesitas crear otra cuenta y tus lotes anteriores siguen guardados.';
+    const bp = $('blockedPlanes');
+    bp.innerHTML = [['Agente', 50, 10], ['Pro', 60, 15], ['Max', 70, 20]].map(([pl, pr, li]) => `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/50766276979?text=${encodeURIComponent(`Hola, soy ${c.nombre} (${c.codigo}). Mi prueba de Publik terminó y quiero activar mi cuenta con el plan ${pl} ($${pr}/mes, ${li} avisos por día).`)}">${pl} · $${pr}/mes · ${li} avisos por día</a>`).join('');
+    bp.hidden = false; show('viewBlocked');
+  }
 
   async function entrar() {
     show('viewLoading');
@@ -508,7 +519,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     $('whoAvatar').textContent = iniciales(c.nombre); $('whoName').textContent = c.nombre; const venceTxt = c.prueba_hasta ? new Date(c.prueba_hasta).toLocaleString('es-PA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''; $('whoPlan').textContent = `Plan ${c.plan}${c.limite_dia ? ' · ' + c.limite_dia + ' por día' : ''}${c.plan === 'Prueba' && venceTxt ? ' · termina ' + venceTxt : ''}`;
     $('btnAdmin').hidden = !c.es_admin; $('ver').hidden = !c.es_admin;
     const pruebaVencida = c.plan === 'Prueba' && c.prueba_hasta && new Date(c.prueba_hasta) <= new Date();
-    if (!c.activo || pruebaVencida) { $('blockedTitle').textContent = c.plan === 'Prueba' ? `${nombre}, tu prueba gratis terminó` : `${nombre}, tu plan no está activo`; if (c.plan === 'Prueba') { $('blockedText').textContent = 'Tu prueba de 3 días terminó. Si quieres seguir usando Publik, toca el plan que te interesa y te abrirá un WhatsApp con el mensaje listo para activar tu cuenta. No necesitas crear otra cuenta y tus lotes anteriores siguen guardados.'; const bp = $('blockedPlanes'); bp.innerHTML = [['Agente', 50, 10], ['Pro', 60, 15], ['Max', 70, 20]].map(([pl, pr, li]) => `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/50766276979?text=${encodeURIComponent(`Hola, soy ${c.nombre} (${c.codigo}). Mi prueba de Publik terminó y quiero activar mi cuenta con el plan ${pl} ($${pr}/mes, ${li} avisos por día).`)}">${pl} · $${pr}/mes · ${li} avisos por día</a>`).join(''); bp.hidden = false; } show('viewBlocked'); $('who').hidden = false; return; }
+    if (!c.activo || pruebaVencida) { if (c.plan === 'Prueba') pantallaPruebaTerminada(c); else { $('blockedTitle').textContent = `${nombre}, tu plan no está activo`; show('viewBlocked'); } $('who').hidden = false; return; }
     $('bandTitle').textContent = `Hola, ${nombre}. ¿Qué publicamos hoy?`;
     $('connState').textContent = 'conectado';
     await cargar();
