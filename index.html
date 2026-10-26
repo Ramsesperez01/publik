@@ -139,6 +139,14 @@ form{display:grid;gap:20px}
 .pill:has(input:checked){border-color:var(--red);background:var(--red-tint);color:var(--fg)}
 .pill:has(input:checked)::before{background:var(--red);border-color:var(--red)}
 .pill:has(input:focus-visible){outline:3px solid var(--red-soft);outline-offset:2px}
+.pill.sel{border-color:var(--red);background:var(--red-tint);color:var(--fg)}
+.pill.sel::before{background:var(--red);border-color:var(--red)}
+.planpicks{display:grid;gap:10px;justify-items:center;width:100%;margin-top:4px}
+.pill.plan{width:100%;max-width:400px;padding:15px 18px;font-size:15px;text-decoration:none;font-family:var(--display)}
+#viewBlocked .card{text-align:center;justify-items:center}
+#viewBlocked .brand{justify-content:center;margin-bottom:4px}
+#viewBlocked .brand svg{width:46px;height:46px}
+#viewBlocked .brand .name{font-size:34px}
 .seg{position:relative;display:grid;grid-template-columns:1fr 1fr;background:var(--panel-2);border-radius:999px;padding:4px}
 .seg .thumb{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:999px;background:var(--panel);box-shadow:var(--shadow-s);transition:transform 220ms var(--ease-out)}
 .seg[data-i="1"] .thumb{transform:translateX(100%)}
@@ -308,10 +316,10 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   <!-- PLAN VENCIDO -->
   <section id="viewBlocked" class="lift" hidden>
     <div class="card narrow" style="display:grid;gap:12px">
-      <span class="eyebrow">Acceso</span>
+      <div class="brand"><svg viewBox="0 0 72 72" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 40 36 16l24 24"/><path d="M36 16v42"/><path d="M18 46v14h36V46"/></g></svg><span class="name">publi<b>k</b></span></div>
       <h2 id="blockedTitle">Tu plan no está activo</h2>
       <p class="muted" id="blockedText">No puedes mandar links a publicar. Cuando renueves el plan, el acceso vuelve solo y tus lotes anteriores siguen guardados.</p>
-      <div id="blockedPlanes" hidden style="display:grid;gap:8px"></div>
+      <div id="blockedPlanes" class="planpicks" hidden></div>
       <div><button class="btn" id="blockedOut" type="button">Salir</button></div>
     </div>
   </section>
@@ -445,7 +453,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-25 22:17</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-25 22:20</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -474,7 +482,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   const activo = (t) => ['En cola', 'En proceso', 'Programado'].includes(t.estado);
   const sitio = () => location.origin + location.pathname;
   const VIEWS = ['viewLoading', 'viewLogin', 'viewActivar', 'viewBlocked', 'viewApp', 'viewAdmin'];
-  function show(v) { VIEWS.forEach((id) => { $(id).hidden = id !== v; }); $('who').hidden = !S.user || v === 'viewActivar'; const dentro = v === 'viewApp' || v === 'viewAdmin'; $('steps').hidden = dentro; $('bandLead').hidden = dentro; }
+  function show(v) { VIEWS.forEach((id) => { $(id).hidden = id !== v; }); document.querySelector('.band').hidden = v === 'viewBlocked'; $('who').hidden = !S.user || v === 'viewActivar'; const dentro = v === 'viewApp' || v === 'viewAdmin'; $('steps').hidden = dentro; $('bandLead').hidden = dentro; }
   function banner(text, kind) { const b = $('banner'); if (!text) { b.hidden = true; return; } b.textContent = text; b.className = 'notice ' + (kind || 'warn'); b.hidden = false; }
   const errMsg = (e) => { const m = (e && (e.message || e.error_description || e.error)) || ''; if (/invalid login|invalid credentials/i.test(m)) return 'Correo o contraseña incorrectos.'; if (/rate limit/i.test(m)) return 'Demasiados intentos. Espera un minuto.'; if (/network|fetch/i.test(m)) return 'Sin conexión. Intenta otra vez.'; return m || 'Algo salió mal. Intenta otra vez.'; };
 
@@ -505,7 +513,8 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     $('blockedTitle').textContent = `${nombre}, tu prueba gratis terminó`;
     $('blockedText').textContent = 'Tu prueba de 3 días terminó. Si quieres seguir usando Publik, toca el plan que te interesa y te abrirá un WhatsApp con el mensaje listo para activar tu cuenta. No necesitas crear otra cuenta y tus lotes anteriores siguen guardados.';
     const bp = $('blockedPlanes');
-    bp.innerHTML = [['Agente', 50, 10], ['Pro', 60, 15], ['Max', 70, 20]].map(([pl, pr, li]) => `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/50766276979?text=${encodeURIComponent(`Hola, soy ${c.nombre} (${c.codigo}). Mi prueba de Publik terminó y quiero activar mi cuenta con el plan ${pl} ($${pr}/mes, ${li} avisos por día).`)}">${pl} · $${pr}/mes · ${li} avisos por día</a>`).join('');
+    bp.innerHTML = [['Agente', 50, 10], ['Pro', 60, 15], ['Max', 70, 20]].map(([pl, pr, li]) => `<a class="pill plan" target="_blank" rel="noopener" href="https://wa.me/50766276979?text=${encodeURIComponent(`Hola, soy ${c.nombre} (${c.codigo}). Mi prueba de Publik terminó y quiero activar mi cuenta con el plan ${pl} ($${pr}/mes, ${li} avisos por día).`)}">${pl} · $${pr}/mes · ${li} avisos por día</a>`).join('');
+    bp.onclick = (e) => { const a = e.target.closest('a'); if (a) bp.querySelectorAll('a').forEach((x) => x.classList.toggle('sel', x === a)); };
     bp.hidden = false; show('viewBlocked');
   }
 
