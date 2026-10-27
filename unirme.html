@@ -56,16 +56,7 @@ footer{text-align:center;color:var(--fg-3);font-size:13px;padding:10px 16px 30px
     <div class="field"><label for="oficina">Oficina o inmobiliaria</label><input id="oficina" autocomplete="organization" placeholder="Nombre de tu oficina" required></div>
   </div>
   <div class="sec">
-    <h2><span class="n">2</span>Tu plan</h2>
-    <div class="planes" id="planes">
-      <label class="plan"><input type="radio" name="plan" value="Agente"><b>Agente</b><span class="p">$50<small style="font-size:13px;color:var(--fg-3)">/mes</small></span><span class="d">10 avisos por día</span></label>
-      <label class="plan"><input type="radio" name="plan" value="Pro" checked><span class="tag">Más elegido</span><b>Pro</b><span class="p">$60<small style="font-size:13px;color:var(--fg-3)">/mes</small></span><span class="d">15 avisos por día</span></label>
-      <label class="plan"><input type="radio" name="plan" value="Max"><b>Max</b><span class="p">$70<small style="font-size:13px;color:var(--fg-3)">/mes</small></span><span class="d">20 avisos por día</span></label>
-    </div>
-    <p class="hint">Los 7 días, los dos portales, reporte por WhatsApp. Pagos por Yappy o ACH.</p>
-  </div>
-  <div class="sec">
-    <h2><span class="n">3</span>Tus cuentas en los portales</h2>
+    <h2><span class="n">2</span>Tus cuentas en los portales</h2>
     <p class="muted" style="font-size:15px">Publicamos desde tu cuenta, con tu nombre y tu contacto. Pon el correo y la contraseña del portal donde publicas, o de los dos si usas ambos. Se guardan cifradas y solo se usan para publicar.</p>
     <div class="row">
       <div class="field" style="gap:10px"><h3>Encuentra24</h3>
@@ -122,7 +113,7 @@ footer{text-align:center;color:var(--fg-3);font-size:13px;padding:10px 16px 30px
     if (malos.length) { err.textContent = (!e24v && !coav) ? 'Pon el correo y la contraseña de al menos un portal (Encuentra24 o Compre o Alquile).' : malos.includes('celular2') && t1 && t2 !== t1 ? 'Los dos celulares no coinciden.' : malos.includes('celular') || malos.includes('celular2') ? 'Revisa el celular: son 8 dígitos, por ejemplo 6000-0000.' : 'Revisa los campos marcados.'; $(malos[0]).focus(); return; }
     if (!codigo) { err.textContent = 'Este link no trae el código de registro. Pídele a Ramsés el link completo.'; return; }
     btn.disabled = true; btn.textContent = 'Enviando…';
-    const cuerpo = { codigo, miel: $('miel').value, nombre: v('nombre'), celular: '+507 ' + t1.slice(0, 4) + ' ' + t1.slice(4), correo: v('correo'), codigo_agente: v('codigo'), oficina: v('oficina'), plan: document.querySelector('input[name=plan]:checked').value, notas: v('notas'),
+    const cuerpo = { codigo, miel: $('miel').value, nombre: v('nombre'), celular: '+507 ' + t1.slice(0, 4) + ' ' + t1.slice(4), correo: v('correo'), codigo_agente: v('codigo'), oficina: v('oficina'), plan: 'Prueba', notas: v('notas'),
       e24: e24v ? { correo: v('e24correo'), clave: $('e24clave').value } : null,
       coa: coav ? { correo: v('coacorreo'), clave: $('coaclave').value } : null };
     try {
