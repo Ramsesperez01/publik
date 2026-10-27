@@ -77,7 +77,7 @@ footer{text-align:center;color:var(--fg-3);font-size:13px;padding:10px 16px 30px
 <div class="card done" id="done" hidden>
   <div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg></div>
   <h2>¡Recibido!</h2>
-  <p class="muted">Ya tenemos tus datos, <b id="doneNombre"></b>. En cuanto Ramsés active tu cuenta te llega por WhatsApp el enlace para crear tu contraseña y empezar a publicar.</p>
+  <p class="muted">Ya tenemos tus datos, <b id="doneNombre"></b>. Te escribimos por WhatsApp con el enlace para crear tu contraseña y empezar a publicar.</p>
   <p class="hint">Después entras siempre por <a href="https://publikpanama.com">publikpanama.com</a>.</p>
 </div>
 </div></main>
@@ -110,7 +110,7 @@ footer{text-align:center;color:var(--fg-3);font-size:13px;padding:10px 16px 30px
     if (!e24v && !coav) { malos.push('e24correo'); malos.push('coacorreo'); }
     marcar(malos);
     if (malos.length) { err.textContent = (!e24v && !coav) ? 'Pon el correo y la contraseña de al menos un portal (Encuentra24 o Compre o Alquile).' : malos.includes('celular2') && t1 && t2 !== t1 ? 'Los dos celulares no coinciden.' : malos.includes('celular') || malos.includes('celular2') ? 'Revisa el celular: son 8 dígitos, por ejemplo 6000-0000.' : 'Revisa los campos marcados.'; $(malos[0]).focus(); return; }
-    if (!codigo) { err.textContent = 'Este link no trae el código de registro. Pídele a Ramsés el link completo.'; return; }
+    if (!codigo) { err.textContent = 'Este link no trae el código de registro. Escríbenos por WhatsApp al +507 6032 0506 para pedir el link completo.'; return; }
     btn.disabled = true; btn.textContent = 'Enviando…';
     const cuerpo = { codigo, miel: $('miel').value, nombre: v('nombre'), celular: '+507 ' + t1.slice(0, 4) + ' ' + t1.slice(4), correo: v('correo'), codigo_agente: v('codigo'), oficina: v('oficina'), plan: 'Prueba', notas: v('notas'),
       e24: e24v ? { correo: v('e24correo'), clave: $('e24clave').value } : null,
