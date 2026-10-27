@@ -24,7 +24,7 @@ h1{font-size:clamp(30px,5vw,46px);font-weight:800;letter-spacing:-.03em}h2{font-
 .band .inner{position:relative;padding-block:36px 64px;display:grid;gap:12px}.band .lead{font-size:clamp(16px,2vw,18px);color:var(--band-fg-2);max-width:52ch}
 main{padding-block:0 60px}.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:26px;box-shadow:var(--shadow);margin-top:-34px;position:relative}
 .sec{display:grid;gap:14px;padding-block:18px;border-top:1px solid var(--line)}.sec:first-of-type{border-top:0;padding-top:0}.sec h2{display:flex;align-items:center;gap:10px}.sec h2 .n{width:28px;height:28px;border-radius:50%;background:var(--red);color:var(--red-ink);font-size:14px;display:grid;place-items:center;flex:none}
-.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 20px;align-items:start}.row+.row,.row+.field,.field+.row{margin-top:8px}@media(max-width:620px){.row{grid-template-columns:1fr}}
+.req{color:var(--red);font-weight:800}.msgbad{color:var(--bad)!important;font-weight:600}.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 20px;align-items:start}.row+.row,.row+.field,.field+.row{margin-top:8px}@media(max-width:620px){.row{grid-template-columns:1fr}}
 .field{display:grid;gap:7px;min-width:0}.field label{font-weight:700;font-size:15px;font-family:var(--display)}.field input:not([type=checkbox]):not([type=radio]),.field textarea,.field select{width:100%;font:inherit;font-size:16px;padding:14px 16px;border-radius:var(--r-s);border:2px solid var(--line-2);background:var(--bg);color:var(--fg);transition:border-color 150ms,box-shadow 150ms}.field>*{min-width:0;max-width:100%}
 .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--red);box-shadow:0 0 0 4px var(--red-soft);outline:none}.field textarea{min-height:70px;resize:vertical}.field input.bad{border-color:var(--bad)}
 .hint{font-size:13.5px;color:var(--fg-3)}.muted{color:var(--fg-2)}
@@ -44,26 +44,27 @@ footer{text-align:center;color:var(--fg-3);font-size:13px;padding:10px 16px 30px
 <form class="card" id="f" novalidate>
   <div class="sec">
     <h2><span class="n">1</span>Tus datos</h2>
+    <p class="hint" style="margin:-4px 0 12px"><span class="req">*</span> Campo obligatorio</p>
     <div class="row">
-      <div class="field"><label for="nombre">Nombre y apellido</label><input id="nombre" autocomplete="name" required></div>
-      <div class="field"><label for="correo">Correo</label><input id="correo" type="email" inputmode="email" autocomplete="email" required><span class="hint">Con este correo entras a Publik.</span></div>
+      <div class="field"><label for="nombre">Nombre y apellido <span class="req" aria-hidden="true">*</span></label><input id="nombre" autocomplete="name" required></div>
+      <div class="field"><label for="correo">Correo <span class="req" aria-hidden="true">*</span></label><input id="correo" type="email" inputmode="email" autocomplete="email" required><span class="hint">Con este correo entras a Publik.</span></div>
     </div>
     <div class="row">
-      <div class="field"><label for="celular">Celular (WhatsApp)</label><input id="celular" type="tel" inputmode="tel" autocomplete="tel" placeholder="6000-0000" required><span class="hint">Es el número que verán los interesados en tus avisos.</span></div>
-      <div class="field"><label for="celular2">Confirma tu celular</label><input id="celular2" type="tel" inputmode="tel" autocomplete="off" placeholder="6000-0000" required></div>
+      <div class="field"><label for="celular">Celular (WhatsApp) <span class="req" aria-hidden="true">*</span></label><input id="celular" type="tel" inputmode="tel" autocomplete="tel" placeholder="6000-0000" required><span class="hint">Es el número que verán los interesados en tus avisos.</span></div>
+      <div class="field"><label for="celular2">Confirma tu celular <span class="req" aria-hidden="true">*</span></label><input id="celular2" type="tel" inputmode="tel" autocomplete="off" placeholder="6000-0000" required></div>
     </div>
     <div class="row">
-      <div class="field"><label for="codigo">Iniciales <span class="muted" style="font-weight:400">(opcional)</span></label><input id="codigo" maxlength="8" autocapitalize="characters" placeholder="Mínimo 3 letras. Ej. ABC"><span class="hint">¿Compartes tu cuenta con más compañeros? Coloca tus iniciales para diferenciar tus publicaciones de las de los demás.</span></div>
-      <div class="field"><label for="oficina">Oficina o inmobiliaria</label><input id="oficina" autocomplete="organization" placeholder="Nombre de tu oficina" required></div>
+      <div class="field"><label for="codigo">Iniciales <span class="muted" style="font-weight:400">(opcional)</span></label><input id="codigo" maxlength="8" autocapitalize="characters" placeholder="Mínimo 3 letras. Ej. ABC"><span class="hint">¿Compartes tu cuenta con más compañeros? Coloca tus iniciales para diferenciar tus publicaciones de las de los demás.</span><span class="hint msgbad" id="codigoMsg" role="alert" hidden>Las iniciales deben tener al menos 3 letras. Escribe 3 o más, o deja el campo vacío.</span></div>
+      <div class="field"><label for="oficina">Oficina o inmobiliaria <span class="req" aria-hidden="true">*</span></label><input id="oficina" autocomplete="organization" placeholder="Nombre de tu oficina" required></div>
     </div>
     <div class="row">
-      <div class="field"><label for="clave1">Crea tu contraseña</label><input id="clave1" type="password" autocomplete="new-password" minlength="8" required><span class="hint">Mínimo 8 caracteres. Con ella entras a Publik.</span></div>
-      <div class="field"><label for="clave2">Repite tu contraseña</label><input id="clave2" type="password" autocomplete="new-password" required></div>
+      <div class="field"><label for="clave1">Crea tu contraseña <span class="req" aria-hidden="true">*</span></label><input id="clave1" type="password" autocomplete="new-password" minlength="8" required><span class="hint">Mínimo 8 caracteres. Con ella entras a Publik.</span></div>
+      <div class="field"><label for="clave2">Repite tu contraseña <span class="req" aria-hidden="true">*</span></label><input id="clave2" type="password" autocomplete="new-password" required></div>
     </div>
   </div>
   <div class="sec">
-    <h2><span class="n">2</span>Tus cuentas en los portales</h2>
-    <p class="muted" style="font-size:15px">Publicamos desde tu cuenta, con tu nombre y tu contacto. Pon el correo y la contraseña del portal donde publicas, o de los dos si usas ambos. Se guardan cifradas y solo se usan para publicar.</p>
+    <h2><span class="n">2</span>Tus cuentas en los portales <span class="req" aria-hidden="true">*</span></h2>
+    <p class="muted" style="font-size:15px">Publicamos desde tu cuenta, con tu nombre y tu contacto. Pon el correo y la contraseña del portal donde publicas, o de los dos si usas ambos. Se guardan cifradas y solo se usan para publicar. <b>Completa al menos un portal</b> (correo y contraseña).</p>
     <div class="row">
       <div class="field" style="gap:10px"><h3>Encuentra24</h3>
         <input id="e24correo" type="email" inputmode="email" autocomplete="off" placeholder="Correo de Encuentra24"><input id="e24clave" type="password" autocomplete="off" placeholder="Contraseña de Encuentra24">
@@ -100,7 +101,9 @@ footer{text-align:center;color:var(--fg-3);font-size:13px;padding:10px 16px 30px
   const FN = 'https://vjivvprjtydmkxsrwygf.supabase.co/functions/v1/solicitud';
   const KEY = 'sb_publishable_iPGhThzxWVApDJomhbcL8w_PFMrvwqx';
   const codigo = new URLSearchParams(location.search).get('c') || '';
-  $('codigo').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8); });
+  const avisoIniciales = () => { const n = $('codigo').value.length; const mal = n > 0 && n < 3; $('codigoMsg').hidden = !mal; $('codigo').classList.toggle('bad', mal); return mal; };
+  $('codigo').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8); avisoIniciales(); });
+  $('codigo').addEventListener('blur', avisoIniciales);
   const v = id => $(id).value.trim();
   const marcar = (ids) => { document.querySelectorAll('.bad').forEach(e => e.classList.remove('bad')); ids.forEach(id => $(id).classList.add('bad')); };
   $('f').addEventListener('submit', async (ev) => {
@@ -121,7 +124,7 @@ footer{text-align:center;color:var(--fg-3);font-size:13px;padding:10px 16px 30px
     if (e24v) { if (!mail('e24correo')) malos.push('e24correo'); if ($('e24clave').value.length < 4) malos.push('e24clave'); }
     if (coav) { if (!mail('coacorreo')) malos.push('coacorreo'); if ($('coaclave').value.length < 4) malos.push('coaclave'); }
     if (!e24v && !coav) { malos.push('e24correo'); malos.push('coacorreo'); }
-    marcar(malos);
+    marcar(malos); avisoIniciales();
     if (malos.length) { err.textContent = (!e24v && !coav) ? 'Pon el correo y la contraseña de al menos un portal (Encuentra24 o Compre o Alquile).' : malos.includes('celular2') && t1 && t2 !== t1 ? 'Los dos celulares no coinciden.' : malos.includes('celular') || malos.includes('celular2') ? 'Revisa el celular: son 8 dígitos, por ejemplo 6000-0000.' : malos.includes('codigo') ? 'Las iniciales deben tener al menos 3 letras (o déjalas vacías).' : malos.includes('clave1') ? 'La contraseña necesita al menos 8 caracteres.' : malos.includes('clave2') ? 'Las dos contraseñas no coinciden.' : 'Revisa los campos marcados.'; $(malos[0]).focus(); return; }
     if (!codigo) { err.textContent = 'Este link no trae el código de registro. Escríbenos por WhatsApp al +507 6032 0506 para pedir el link completo.'; return; }
     btn.disabled = true; btn.textContent = 'Enviando…';
