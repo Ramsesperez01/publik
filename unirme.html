@@ -53,7 +53,7 @@ footer{text-align:center;color:var(--fg-3);font-size:13px;padding:10px 16px 30px
       <div class="field"><label for="celular2">Confirma tu celular</label><input id="celular2" type="tel" inputmode="tel" autocomplete="off" placeholder="6000-0000" required></div>
     </div>
     <div class="row">
-      <div class="field"><label for="codigo">Tu código de agente</label><input id="codigo" maxlength="8" autocapitalize="characters" placeholder="Ej. AECC" required><span class="hint">Tus iniciales. Va en el título de cada aviso.</span></div>
+      <div class="field"><label for="codigo">Iniciales <span class="muted" style="font-weight:400">(opcional)</span></label><input id="codigo" maxlength="8" autocapitalize="characters" placeholder="Ej. LB"><span class="hint">Si utilizas tus iniciales para publicar en el nombre de la propiedad, colócalas aquí.</span></div>
       <div class="field"><label for="oficina">Oficina o inmobiliaria</label><input id="oficina" autocomplete="organization" placeholder="Nombre de tu oficina" required></div>
     </div>
     <div class="row">
@@ -107,7 +107,7 @@ footer{text-align:center;color:var(--fg-3);font-size:13px;padding:10px 16px 30px
     const t1 = tel(v('celular')), t2 = tel(v('celular2'));
     if (!t1) malos.push('celular'); if (!t2 || t1 !== t2) malos.push('celular2');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('correo'))) malos.push('correo');
-    if (!/^[A-Z0-9]{2,8}$/.test(v('codigo'))) malos.push('codigo');
+    if (v('codigo') && !/^[A-Z0-9]{2,8}$/.test(v('codigo'))) malos.push('codigo');
     const c1 = $('clave1').value, c2 = $('clave2').value; if (c1.length < 8) malos.push('clave1'); if (c2 !== c1) malos.push('clave2');
     if (v('oficina').length < 2) malos.push('oficina');
     // Ramsés 2026-10-24: no hay que registrarse en los dos portales (muchos agentes usan uno solo): cada portal es opcional, pero cada uno que se llene va completo y al menos uno es obligatorio.
