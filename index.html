@@ -454,7 +454,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-26 21:24</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-26 21:33</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -526,7 +526,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     if (!c) { show('viewLogin'); banner('Tu usuario existe pero no tiene ficha de cliente. Escríbenos por WhatsApp al +507 6032 0506.', 'bad'); await sb.auth.signOut(); return; }
     S.cliente = c;
     const nombre = c.nombre.split(' ')[0];
-    $('whoAvatar').textContent = iniciales(c.nombre); $('whoName').textContent = c.nombre; const venceTxt = c.prueba_hasta ? new Date(c.prueba_hasta).toLocaleString('es-PA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''; $('whoPlan').textContent = `Plan ${c.plan}${c.limite_dia ? ' · ' + c.limite_dia + ' por día' : ''}${c.plan === 'Prueba' && venceTxt ? ' · termina ' + venceTxt : ''}`;
+    $('whoAvatar').textContent = iniciales(c.nombre); $('whoName').textContent = c.nombre; const venceTxt = c.prueba_hasta ? new Date(c.prueba_hasta).toLocaleString('es-PA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''; $('whoPlan').textContent = `Plan ${c.plan}${c.limite_dia ? ' · ' + c.limite_dia + ' por día' : ''}${c.plan === 'Prueba' ? (venceTxt ? ' · termina ' + venceTxt : ' · tus 3 días empiezan con tu primera publicación') : ''}`;
     $('btnAdmin').hidden = !c.es_admin; $('ver').hidden = !c.es_admin;
     const pruebaVencida = c.plan === 'Prueba' && c.prueba_hasta && new Date(c.prueba_hasta) <= new Date();
     if (!c.activo || pruebaVencida) { if (c.plan === 'Prueba') pantallaPruebaTerminada(c); else { $('blockedTitle').textContent = `${nombre}, tu plan no está activo`; show('viewBlocked'); } $('who').hidden = false; return; }
