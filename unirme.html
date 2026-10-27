@@ -82,9 +82,14 @@ footer{text-align:center;color:var(--fg-3);font-size:13px;padding:10px 16px 30px
 </form>
 <div class="card done" id="done" hidden>
   <div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 7"/></svg></div>
-  <h2>¡Listo!</h2>
-  <p class="muted">Tu cuenta está activa, <b id="doneNombre"></b>. Entrando a Publik para que pegues tu primer link…</p>
-  <p class="hint">Si no entras solo, ve a <a href="https://publikpanama.com">publikpanama.com</a> y entra con tu correo y la contraseña que acabas de crear.</p>
+  <h2>¡Listo, <b id="doneNombre"></b>! Vas a empezar tu prueba gratis</h2>
+  <ul style="text-align:left;max-width:420px;margin:14px auto 6px;padding-left:20px;line-height:1.7">
+    <li>Puedes publicar hasta <b>10 propiedades por día</b>.</li>
+    <li>Tu prueba dura <b>3 días</b> y empieza a contar desde tu <b>primera publicación</b>.</li>
+    <li>Al terminar, te mostramos los planes para que sigas.</li>
+  </ul>
+  <p style="margin:18px 0 6px"><a class="btn" id="doneIr" href="https://publikpanama.com/" style="display:inline-block;text-align:center;text-decoration:none">Entrar a Publik y publicar</a></p>
+  <p class="hint">Entras siempre por <a href="https://publikpanama.com">publikpanama.com</a> con tu correo y la contraseña que acabas de crear.</p>
 </div>
 </div></main>
 <footer>Publik · publikpanama.com</footer>
@@ -129,7 +134,7 @@ footer{text-align:center;color:var(--fg-3);font-size:13px;padding:10px 16px 30px
       if (!r.ok || j.error) throw new Error(j.error || ('Error ' + r.status));
       $('doneNombre').textContent = v('nombre').split(' ')[0];
       $('f').hidden = true; $('done').hidden = false; window.scrollTo({ top: 0, behavior: 'smooth' });
-      try { const sb = window.supabase.createClient('https://vjivvprjtydmkxsrwygf.supabase.co', KEY); const { error: eIn } = await sb.auth.signInWithPassword({ email: v('correo').toLowerCase(), password: $('clave1').value }); if (!eIn) setTimeout(() => { location.href = 'https://publikpanama.com/'; }, 1200); } catch (e2) {}
+      try { const sb = window.supabase.createClient('https://vjivvprjtydmkxsrwygf.supabase.co', KEY); const { error: eIn } = await sb.auth.signInWithPassword({ email: v('correo').toLowerCase(), password: $('clave1').value }); /* sesión iniciada; el botón de arriba entra a Publik */ void eIn; } catch (e2) {}
       if (j.aviso) $('done').querySelector('.hint').textContent = j.aviso;
     } catch (e) {
       err.textContent = e.message || 'No se pudo enviar. Intenta de nuevo.';
