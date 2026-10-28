@@ -336,6 +336,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
             <div class="linkrow"><input class="big" type="url" id="share" placeholder="https://www.flexmls.com/share/XXXXX/Selected" autocomplete="off" inputmode="url" spellcheck="false"><div class="pills"><label class="pill"><input type="checkbox" data-p="e24" autocomplete="off">Encuentra24</label><label class="pill"><input type="checkbox" data-p="coa" autocomplete="off">Compre o Alquile</label></div></div>
           </div>
           <span class="hint">Se publica todo lo que traiga cada share, tal como está en Flex.</span>
+          <span class="hint" id="e24Pausa" hidden>Encuentra24 no está disponible por ahora: publicamos solo en Compre o Alquile.</span>
           <button class="addlink" id="addLink" type="button">+ Otro link</button>
           <span class="err" id="errShare" hidden></span>
         </div>
@@ -454,7 +455,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-26 22:05</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-27 22:11</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -615,7 +616,8 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   const linkRows = () => [...$('links').querySelectorAll('.linkrow')];
   const linkInputs = () => linkRows().map((r) => r.querySelector('input[type=url]'));
   // Ramsés 2026-10-24: un agente puede usar un solo portal; el que no registró no se ofrece ni se envía (se sabe por el correo de portal registrado en su fila).
-  const portalOk = (p) => !S.cliente || S.cliente.es_admin || !!(p === 'e24' ? S.cliente.e24_correo : S.cliente.coa_correo);
+  const E24_PAUSA = true;  // 2026-10-27 21:5x, Ramsés: "dejemos solo Compre o Alquile habilitado por ahora, hasta resolver lo de Encuentra24" (bloqueo de IP por Cloudflare). Volver a false cuando él lo diga.
+  const portalOk = (p) => !(p === 'e24' && E24_PAUSA) && (!S.cliente || S.cliente.es_admin || !!(p === 'e24' ? S.cliente.e24_correo : S.cliente.coa_correo));
   const portalesDe = (row) => [...row.querySelectorAll('input[data-p]')].filter((c) => c.checked && portalOk(c.dataset.p)).map((c) => c.dataset.p);
   const PILLS = '<div class="pills"><label class="pill"><input type="checkbox" data-p="e24" autocomplete="off">Encuentra24</label><label class="pill"><input type="checkbox" data-p="coa" autocomplete="off">Compre o Alquile</label></div>';
   function agregarLink(focus = true) {
@@ -705,7 +707,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const box = $('jobs'); box.innerHTML = '';
     $('jobsEmpty').hidden = mios.length > 0;
     $('jobsCount').textContent = mios.length ? plural(mios.length, 'link', 'links') : '';
-    rellenarCuentas(); document.body.classList.toggle('sin-e24', !portalOk('e24')); document.body.classList.toggle('sin-coa', !portalOk('coa'));
+    rellenarCuentas(); document.body.classList.toggle('sin-e24', !portalOk('e24')); document.body.classList.toggle('sin-coa', !portalOk('coa')); $('e24Pausa').hidden = !E24_PAUSA;
     renderDash();
     mios.forEach((t, i) => {
       const d = document.createElement('details'); d.className = 'job'; d.dataset.k = estadoKind(t.estado); if (i === 0) d.open = true;
