@@ -329,6 +329,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   <section id="viewApp" hidden style="display:grid;gap:28px">
     <section class="card lift">
       <div class="card-head"><div style="display:grid;gap:6px"><h2 id="greetTitle">Nuevo lote</h2><p class="muted" id="greetText"></p></div><span class="chip" id="hoyChip"></span></div>
+      <p class="muted" id="pausaAviso" hidden>Publicaciones en pausa por mantenimiento. Retomamos pronto; tus lotes anteriores siguen en Mis links.</p>
       <form id="form" novalidate>
         <div class="field">
           <label for="share">Link de Flex</label>
@@ -455,7 +456,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-27 22:11</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-27 22:53</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -616,6 +617,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   const linkRows = () => [...$('links').querySelectorAll('.linkrow')];
   const linkInputs = () => linkRows().map((r) => r.querySelector('input[type=url]'));
   // Ramsés 2026-10-24: un agente puede usar un solo portal; el que no registró no se ofrece ni se envía (se sabe por el correo de portal registrado en su fila).
+  const PUBLICACIONES_PAUSA = true;  // 2026-10-27 22:4x, Ramsés: "cuando publiques todo de Compre o Alquile, suspende las publicaciones por el momento hasta comprobar que todo esté bien". Oculta el formulario de Nuevo lote para todos (admin incluido) y muestra el aviso. Volver a false cuando él lo diga.
   const E24_PAUSA = true;  // 2026-10-27 21:5x, Ramsés: "dejemos solo Compre o Alquile habilitado por ahora, hasta resolver lo de Encuentra24" (bloqueo de IP por Cloudflare). Volver a false cuando él lo diga.
   const portalOk = (p) => !(p === 'e24' && E24_PAUSA) && (!S.cliente || S.cliente.es_admin || !!(p === 'e24' ? S.cliente.e24_correo : S.cliente.coa_correo));
   const portalesDe = (row) => [...row.querySelectorAll('input[data-p]')].filter((c) => c.checked && portalOk(c.dataset.p)).map((c) => c.dataset.p);
@@ -707,7 +709,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
     const box = $('jobs'); box.innerHTML = '';
     $('jobsEmpty').hidden = mios.length > 0;
     $('jobsCount').textContent = mios.length ? plural(mios.length, 'link', 'links') : '';
-    rellenarCuentas(); document.body.classList.toggle('sin-e24', !portalOk('e24')); document.body.classList.toggle('sin-coa', !portalOk('coa')); $('e24Pausa').hidden = !E24_PAUSA;
+    rellenarCuentas(); document.body.classList.toggle('sin-e24', !portalOk('e24')); document.body.classList.toggle('sin-coa', !portalOk('coa')); $('e24Pausa').hidden = !E24_PAUSA; $('pausaAviso').hidden = !PUBLICACIONES_PAUSA; $('form').hidden = PUBLICACIONES_PAUSA;
     renderDash();
     mios.forEach((t, i) => {
       const d = document.createElement('details'); d.className = 'job'; d.dataset.k = estadoKind(t.estado); if (i === 0) d.open = true;
