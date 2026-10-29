@@ -337,7 +337,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
             <div class="linkrow"><input class="big" type="url" id="share" placeholder="https://www.flexmls.com/share/XXXXX/Selected" autocomplete="off" inputmode="url" spellcheck="false"><div class="pills"><label class="pill"><input type="checkbox" data-p="e24" autocomplete="off">Encuentra24</label><label class="pill"><input type="checkbox" data-p="coa" autocomplete="off">Compre o Alquile</label></div></div>
           </div>
           <span class="hint">Se publica todo lo que traiga cada share, tal como está en Flex.</span>
-          <span class="hint" id="e24Pausa" hidden>Encuentra24 no está disponible por ahora: publicamos solo en Compre o Alquile.</span>
+          <span class="hint" id="e24Pausa" hidden>Publik publica en Compre o Alquile. Encuentra24 ya no está disponible en Publik.</span>
           <button class="addlink" id="addLink" type="button">+ Otro link</button>
           <span class="err" id="errShare" hidden></span>
         </div>
@@ -456,7 +456,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   </div>
 
   <footer>
-    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-28 08:22</span></span>
+    <span>Publik <span class="mono" id="ver" hidden style="opacity:.6">v2026-10-29 10:48</span></span>
     <span id="connState" class="mono" hidden>conectando…</span>
   </footer>
 </main>
@@ -618,7 +618,7 @@ footer{font-size:13px;color:var(--fg-3);display:flex;justify-content:space-betwe
   const linkInputs = () => linkRows().map((r) => r.querySelector('input[type=url]'));
   // Ramsés 2026-10-24: un agente puede usar un solo portal; el que no registró no se ofrece ni se envía (se sabe por el correo de portal registrado en su fila).
   const PUBLICACIONES_PAUSA = false;  // 2026-10-28 08:4x Ramsés: "habilitemos ambos portales en Publik" (reapertura tras el proceso de 2 cargas). Historial: true desde 2026-10-27 22:4x, Ramsés: "cuando publiques todo de Compre o Alquile, suspende las publicaciones por el momento hasta comprobar que todo esté bien". Oculta el formulario de Nuevo lote para todos (admin incluido) y muestra el aviso. Volver a false cuando él lo diga.
-  const E24_PAUSA = false;  // 2026-10-28 08:4x Ramsés: ambos portales habilitados. Historial: true desde 2026-10-27 21:5x, Ramsés: "dejemos solo Compre o Alquile habilitado por ahora, hasta resolver lo de Encuentra24" (bloqueo de IP por Cloudflare). Volver a false cuando él lo diga.
+  const E24_PAUSA = true;  // 2026-10-29 10:4x Ramsés: "Ya dejemos encuentra 24" + "Sí por favor" a sacarlo de Publik del todo: Publik publica solo en Compre o Alquile. Historial: false 2026-10-28 08:4x (ambos portales habilitados); Historial: true desde 2026-10-27 21:5x, Ramsés: "dejemos solo Compre o Alquile habilitado por ahora, hasta resolver lo de Encuentra24" (bloqueo de IP por Cloudflare). Volver a false cuando él lo diga.
   const portalOk = (p) => !(p === 'e24' && E24_PAUSA) && (!S.cliente || S.cliente.es_admin || !!(p === 'e24' ? S.cliente.e24_correo : S.cliente.coa_correo));
   const portalesDe = (row) => [...row.querySelectorAll('input[data-p]')].filter((c) => c.checked && portalOk(c.dataset.p)).map((c) => c.dataset.p);
   const PILLS = '<div class="pills"><label class="pill"><input type="checkbox" data-p="e24" autocomplete="off">Encuentra24</label><label class="pill"><input type="checkbox" data-p="coa" autocomplete="off">Compre o Alquile</label></div>';
